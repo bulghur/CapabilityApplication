@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8"/>
+	<title>Philip Crosby Associates - Operate Processes</title>
+	
+	<link rel="stylesheet" href="/stylesheets/layout.css" type="text/css" media="screen" />
+	<!--[if lt IE 9]>
+	<link rel="images" href="/images/" type="" media="screen" />
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<script src="js/jquery-1.5.2.min.js" type="text/javascript"></script>
+	<script src="js/hideshow.js" type="text/javascript"></script>
+	<script src="js/jquery.tablesorter.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="js/jquery.equalHeight.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function() 
+    	{ 
+      	  $(".tablesorter").tablesorter(); 
+   	 } 
+	);
+	$(document).ready(function() {
+
+	//When page loads...
+	$(".tab_content").hide(); //Hide all content
+	$("ul.tabs li:first").addClass("active").show(); //Activate first tab
+	$(".tab_content:first").show(); //Show first tab content
+
+	//On Click Event
+	$("ul.tabs li").click(function() {
+
+		$("ul.tabs li").removeClass("active"); //Remove any "active" class
+		$(this).addClass("active"); //Add "active" class to selected tab
+		$(".tab_content").hide(); //Hide all tab content
+
+		var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
+		$(activeTab).fadeIn(); //Fade in the active ID content
+		return false;
+	});
+
+});
+    </script>
+    <script type="text/javascript">
+    $(function(){
+        $('.column').equalHeight();
+    });
+	</script>
+</head>
+
+
+<body>
+
+	<header id="header">
+		<hgroup>
+			<h1 class="site_title"><a href="/">Integrated Capability</a></h1>
+			<h2 class="section_title">Operate & Manage</h2><div class="btn_view_site"><a href="http://http://www.theonion.com/">View Site</a></div>
+		</hgroup>
+	</header> <!-- end of header bar -->
+	
+	<section id="secondary_bar">
+		<div class="user">
+			<p>Yo Pinkman! What's cooking?</p> 
+			<!-- <a class="logout_user" href="#" title="Logout">Logout</a> -->
+		</div>
+		<div class="breadcrumbs_container">
+			<article class="breadcrumbs"><a href="index.html">Website Admin</a> <div class="breadcrumb_divider"></div> <a class="current">Dashboard</a></article>
+		</div>
+	</section><!-- end of secondary bar -->
+	
+<aside id="sidebar" class="column">
+{% include 'leftnav.html' %}
+</aside><!-- end of sidebar -->
+	
+<section id="main" class="column">
+		
+		<h4 class="alert_info">Let's operate some ZD capable processes comrades...</h4>
+		
+		<div class="clear"></div>
+		
+	<article class="module width_full">	
+		<label><h2>1. Select Process to Operate</h2></label>
+		<fieldset style="width:25%; float:left;">
+			<table summary="High Level Selectors">
+				<form action="SelectProcessStep" method="POST">
+    			<select name="proc_id" id="proc_id" onchange="this.form.submit()">
+					{% for row in ddb_process %}
+						{% if row == selected %}
+							<option selected="selected">{{row}}</option>
+						{% else %}
+							<option value={{ row[0]|e }}<option>{{ row[1]|e }}</option>
+						{%endif%}
+					{% endfor %}
+				</select>
+				</form>
+				<noscript><input type="submit" value="Submit"></noscript>
+				<tr><td><label>Process Steps</label>
+				<form action="SelectProcessStep" method="POST">
+				<select name="proc_step_id" id="proc_step_id" onchange='this.form.submit()'>			
+					{% for row in ddb_proc_step %}
+					<option value={{ row[0]|e }}<option>{{ row[1]|e }}</option>
+					{% endfor %}
+				</select>
+				
+			</table>
+		</fieldset><div class="clear"></div>
+	</article><!-- END 1. Select a Process to Operate -->
+			
+	<article class="module width_full">	
+		<label><h2>2. Process Instructions</h2></label>
+		<fieldset style="width:100%; float:left;"> 				
+			<table id="Operating Instructions">
+				<form>
+				<tr><td><b>Operating Instructions<td><b>SOP</tr>
+					{% for row in ddb_proc_step %}
+				<tr><td>{{ row[1]|e }}<td><a href={{ row[2]|e }}>{{ row[5]|e }}</a></tr>
+					{% endfor %}
+				</form>
+			</table>
+		</fieldset><div class="clear"></div>
+  	</article><!-- END 2. Process Instructions -->
+  			
+	<article class="module width_full">	
+		<label><h2>3. Record Conformance</h2></label>
+		<fieldset style="width:100%; float:left;"> 		
+			<form action="/postProcessRun" method="POST">
+			<noscript><input type="submit" value="Submit"></noscript>
+			 	<tr><td><label>Requirement</label>	
+				<select name="proc_req_id" style="width:20%;><td>
+					<optgroup label="proc_req_id">
+					{% for row in ddb_requirement %}
+					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
+					{% endfor %}
+					</optgroup></label>
+				</select><tr>
+				<table>
+					<tr><td><label>Process Start Timestamp</label><input type="text" name="proc_run_start_tm" style="width:50%;"><tr>
+					<tr><td><label>Process End Timestamp</label><input type="text" name="proc_run_end_tm" style="width:50%;"><tr>
+					<tr><td><label>Input Conformance</label><input type="text" name="proc_input_comment" style="width:90%;">
+						<select name="proc_input_conf" style="width:50%;><td>
+						<optgroup label="proc_input_conf">
+						<option value="1">Input Conforming</option>
+						<option value="0">Input Non-Conforming</option>
+						</optgroup></label>
+						</select><tr>
+					<tr><td><label>Output Conformance</label><input type="text" name="proc_input_comment" style="width:90%;">
+						<select name="proc_output_conf" style="width:50%;><td>
+						<optgroup label="proc_output_conf">
+						<option value="1">Output Conforming</option>
+						<option value="0">Output Non-Conforming</option>
+						</optgroup></label>
+						</select><tr>
+					<tr><td><label>Status</label>	
+					<select name="proc_run_status" style="width:50%;><td>
+						<optgroup label="proc_run_status">
+						<option value="1">Pending</option>
+						<option value="0">Complete</option>
+						</optgroup></label>
+						</select><tr>
+					<tr><td><td><input type=hidden value="10" name="emp_id"></td><tr>
+				</table>
+			
+					<div class="submit_link">
+							 <input type="submit" value="Record Conformance">
+							 <input type="submit" value="Cancel">
+			</form>		
+		</fieldset><div class="clear"></div>
+  	</article><!-- END 3. Record Conformance -->
+		
+
+
+	</div>
+	<footer>
+	</footer>
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+application: capabilityapp
+version: 1
+api_version: 1
+runtime: python27
+threadsafe: true
+
+handlers:
+- url: /stylesheets
+  static_dir: stylesheets
+  # stylesheets must go above the script main.application or it doesn't work
+  
+- url: /images
+  static_dir: images
+  
+- url: /sqlscripts
+  static_dir: sqlscripts
+  
+- url: /.*
+  script: main.application
+
+libraries:
+- name: jinja2
+  version: latest

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+		<title>Philip Crosby Associates</title>
+	</head>
+	<body>
+		<h2>PCA Capability Application</h2>
+		<form action="postProcess" method="POST">
+		  Process Name: <input name="proc_nm"><br>
+		  Process Desc: <textarea name="proc_desc" rows="3" cols="60"></textarea><br>
+		  Owner: <input name="emp_id"><br>
+		  Start Date: <input name="proc_start_dt"><br>
+		  <input type="submit" value="Create Process">
+		</form>
+		
+		<h2>Create Process Step</h2>
+		<form action="postProcessStep" method="POST">
+		  Process Step Name: <input name="proc_step_nm"><br>
+		  Process Process Seq: <input name="proc_seq" ><br>
+		  Process Step Desc: <textarea name="proc_step_desc" rows="3" cols="60"></textarea><br>
+		  Process Parent ID: <input name="proc_id"><br>
+		  Process Step SOP: <input name="proc_step_sop"><br>
+		  <input type="submit" value="Create Process Step">
+		</form>
+		
+		<h2>Process Requirements</h2>
+		<form action="postProcessRequirement" method="POST">
+		  Process Requirement Name: <input name="proc_req_nm"><br>
+		  Process Step Desc: <textarea name="proc_req_desc" rows="3" cols="60"></textarea><br>
+		  Process Parent ID: <input name="proc_step_id"><br>
+		  <input type="submit" value="Create Process Requirement">
+		</form>
+		
+		
+		
+		<table id="data">
+			<tr><td><b>Process Name<td><b>Process Step<td><b>Description<td><b>Seq<td><b>Requirement<td><b>Owner</b></tr>
+			{% for row in rows %}
+				<tr><td>{{ row[0]|e }}<td>{{ row[1]|e }}<td>{{ row[2]|e }}<td>{{ row[3]|e }}<td>{{ row[4]|e }}</td><td>{{ row[5]|e }} {{ row[6]|e }}</tr>
+			{% endfor %}
+		</table>
+		<a href="/processRun"
+		title="High Level Process Page">Record Procedural Conformances</a>
+		
+	</body>
+</html>
