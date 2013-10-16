@@ -1,4 +1,4 @@
-# bulghur-capability-01: Little change 2
+# bulghur-capability-01: Little change 3 Fuyuko
 import os
 import cgi
 import logging
