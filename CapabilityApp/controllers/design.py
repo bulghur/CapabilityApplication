@@ -2,11 +2,9 @@
 import os
 import cgi
 import logging
-import webapp2
 import time
 import jinja2
 import itertools
-import _mysql
 
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
@@ -22,7 +20,7 @@ jinja2_env = jinja2.Environment(
 )
 
 def get_connection():
-    return rdbms.connect(host=config.HOST, db=config.DATABASE_NAME, user=config.USER_NAME, passwd=config.PASSWORD, charset='utf8')
+    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8')
 
 class PostProcessStep(webapp.RequestHandler):
     def post(self): # post to DB

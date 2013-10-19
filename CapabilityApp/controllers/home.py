@@ -2,11 +2,9 @@
 import os
 import cgi
 import logging
-import webapp2
 import time
 import jinja2
 import itertools
-import _mysql
 
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
@@ -21,11 +19,10 @@ backhome = os.path.join(os.path.dirname(__file__), 'index2.html')
 #Jinja2 Environment Setup
 jinja2_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_path)
-)
+) 
 
 def get_connection():
-    return rdbms.connect(host=config.HOST, db=config.DATABASE_NAME, user=config.USER_NAME, passwd=config.PASSWORD, charset='utf8')
-
+    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8')
 
 class MainHandler(webapp.RequestHandler): 
     def get(self): # get from DB
