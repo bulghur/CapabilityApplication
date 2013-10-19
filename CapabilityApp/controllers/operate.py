@@ -33,7 +33,7 @@ class OperateProcess(webapp.RequestHandler):
         
         conn.close()
         
-        template_values = {'ddb_process': ddb_process, 'sqlProcssSummary': sqlProcssSummary}
+        template_values = {'ddb_process': ddb_process, 'processSummary': processSummary}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
 '''        

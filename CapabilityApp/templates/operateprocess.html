@@ -168,9 +168,9 @@
   	</article><!-- END 3. Record Conformance -->
   	
   <article class="module width_full">	
-		<label><h2>4. Process Summary/h2></label>
+		<label><h2>4. Process Summary</h2></label>
 		<table>
-					{% for row in ddb_requirement %}
+					{% for row in processSummary %}
 					<tr>{{ row[0]|e }}<td>{{ row[1]|e }}<td>{{ row[2]|e }}<td>{{ row[3]|e }}<td>{{ row[4]|e }}<tr>
 					{% endfor %}
 		</table>			
