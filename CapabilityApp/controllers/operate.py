@@ -29,9 +29,14 @@ class OperateProcess(webapp.RequestHandler):
         sqlGetAllProcesses = "SELECT * FROM process ORDER by proc_nm"
         cursor.execute(sqlGetAllProcesses)
         ddb_process = cursor.fetchall()
+        
+        sqlProcssSummary = "SELECT proc_nm, proc_step_nm, proc_seq, proc_req_desc, person.first_nm, person.last_nm FROM process inner join process_step ON (process.proc_id = process_step.proc_id) inner join person ON (process.emp_id = person.emp_id) inner join proc_req ON (process_step.proc_step_id = proc_req.proc_step_id);"
+        cursor.execute(sqlProcssSummary)
+        processSummary = cursor.fetchall()       
+        
         conn.close()
         
-        template_values = {'ddb_process': ddb_process,}
+        template_values = {'ddb_process': ddb_process, 'sqlProcssSummary': sqlProcssSummary}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
 

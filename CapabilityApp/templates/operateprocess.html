@@ -166,9 +166,15 @@
 			</form>		
 		</fieldset><div class="clear"></div>
   	</article><!-- END 3. Record Conformance -->
-		
-
-
+  	
+  <article class="module width_full">	
+		<label><h2>4. Process Summary/h2></label>
+		<table>
+					{% for row in ddb_requirement %}
+					<tr>{{ row[0]|e }}<td>{{ row[1]|e }}<td>{{ row[2]|e }}<td>{{ row[3]|e }}<td>{{ row[4]|e }}<tr>
+					{% endfor %}
+		</table>			
+  </article><!-- END 3. Record Conformance -->
 	</div>
 	<footer>
 	</footer>
