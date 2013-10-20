@@ -58,10 +58,12 @@
 		</hgroup>
 	</header> <!-- end of header bar -->
 	
-	<section id="secondary_bar">
+		<section id="secondary_bar">
 		<div class="user">
-			<p>Paul Weber (<a href="#">3 Messages</a>)</p>
-			<!-- <a class="logout_user" href="#" title="Logout">Logout</a> -->
+			<p>{{ authenticateUser }}
+			(<a href="/">3 Messages</a>)</p>
+			<a class="logout_user" href="/" title="Logout">Logout</a>
+
 		</div>
 		<div class="breadcrumbs_container">
 			<article class="breadcrumbs"><a href="/">Website Admin</a> <div class="breadcrumb_divider"></div> <a class="current">Dashboard</a></article>
@@ -77,12 +79,12 @@
 		<h4 class="alert_info">Welcome to the Philip Crosby Capability Application.</h4>
 		
 		<article class="module width_full">
-			<header><h3>Quality Employees of the Year: Pinkman and White -- way to go guys!</h3></header>
+			<header><h3>Quality Employees of the Year: Pinkman and White -- way to go guys! </h3></header>
 			<div class="module_content">
 				<article class="stats_graph">
 				<table style="width: 50%; ">
 					<tr><img src="/images/qualityEmployeesoftheYear.jpg" height="200" alt="50%" /></tr><tr></tr></tr><br>
-					<tr>It's been a busy year for Jesse and Walt. Find out how their ZD Mindset is delivering the finest cook to their for their customers in the American Southwest and the Czech Republic.<td></tr>
+					<tr>It's been a very busy year for Jesse and Walt. Find out how their ZD Mindset is delivering the finest cook to their for their customers in the American Southwest and the Czech Republic. {{person}}<td></tr>
 				</table>
 				</article>
 				
@@ -117,10 +119,6 @@
 		<div class="tab_container">
 			<div id="tab1" class="tab_content">
 			<table class="tablesorter" cellspacing="0"> 
-			<thead> 
-				<tr> 
-				</tr> 
-			</thead> 
 			<tbody> 
 				<table id="data">
 					<tr><td><h4>Operator<td><b>Process<td><b>Scoped Process<td><b>Requirement<td><b>Conformance </b><b>of Operations</b></h4></tr>
@@ -128,11 +126,7 @@
 					<tr><td>{{ row[1]|e }} <td>{{ row[2]|e }} <td>{{ row[3]|e }} <td>{{ row[4]|e }} <td>{{ row[5]|e }} <td>{{ row[6]|e }} <td>{{ row[7]|e }} </tr>
 					{% endfor %}
 				</table>
-				<tr> 
 
-				</tr>
-				
-			</tbody> 
 			</table>
 			</div><!-- end of #tab1 -->
 

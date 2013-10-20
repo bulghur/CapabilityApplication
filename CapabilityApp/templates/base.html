@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+	<link rel="stylesheet" href="/stylesheets/layout.css" type="text/css" media="screen" />
 <head>
 <meta charset="UTF-8">
 <title>{{ title }}</title>
@@ -9,9 +10,34 @@
 <body>
 <h1>{{ title }}</h1>
 
-Comment: <input type="text" id="comment"/>
+<form action="/postProcessRun" method="POST">
+
+Comment: <input type="text" id="comment">
 <p id="myButton">Add-It!</p>
 <ol id="output"></ol>
+
+</form>	
+ <article class="module width_full">	
+		<label><h2>3. Record Conformance</h2></label>
+		<fieldset style="width:100%; float:left;"> 		
+			<form action="/postProcessRun" method="POST">
+			<noscript><input type="submit" value="Submit"></noscript>
+			 	<tr><td><label>Requirement</label>	
+				<select name="proc_req_id" style="width:20%;><td>
+					<optgroup label="proc_req_id">
+					{% for row in ddb_requirement %}
+					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
+					{% endfor %}
+					</optgroup></label>
+				</select><tr>
+							 <input type="submit" value="Record Conformance">
+							 <input type="submit" value="Cancel">
+	
+		</fieldset><div class="clear"></div>
+  	</article><!-- END 3. Record Conformance -->
+ 
+ 
+ 
  
 </body>
 </html>
