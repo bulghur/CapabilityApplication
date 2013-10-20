@@ -58,15 +58,7 @@
 		</hgroup>
 	</header> <!-- end of header bar -->
 	
-	<section id="secondary_bar">
-		<div class="user">
-			<p>Yo Pinkman! What's cooking?</p> 
-			<!-- <a class="logout_user" href="#" title="Logout">Logout</a> -->
-		</div>
-		<div class="breadcrumbs_container">
-			<article class="breadcrumbs"><a href="index.html">Website Admin</a> <div class="breadcrumb_divider"></div> <a class="current">Dashboard</a></article>
-		</div>
-	</section><!-- end of secondary bar -->
+{% include 'userbar.html' %}
 	
 <aside id="sidebar" class="column">
 {% include 'leftnav.html' %}
@@ -96,7 +88,7 @@
 				<noscript><input type="submit" value="Submit"></noscript>
 				<tr><td><label>Process Steps</label>
 				<form action="SelectProcessStep" method="POST">
-				<select name="proc_step_id" id="proc_step_id" onchange='this.form.submit()'>			
+				<select name="proc_step_id" id="proc_step_id" onSelect='this.form.submit()'>			
 					{% for row in ddb_proc_step %}
 					<option value={{ row[0]|e }}<option>{{ row[1]|e }}</option>
 					{% endfor %}

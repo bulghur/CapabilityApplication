@@ -50,12 +50,35 @@ class DevelopCapability(webapp.RequestHandler):
 ###################################################################Ajax########################################################################
 
 class AjaxHandler(webapp2.RequestHandler):
-    def get(self): # / 
+    def get(self): # /ajax 
+        '''
         self.templateValues = {}
         self.templateValues["title"] = 'jQuery Ajax - It looks terrific Hilary'
         template = jinja2_env.get_template("base.html")
         self.response.out.write(template.render(self.templateValues))
- 
+        '''
+        proc_id = self.request.get("proc_id")
+        proc_step_id = self.request.get("proc_step_id")
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        sqlGetAllProcesses = "SELECT * FROM process ORDER by proc_nm"
+        cursor.execute(sqlGetAllProcesses)
+        ddb_process = cursor.fetchall()
+
+        cursor.execute("SELECT * FROM process_step WHERE process_step.proc_id=%s", (proc_id))
+        ddb_proc_step = cursor.fetchall()
+
+        cursor.execute("SELECT * FROM proc_req where proc_step_id=%s", (proc_step_id))
+        ddb_requirement = cursor.fetchall()
+        
+        conn.close()
+        
+        title = 'jQuery Ajax - It looks terrific Hilary'
+        template_values = {'ddb_process': ddb_process, 'ddb_proc_step': ddb_proc_step, 'ddb_requirement': ddb_requirement, 'title': title, }
+        template = jinja2_env.get_template('base.html')
+        self.response.out.write(template.render(template_values))
 
     def post(self):
         conn = get_connection()
@@ -68,6 +91,7 @@ class AjaxHandler(webapp2.RequestHandler):
                        ))
         conn.commit()
         conn.close()
+        
 
 #################################################            All Pages       ##############################################################
 ### these are temporary until the pages handlers are completely built, then destroy

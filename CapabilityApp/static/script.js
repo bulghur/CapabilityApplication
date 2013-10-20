@@ -4,8 +4,8 @@ function handleResponse(data){
 	console.log('Got from server: ' + data);
 }
 
-function handleClick(e){
-	var text = $('#comment').val();
+function handleDDBSelect(e){
+	var text = $('#proc_id').val();
 	console.log('user typed ' + text);
 	$('#output').append('<li>' + text + '</li>');
 	$.ajax('/', { 
@@ -19,5 +19,5 @@ function handleClick(e){
 }
 
 $(document).ready(function(){
-	$('#myButton').click(handleClick);
+	$('#process').click(handleClick);
 })

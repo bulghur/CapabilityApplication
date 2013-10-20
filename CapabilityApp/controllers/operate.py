@@ -8,6 +8,7 @@ import itertools
 
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
+from google.appengine.api import users
 from google.appengine.ext.webapp.util import run_wsgi_app
 from config import config
 template_path = os.path.join(os.path.dirname(__file__), '../templates')
@@ -21,6 +22,9 @@ def get_connection():
 
 class OperateProcess(webapp.RequestHandler):
     def get(self):
+        
+        authenticateUser = users.get_current_user()
+        
         conn = get_connection()
         cursor = conn.cursor()
         sqlGetAllProcesses = "SELECT * FROM process ORDER by proc_nm"
@@ -33,7 +37,7 @@ class OperateProcess(webapp.RequestHandler):
         
         conn.close()
         
-        template_values = {'ddb_process': ddb_process, 'processSummary': processSummary}
+        template_values = {'ddb_process': ddb_process, 'processSummary': processSummary, 'authenticateUser': authenticateUser}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
 '''        
