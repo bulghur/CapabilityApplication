@@ -168,13 +168,23 @@
   	</article><!-- END 3. Record Conformance -->
   	
   <article class="module width_full">	
-		<label><h2>4. Process Summary</h2></label>
-		<table>
+		
+		<table class=datatable>
+		<caption>Active</caption><tr>
+		<th class=datatable colspan="5"> Processes </th>
+		<tr>
+		<th class=datatable>Parent Process</th>
+		<th class=datatable>Child Process</th>
+		<th class=datatable>Sequence</th>
+		<th class=datatable>Requirement</th>
+		<th class=datatable>Owner</th>
+		<tr>
+		
 					{% for row in processSummary %}
-					<tr>{{ row[0]|e }}<td>{{ row[1]|e }}<td>{{ row[2]|e }}<td>{{ row[3]|e }}<td>{{ row[4]|e }}<tr>
+					<tr><td>{{ row[0]|e }}<td>{{ row[1]|e }}<td class=center>{{ row[2]|e }}<td>{{ row[3]|e }}<td class=center>{{ row[4]|e }} {{ row[5]|e }}<tr>
 					{% endfor %}
 		</table>			
-  </article><!-- END 3. Record Conformance -->
+  </article><!-- END Display Processes -->
 	</div>
 	<footer>
 	</footer>

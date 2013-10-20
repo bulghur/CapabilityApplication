@@ -63,7 +63,7 @@ class SelectProcessStep(webapp.RequestHandler):
         cursor.execute(sqlGetAllProcesses)
         ddb_process = cursor.fetchall()
 
-        cursor.execute("SELECT * FROM process_step where process_step.proc_id=%s", (proc_id))
+        cursor.execute("SELECT * FROM process_step WHERE process_step.proc_id=%s", (proc_id))
         ddb_proc_step = cursor.fetchall()
 
         cursor.execute("SELECT * FROM proc_req where proc_step_id=%s", (proc_step_id))

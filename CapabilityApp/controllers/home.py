@@ -8,13 +8,10 @@ import itertools
 
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
+from google.appengine.api import users
 from google.appengine.ext.webapp.util import run_wsgi_app
 from config import config
 template_path = os.path.join(os.path.dirname(__file__), '../templates')
-
-backhome = os.path.join(os.path.dirname(__file__), 'index2.html')
-
-#from ProcessRun import *
 
 #Jinja2 Environment Setup
 jinja2_env = jinja2.Environment(
@@ -23,6 +20,8 @@ jinja2_env = jinja2.Environment(
 
 def get_connection():
     return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8')
+
+authenticateUser = users.get_current_user()
 
 class MainHandler(webapp.RequestHandler): 
     def get(self): # get from DB
@@ -39,6 +38,6 @@ class MainHandler(webapp.RequestHandler):
         
         conn.close()
     
-        template_values = {"rows": rows, "processes": processes,}
+        template_values = {"rows": rows, "processes": processes, "userEmail": authenticateUser}
         template = jinja2_env.get_template('index.html')
         self.response.out.write(template.render(template_values))
