@@ -21,12 +21,20 @@ jinja2_env = jinja2.Environment(
 def get_connection():
     return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8')
 
+###################    COMMON    ##############################
+
 authenticateUser = users.get_current_user()
+
+
+
 
 class MainHandler(webapp.RequestHandler): 
     def get(self): # get from DB
         conn = get_connection()
         cursor = conn.cursor()
+                
+        cursor.execute("SELECT * FROM process ORDER by proc_nm")
+        ddb_process = cursor.fetchall()
         
         sqlScript = "SELECT proc_run.proc_req_id, person.last_nm, process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_nm,SUM(proc_run.proc_output_conf)/COUNT(*), COUNT(*) FROM proc_run inner join person ON (proc_run.emp_id = person.emp_id) inner join proc_req ON (proc_run.proc_req_id = proc_req.proc_req_id) inner join process_step ON (proc_req.proc_step_id = process_step.proc_step_id) inner join process ON (process_step.proc_id = process.proc_id) WHERE proc_run.proc_run_status='C' GROUP BY proc_run.emp_id, proc_run.proc_req_id"
         cursor.execute(sqlScript)
@@ -38,6 +46,6 @@ class MainHandler(webapp.RequestHandler):
         
         conn.close()
     
-        template_values = {"rows": rows, "processes": processes, "userEmail": authenticateUser}
+        template_values = {"rows": rows, "processes": processes, "userEmail": authenticateUser, 'ddb_process': ddb_process}
         template = jinja2_env.get_template('index.html')
         self.response.out.write(template.render(template_values))

@@ -1,15 +1,17 @@
 # bulghur-capability-01: Little change 3
 import os
 import webapp2
-#import time
 import jinja2
+import logging
+import string
 
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
+from google.appengine.ext import db
 from google.appengine.api import users
 from controllers import measure, operate, home, design, utilities
 from config import config
-
+import unicodedata
 # Paths and Jinja2
 template_path = os.path.join(os.path.dirname(__file__), 'templates')
 jinja2_env = jinja2.Environment(
@@ -91,6 +93,48 @@ class AjaxHandler(webapp2.RequestHandler):
                        ))
         conn.commit()
         conn.close()
+
+
+class Comment(db.Model):
+    text = db.StringProperty
+        
+class AjaxJSON(webapp2.RequestHandler):
+    def get(self):
+        proc_id = self.request.get("proc_id")
+        proc_step_id = self.request.get("proc_step_id")
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT * FROM process ORDER by proc_nm")
+        ddb_process = cursor.fetchall()
+
+        conn.close()
+        
+        title = 'jQuery Ajax/JSON'
+        template_values = {'ddb_process': ddb_process, 'title': title, }
+        template = jinja2_env.get_template('ajaxjson.html')
+        self.response.out.write(template.render(template_values))
+        
+    def post(self):
+
+        proc_id = self.request.get("text")
+        title = proc_id
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT proc_step_id, proc_step_nm FROM process_step WHERE process_step.proc_id=%s", (proc_id))
+        ddb_proc_step = cursor.fetchall()
+        conn.close()
+        
+        self.response.out.write('<li>' + ddb_proc_step + '</li>')
+        
+
+
+        
+
+        
         
 
 #################################################            All Pages       ##############################################################
@@ -114,9 +158,12 @@ class Permissions(webapp.RequestHandler): #This is messy -- clean it up
             cursor = conn.cursor()
             cursor.execute('SELECT email FROM person WHERE email = %s', (email))
             person = cursor.fetchall()
+            person1 = [str(person).encode('unicode-escape') for person in person]
+            person2 = '["' + "(u'" + email + "'," + ')"]'  #HACK!!!
 
 
-            if authenticateUser.nickname() == "paul.weber@philipcrosby.com":
+
+            if  email == "m4bulghur@gmail.com" or "paul.weber@philipcrosby.com" or "cheryl.salatino@philipcrosby.com" :
                 conn = get_connection()
                 cursor = conn.cursor()
                 
@@ -128,9 +175,13 @@ class Permissions(webapp.RequestHandler): #This is messy -- clean it up
                 cursor.execute(sqlScript1)
                 processes = cursor.fetchall()
                 
+                cursor.execute("SELECT * FROM process ORDER by proc_nm")
+                ddb_process = cursor.fetchall()
+                
                 conn.close()
             
-                template_values = {"rows": rows, "processes": processes, "authenticateUser": authenticateUser, "person": person}
+                template_values = {"rows": rows, "processes": processes, "authenticateUser": authenticateUser, "person": person, "ddb_process": ddb_process, "person1": person1, "email": email, "person2": person2
+                                   }
                 template = jinja2_env.get_template('index.html')
                 self.response.out.write(template.render(template_values))
                 
@@ -161,7 +212,8 @@ application = webapp.WSGIApplication(
         ("/postperson", utilities.PostPerson),
         ("/playground", PlayGroundHandler),
         ("/leftnav", LeftNavHandler),
-        ("/ajax", AjaxHandler)
+        ("/ajax", AjaxHandler),
+        ("/ajaxjson", AjaxJSON)
 
     ],
     debug=True

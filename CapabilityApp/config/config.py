@@ -1,5 +1,7 @@
 #    Centralised configuration
 
+import datetime
+
 #Database Connections: LOCAL
 CLOUDSQL_INSTANCE = 'MySQL56'
 HOST = 'localhost'
@@ -14,3 +16,9 @@ DATABASE_NAME = 'capability'
 USER_NAME = 'root'
 PASSWORD = ''
 '''
+
+def UTCTime():
+    rawNow = datetime.datetime.now()
+    now = rawNow.date().isoformat()
+    return now
+    

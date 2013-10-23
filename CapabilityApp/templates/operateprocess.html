@@ -4,7 +4,8 @@
 <head>
 	<meta charset="utf-8"/>
 	<title>Philip Crosby Associates - Operate Processes</title>
-	
+
+<! -- SCRP	
 	<link rel="stylesheet" href="/stylesheets/layout.css" type="text/css" media="screen" />
 	<!--[if lt IE 9]>
 	<link rel="images" href="/images/" type="" media="screen" />
@@ -14,7 +15,9 @@
 	<script src="js/hideshow.js" type="text/javascript"></script>
 	<script src="js/jquery.tablesorter.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="js/jquery.equalHeight.js"></script>
-	<script type="text/javascript">
+	<script type="text/javascript"></script>
+	<script type="text/javascript" src="/static/jquery-1.8.2.min.js"></script>
+	<script type="text/javascript" src="/static/getDate.js"></script>
 	$(document).ready(function() 
     	{ 
       	  $(".tablesorter").tablesorter(); 
@@ -71,93 +74,75 @@
 		<div class="clear"></div>
 		
 	<article class="module width_full">	
-		<label><h2>1. Select Process to Operate</h2></label>
-		<fieldset style="width:25%; float:left;">
+		<label><h2>1. Select the Process Step to Operate</h2></label>
+ 
+<h1>Date</h1>
+<p id="demo">This is a paragraph.</p>
+
+<button type="button" onclick="displayDate()">Display Date</button>
+
+		<fieldset style="width:40%; float:center;">
 			<table summary="High Level Selectors">
-				<form action="SelectProcessStep" method="POST">
-    			<select name="proc_id" id="proc_id" onchange="this.form.submit()">
-					{% for row in ddb_process %}
-						{% if row == selected %}
-							<option selected="selected">{{row}}</option>
-						{% else %}
-							<option value={{ row[0]|e }}<option>{{ row[1]|e }}</option>
-						{%endif%}
-					{% endfor %}
-				</select>
-				</form>
-				<noscript><input type="submit" value="Submit"></noscript>
-				<tr><td><label>Process Steps</label>
-				<form action="SelectProcessStep" method="POST">
-				<select name="proc_step_id" id="proc_step_id" onSelect='this.form.submit()'>			
+		    <li><form action="/SelectProcessStep" method="GET">
+    			<select name="proc_step_id" id="proc_step_id" onChange='this.form.submit()'>
+    			<option>Select Process Step</option>
 					{% for row in ddb_proc_step %}
-					<option value={{ row[0]|e }}<option>{{ row[1]|e }}</option>
-					{% endfor %}
-				</select>
-				
+					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
+					{% endfor %}				
 			</table>
+			<br>
+				</form>
+			
+		<table class=datatable>
+				<tr><td><b>ID<td><b>Operating Instructions<td><b>SOP</tr>
+					{% for row in ddb_proc_step %}
+				<tr><td>{{ row[0]|e }}<td>{{ row[1]|e }}<td><a href={{ row[5]|e }}>{{ row[3]|e }}</a></tr>
+					{% endfor %}
+		</table>
+
 		</fieldset><div class="clear"></div>
 	</article><!-- END 1. Select a Process to Operate -->
-			
-	<article class="module width_full">	
-		<label><h2>2. Process Instructions</h2></label>
-		<fieldset style="width:100%; float:left;"> 				
-			<table id="Operating Instructions">
-				<form>
-				<tr><td><b>Operating Instructions<td><b>SOP</tr>
-					{% for row in ddb_proc_step %}
-				<tr><td>{{ row[1]|e }}<td><a href={{ row[2]|e }}>{{ row[5]|e }}</a></tr>
-					{% endfor %}
-				</form>
-			</table>
-		</fieldset><div class="clear"></div>
-  	</article><!-- END 2. Process Instructions -->
+	
   			
 	<article class="module width_full">	
 		<label><h2>3. Record Conformance</h2></label>
-		<fieldset style="width:100%; float:left;"> 		
-			<form action="/postProcessRun" method="POST">
-			<noscript><input type="submit" value="Submit"></noscript>
-			 	<tr><td><label>Requirement</label>	
-				<select name="proc_req_id" style="width:20%;><td>
-					<optgroup label="proc_req_id">
-					{% for row in ddb_requirement %}
-					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
-					{% endfor %}
-					</optgroup></label>
-				</select><tr>
-				<table>
-					<tr><td><label>Process Start Timestamp</label><input type="text" name="proc_run_start_tm" style="width:50%;"><tr>
-					<tr><td><label>Process End Timestamp</label><input type="text" name="proc_run_end_tm" style="width:50%;"><tr>
-					<tr><td><label>Input Conformance</label><input type="text" name="proc_input_comment" style="width:90%;">
-						<select name="proc_input_conf" style="width:50%;><td>
-						<optgroup label="proc_input_conf">
-						<option value="1">Input Conforming</option>
-						<option value="0">Input Non-Conforming</option>
-						</optgroup></label>
-						</select><tr>
-					<tr><td><label>Output Conformance</label><input type="text" name="proc_input_comment" style="width:90%;">
-						<select name="proc_output_conf" style="width:50%;><td>
-						<optgroup label="proc_output_conf">
-						<option value="1">Output Conforming</option>
-						<option value="0">Output Non-Conforming</option>
-						</optgroup></label>
-						</select><tr>
-					<tr><td><label>Status</label>	
-					<select name="proc_run_status" style="width:50%;><td>
-						<optgroup label="proc_run_status">
-						<option value="1">Pending</option>
-						<option value="0">Complete</option>
-						</optgroup></label>
-						</select><tr>
-					<tr><td><td><input type=hidden value="10" name="emp_id"></td><tr>
-				</table>
-			
-					<div class="submit_link">
-							 <input type="submit" value="Record Conformance">
-							 <input type="submit" value="Cancel">
-			</form>		
-		</fieldset><div class="clear"></div>
+		<fieldset style="width:100%; float:center;"> 		
+	
+		<form action="/postProcessRun" method="POST">
+		<table class=datatable>
+		<caption>Operate the Process</caption><tr>
+		<th class=datatable colspan="8"> Performance </th><tr>
+		<th class=datatable>ID</th>
+		<th class=datatable>Sequence</th>
+		<th class=datatable>Requirement</th>
+		<th class=datatable>Detail Requirement</th>
+		<th class=datatable>Output Conformance</th>
+		<th class=datatable>Operational Risks</th>
+		<th class=datatable>Innovations</th>
+		<th class=datatable>Complete</th><tr>
+			{% for row in ddb_requirement %}
+				<td><input type="hidden" name="proc_req_id" value={{ row[0]|e }} ;">
+				<td>{{ row[2]|e }}
+				<td>{{ row[1]|e }}
+				<td>{{ row[3]|e }}
+				<td><input type="cell" name="proc_input_comment" style="width:90%;">
+				<td><input type="cell" name="proc_output_comment" style="width:90%;">
+				<td><select name="proc_output_conf" style="width:90%;>
+                <optgroup label="proc_output_conf">
+                <option value="1">Conforming</option>
+                <option value="0">Non-Conforming</option>
+                <option value="2">Pending</option>
+                </optgroup></label>
+                </select>
+                <td><input type="submit" name = "proc_run_status" value="Pending"></tr>
+                <tr><td><td><input type=hidden value="10" name="emp_id"></td><tr>
+
+			{% endfor %}
+		</tr>
+		</form>		
+	</fieldset><div class="clear"></div>
   	</article><!-- END 3. Record Conformance -->
+  		
   	
   <article class="module width_full">	
 		
@@ -171,7 +156,6 @@
 		<th class=datatable>Requirement</th>
 		<th class=datatable>Owner</th>
 		<tr>
-		
 					{% for row in processSummary %}
 					<tr><td>{{ row[0]|e }}<td>{{ row[1]|e }}<td class=center>{{ row[2]|e }}<td>{{ row[3]|e }}<td class=center>{{ row[4]|e }} {{ row[5]|e }}<tr>
 					{% endfor %}
