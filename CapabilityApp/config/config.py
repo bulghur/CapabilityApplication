@@ -1,6 +1,8 @@
 #    Centralised configuration
 
 import datetime
+from google.appengine.api import rdbms
+#from controllers import measure
 
 #Database Connections: LOCAL
 CLOUDSQL_INSTANCE = 'MySQL56'
@@ -16,9 +18,40 @@ DATABASE_NAME = 'capability'
 USER_NAME = 'root'
 PASSWORD = ''
 '''
+def get_connection():
+    return rdbms.connect(instance=CLOUDSQL_INSTANCE, database=DATABASE_NAME, user=USER_NAME, password=PASSWORD, charset='utf8')
 
+#Date/Time Function
 def UTCTime():
     rawNow = datetime.datetime.now()
     now = rawNow.date().isoformat()
     return now
+'''
+class Test(object):
     
+    self.proc_step_id = SelectProcessStep("proc_step_id")
+        
+        def querySelectProcessSteps(self):
+            
+        conn = get_connection()
+        cursor = conn.cursor()
+    
+        cursor.execute("SELECT * FROM process_step WHERE process_step.proc_step_id=%s", (proc_step_id))
+        ddb_proc_step = cursor.fetchall()
+        
+        conn.close()
+        
+        return ddb_proc_step  
+        '''
+'''
+class Milk(object):
+
+        self.name = "milk"
+        self.price = 10
+    
+    def getName(self):  
+        return self.name
+    
+    def getPrice(self):
+        return self.price
+'''

@@ -1,0 +1,4 @@
+function displayDate()
+{
+return "hello"
+}

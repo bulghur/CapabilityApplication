@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<link rel="stylesheet" href="/stylesheets/layout.css" type="text/css" media="screen" />
+<head>
+<meta charset="UTF-8">
+<title>{{ title }}</title>
+<script type="text/javascript" src="/static/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="/static/scriptjson.js"></script>
+</head>
+<body>
+<h1>{{ title }}</h1>
+
+Comment: <input type="text" id="comment">
+<p id="myButton">Add-It!</p>
+<ol id="output"></ol>
+<ol id="processsteps"></ol>
+
+<article class="module width_full">	
+		<label><h2>3. Record Conformance</h2></label>
+		<fieldset style="width:100%; float:left;"> 	
+			
+			 	<tr><td><label>Process</label>	
+			 		<select name="process" id="proc_id" onChange="handleDDBSelect(this)"()'>
+					<option>Choose a Process</option>
+					{% for row in ddb_process %}
+					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
+					{% endfor %}
+					
+				</select><tr>
+				
+			 	<tr><td><label>Process_Step</label>	
+			 	<select name="" id="" onChange=""()'>
+					<option>Choose a Process Step</option>
+					{% for row in ddb_proc_step %}
+					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
+					{% endfor %}
+								
+				</select><tr>
+			 <input type="submit" value="Record Conformance">
+			 <input type="submit" value="Cancel">
+	
+		</fieldset><div class="clear"></div>
+  	</article><!-- END 3. Record Conformance -->
+
+
+</body>
+</html>
