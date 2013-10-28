@@ -1,4 +1,0 @@
-function displayDate()
-{
-return "hello"
-}

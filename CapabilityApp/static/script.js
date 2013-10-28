@@ -6,7 +6,7 @@ function handleResponse(data){
 
 function handleDDBSelect(e){
 	var text = $('#proc_id').val();
-	console.log('user typed ' + text);
+	console.log('script.js: user typed ' + text);
 	$('#output').append('<li>' + text + '</li>');
 	$.ajax('/', { 
 		type: 'POST',

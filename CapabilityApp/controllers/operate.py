@@ -6,34 +6,43 @@ import time
 import webapp2
 import jinja2
 import itertools
+import json
 
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
 from google.appengine.api import users
 from google.appengine.ext.webapp.util import run_wsgi_app
 from config import config
-from dataqueries import sql
+from model import sql
+from model import operateandmanage
 template_path = os.path.join(os.path.dirname(__file__), '../templates')
 
 jinja2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path))
+
+
 
 def get_connection():
     return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8')
 
 class OperateProcess(webapp.RequestHandler):
+    '''
+    Initially displays the O&M page for Process Step Selection
+    Uses: operateprocess
+    '''
     def get(self):
         
         authenticateUser = users.get_current_user()
         proc_id = self.request.get("proc_id")
         proc_step_id = self.request.get("proc_step_id")
+      
               
         conn = get_connection()
         cursor = conn.cursor()      
-        
+
         sqlGetAllProcesses = "SELECT * FROM process ORDER by proc_nm"
         cursor.execute(sqlGetAllProcesses)
-        ddb_process = cursor.fetchall()
-
+        ddb_process = cursor.fetchall()  
+        
         cursor.execute("SELECT * FROM process_step WHERE process_step.proc_id=%s", (proc_id))
         ddb_proc_step = cursor.fetchall()
         
@@ -42,61 +51,107 @@ class OperateProcess(webapp.RequestHandler):
         template_values = {'ddb_proc_step': ddb_process, 'ddb_proc_step': ddb_proc_step, 'authenticateUser': authenticateUser}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
+   
+class CreateCase(webapp.RequestHandler): 
+    '''Purpose: This object supports selection of PROCESS STEP, creation of the process case grouping
+    and display of the resulting data set. 
+    Display: operateprocess.html      
+    '''
+    
+    def post(self): # post to DB
         
-class SelectProcessStep(webapp.RequestHandler): 
-    def get(self):
-        
+        idGenerator = config.IDGenerator()
+        authenticateUser = str(users.get_current_user())
+        case_key = str(idGenerator) + authenticateUser + self.request.get('proc_step_id')
+
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO proc_case (case_nm, proc_step_id, emp_id, case_key) '
+                       'VALUES (%s, %s, %s, %s)',
+                       (
+                       self.request.get('case_nm'),
+                       self.request.get('proc_step_id'),
+                       (authenticateUser),
+                       (case_key),            
+                       ))
+        conn.commit()
+        conn.close()
+            
         authenticateUser = users.get_current_user()
-        proc_id = OperateProcess(["proc_id"])
         proc_step_id = self.request.get("proc_step_id")
         
         conn = get_connection()
         cursor = conn.cursor()
         
-        d = "2"
-        sqlscript = "SELECT * FROM proc_req WHERE proc_step_id=" + d
-        
-        c = sql.DoCustomQueries()
-        c.query(sqlscript)
-        ddb_proc_step = c.results
+        cursor.execute("SELECT * FROM process ORDER by proc_nm")
+        processAll = cursor.fetchall()
         
         cursor.execute("SELECT * FROM proc_req WHERE proc_step_id=%s", (proc_step_id))
         ddb_requirement = cursor.fetchall()
-        
-        sqlProcssSummary = "SELECT proc_nm, proc_step_nm, proc_seq, proc_req_desc, person.first_nm, person.last_nm FROM process inner join process_step ON (process.proc_id = process_step.proc_id) inner join person ON (process.emp_id = person.emp_id) inner join proc_req ON (process_step.proc_step_id = proc_req.proc_step_id);"
-        cursor.execute(sqlProcssSummary)
-        processSummary = cursor.fetchall()  
-        
-        cursor.execute("SELECT * FROM process ORDER by proc_nm")
-        processAll = cursor.fetchall()
+
+        '''        
+        sqlscript = ("SELECT * FROM process_step WHERE proc_step_id=%s", (proc_step_id))
+        c = sql.DoCustomQueries()
+        c.query(sqlscript)
+        ddb_proc_step = c.results
         '''
-        sqlGetAllProcesses = "SELECT * FROM process where emp_id = 1 ORDER by proc_nm"
-        processAll = c.query(sqlGetAllProcesses)
-        '''
+   
+
+        cursor.execute("SELECT proc_case.case_id, proc_case.case_nm, proc_case.emp_id, proc_case.case_key, proc_req.proc_req_id, proc_req.proc_req_nm, proc_req.proc_req_seq, "
+                       "proc_req.proc_req_desc, proc_req.proc_step_id, process_step.proc_step_nm, process_step.proc_step_sop, process.proc_nm "
+                            "FROM proc_case "
+                            "INNER JOIN proc_req on (proc_case.proc_step_id = proc_req.proc_step_id) "
+                            "INNER JOIN process_step on (proc_case.proc_step_id = process_step.proc_step_id) "
+                            "INNER JOIN process on (process_step.proc_id = process.proc_id) "
+                            " WHERE case_key = %s", (case_key))
+        case = cursor.fetchall()  
+
         conn.close()
         
-        template_values = {'processAll': processAll, 'ddb_proc_step': ddb_proc_step, 'processSummary': processSummary, 'ddb_requirement': ddb_requirement,'authenticateUser': authenticateUser, 'proc_id': proc_id}
+        template_values = {'processAll': processAll, 'authenticateUser': authenticateUser, 'case': case}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
-        
+    
 class PostProcessRun(webapp.RequestHandler): 
     def post(self): 
         now = config.UTCTime()
-        sqlScript = "INSERT INTO proc_run (proc_run_start_tm, proc_run_end_tm, proc_output_conf, proc_input_comment, proc_output_comment, proc_req_id, emp_id, proc_run_status, proc_event)VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        authenticateUser = str(users.get_current_user())
+        case_key = self.request.get('case_key')
+        proc_req_id = self.request.get('proc_req_id')
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute(sqlScript, (
+        cursor.execute("INSERT INTO proc_run (proc_run_start_tm, proc_run_end_tm, proc_output_conf, proc_conseq, "
+                        "proc_innovation, proc_req_id, emp_id, proc_run_status, proc_step_id, case_key) "
+                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                       (
                        (now),
                        (now),
                        self.request.get('proc_output_conf'),
-                       self.request.get('proc_input_comment'),
-                       self.request.get('proc_output_comment'),
-                       self.request.get('proc_req_id'),
-                       self.request.get('emp_id'),
+                       self.request.get('proc_conseq'),
+                       self.request.get('proc_innovation'),
+                       (proc_req_id),
+                       (authenticateUser),
                        self.request.get('proc_run_status'),
-                       self.request.get('proc_event'),
+                       self.request.get('proc_step_id'),
+                       (case_key),
                        ))
         conn.commit()
+
+        cursor.execute("SELECT proc_case.case_id, proc_case.case_nm, proc_case.emp_id, proc_case.case_key, proc_req.proc_req_id, proc_req.proc_req_nm, proc_req.proc_req_seq, "
+                       "proc_req.proc_req_desc, proc_req.proc_step_id, process_step.proc_step_nm, process_step.proc_step_sop, process.proc_nm, proc_run.proc_output_conf " 
+                       "FROM proc_case "
+                       "INNER JOIN proc_run on (proc_case.case_key = proc_run.case_key) "
+                       "INNER JOIN proc_req on (proc_case.proc_step_id = proc_req.proc_step_id) "
+                       "INNER JOIN process_step on (proc_case.proc_step_id = process_step.proc_step_id) "
+                       "INNER JOIN process on (process_step.proc_id = process.proc_id) "
+                       "WHERE proc_case.case_key = %s AND proc_run.proc_req_id = %s", (case_key, proc_req_id))  
+        case = cursor.fetchall()  
+        
+        cursor.execute("SELECT * FROM process ORDER by proc_nm")
+        ddb_process = cursor.fetchall()
+
         conn.close()
         
-        self.response.out.write(jinja2_env.get_template('operateprocess.html').render({}))
+        template_values = {'ddb_process': ddb_process, 'authenticateUser': authenticateUser, 'case': case}
+        template = jinja2_env.get_template('operateprocess.html')
+        self.response.out.write(template.render(template_values))

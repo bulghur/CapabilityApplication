@@ -1,6 +1,7 @@
 #    Centralised configuration
 
 import datetime
+import time
 from google.appengine.api import rdbms
 #from controllers import measure
 
@@ -21,11 +22,15 @@ PASSWORD = ''
 def get_connection():
     return rdbms.connect(instance=CLOUDSQL_INSTANCE, database=DATABASE_NAME, user=USER_NAME, password=PASSWORD, charset='utf8')
 
-#Date/Time Function
+# Tools
 def UTCTime():
     rawNow = datetime.datetime.now()
     now = rawNow.date().isoformat()
     return now
+
+def IDGenerator():
+    idGenerator = time.time()
+    return idGenerator
 '''
 class Test(object):
     

@@ -1,40 +1,37 @@
-# bulghur-capability-01: Little change 3
+# bulghur-capability-01
 import os
 import webapp2
 import jinja2
 import logging
 import string
-
+import json
+import collections
+import unicodedata
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.api import users
-from controllers import measure, operate, home, design, utilities, dev_operate
+from controllers import measure, operate, home, design, utilities
 from config import config
-import unicodedata
+from config import myhandler
+
 # Paths and Jinja2
 template_path = os.path.join(os.path.dirname(__file__), 'templates')
 jinja2_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_path)
 ) 
 
+
+
+
+def defineVariables():
+    global proc_id
+    value = 1
+    return proc_id
+    
+
 def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8')
-
-class Authenticate(webapp2.RequestHandler):
-    def get(self):
-        authenticateUser = users.get_current_user()
-        
-        if authenticateUser: 
-            
-            greeting = ('Welcome, %s! (<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/permissions">Go to Main Page</a></li>' %
-                        (authenticateUser.email(), users.create_logout_url("/")))
-        else:
-            greeting = ('<a href="%s">Sorry, you are not authorised to use this application</a>.' %
-                        users.create_login_url("/"))
-
-        self.response.out.write('<html><body>%s</body></html>' % greeting)
-            
+    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8')            
               
 class DevelopCapability(webapp.RequestHandler):
     def get(self):
@@ -77,7 +74,7 @@ class AjaxHandler(webapp2.RequestHandler):
         
         conn.close()
         
-        title = 'jQuery Ajax - It looks terrific Hilary'
+        title = 'jQuery Ajax: AjaxHandler()'
         template_values = {'ddb_process': ddb_process, 'ddb_proc_step': ddb_proc_step, 'ddb_requirement': ddb_requirement, 'title': title, }
         template = jinja2_env.get_template('base.html')
         self.response.out.write(template.render(template_values))
@@ -93,15 +90,94 @@ class AjaxHandler(webapp2.RequestHandler):
                        ))
         conn.commit()
         conn.close()
-
-
-class Comment(db.Model):
-    text = db.StringProperty
         
-class AjaxJSON(webapp2.RequestHandler):
+class jQueryJSON(webapp2.RequestHandler):
+    '''
+    From tutorial: altered to load data from the database
+    Check the console object Array
+    Question remains where I can pass this...
+    Renders: jQuery.html
+    # http://www.youtube.com/watch?v=XkddK0Rd7nA
+    '''
     def get(self):
-        proc_id = self.request.get("proc_id")
-        proc_step_id = self.request.get("proc_step_id")
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT proc_id, proc_nm, emp_id FROM process")
+        rows = cursor.fetchall()
+        conn.close()
+
+        rowArray_list = []
+        for row in rows:
+            t = (row)
+            rowArray_list.append(t)
+
+        data = rowArray_list   
+        
+        if self.request.get('fmt') == "json": 
+            #data = {'name': 'bob', 'age': 55, 'name': 'sally', 'age': 45}
+            self.response.out.headers['Content-Type'] = ('text/json')
+            self.response.out.write(json.dumps(data))
+            return
+
+        title = "jQuery JSON Tutorial-edited: jQueryJSON from SQL using ajaxjson.html"
+        self.template_values = {'title': title}
+        template = jinja2_env.get_template('jQuery.html')
+        self.response.out.write(template.render(self.template_values))
+        
+class ProcessDataJSON(webapp2.RequestHandler):
+    '''
+    Altered from tutorial
+    Check the console object Array
+    Load process data, create JSON, use in forms
+    See jQueryJSON for the working tutorial
+    Associated with:
+    Renders: TBD
+    '''
+    def get(self):
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT proc_id, proc_nm, emp_id FROM process")
+        rows = cursor.fetchall()
+        conn.close()
+
+        rowArray_list = []
+        for row in rows:
+            t = (row)
+            rowArray_list.append(t)
+
+        processJSON = json.dumps(rowArray_list)   
+        
+        if self.request.get('fmt') == "json": 
+            #processJSON = {'name': 'bob', 'age': 55, 'name': 'sally', 'age': 45}
+            self.response.out.headers['Content-Type'] = ('text/json')
+            self.response.out.write(processJSON)
+            return
+
+        title = "jQuery JSON Tutorial: ProcessDataJSON()"
+        self.template_values = {'title': title}
+        template = jinja2_env.get_template('operateprocess.html')
+        self.response.out.write(template.render(self.template_values))
+        
+class Comment(db.Model):
+    '''
+    Needed for AjaxJSON to post to the db 
+    Creates the Entity Comment to store the KV pairs
+    '''
+    proc_id = db.StringProperty() # can be string list property
+    proc_step_id = db.StringProperty() # can be string list property
+
+class AjaxJSON(webapp2.RequestHandler):
+    '''
+    From tutorial: http://www.youtube.com/watch?v=cDN-sFM6ack
+    Edit for DB Process to 
+    Check the console object Array
+    Load process loads JSON data on to page and ddb  
+    Associated with: ajaxjson.html, scirptjson.js
+    '''
+    
+    def get(self):
         
         conn = get_connection()
         cursor = conn.cursor()
@@ -111,24 +187,18 @@ class AjaxJSON(webapp2.RequestHandler):
 
         conn.close()
         
-        title = 'jQuery Ajax/JSON'
+        title = 'jQuery Ajax/JSON: From AjaxJSON() in main.py, def get'
         template_values = {'ddb_process': ddb_process, 'title': title, }
         template = jinja2_env.get_template('ajaxjson.html')
         self.response.out.write(template.render(template_values))
         
     def post(self):
-
-        proc_id = self.request.get("text")
-        title = proc_id
         
-        conn = get_connection()
-        cursor = conn.cursor()
 
-        cursor.execute("SELECT proc_step_id, proc_step_nm FROM process_step WHERE process_step.proc_id=%s", (proc_id))
-        ddb_proc_step = cursor.fetchall()
-        conn.close()
-        
-        self.response.out.write('<li>' + ddb_proc_step + '</li>')         
+        com = Comment(proc_id=self.request.get('text'))        
+        com.put()
+
+        self.response.out.write('Got It!')   
 
 #################################################            All Pages       ##############################################################
 ### these are temporary until the pages handlers are completely built, then destroy
@@ -140,6 +210,21 @@ class PlayGroundHandler(webapp.RequestHandler):
 class LeftNavHandler(webapp.RequestHandler):
     def get(self):
         self.response.out.write("jinja2_env.get_template('leftnav.html').render({})")
+        
+class Authenticate(webapp2.RequestHandler):
+    def get(self):
+        authenticateUser = users.get_current_user()
+        #email = authenticateUser.email()
+        
+        if authenticateUser: 
+            
+            greeting = ('Welcome, %s! (<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/permissions">Go to Main Page</a></li>' %
+                        (authenticateUser.email(), users.create_logout_url("/")))
+        else:
+            greeting = ('<a href="%s">Sorry, you are not authorised to use this application</a>.' %
+                        users.create_login_url("/"))
+
+        self.response.out.write('<html><body>%s</body></html>' % greeting)        
         
 class Permissions(webapp.RequestHandler): #This is messy -- clean it up
         def get(self):
@@ -159,19 +244,12 @@ class Permissions(webapp.RequestHandler): #This is messy -- clean it up
             if  email == "m4bulghur@gmail.com" or "paul.weber@philipcrosby.com" or "cheryl.salatino@philipcrosby.com" or "govberg@gmail.com":
                 conn = get_connection()
                 cursor = conn.cursor()
-                
-                sqlScript = "SELECT proc_run.proc_req_id, person.last_nm, process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_nm,SUM(proc_run.proc_output_conf)/COUNT(*), COUNT(*) FROM proc_run inner join person ON (proc_run.emp_id = person.emp_id) inner join proc_req ON (proc_run.proc_req_id = proc_req.proc_req_id) inner join process_step ON (proc_req.proc_step_id = process_step.proc_step_id) inner join process ON (process_step.proc_id = process.proc_id) WHERE proc_run.proc_run_status='C' GROUP BY proc_run.emp_id, proc_run.proc_req_id"
-                cursor.execute(sqlScript)
-                rows = cursor.fetchall()
-                
 
                 cursor.execute("SELECT * FROM process ORDER by proc_nm")
                 ddb_process = cursor.fetchall()
-                
                 conn.close()
             
-                template_values = {"rows": rows, "authenticateUser": authenticateUser, "person": person, "ddb_process": ddb_process, "person1": person1, "email": email, "person2": person2
-                                   }
+                template_values = {"authenticateUser": authenticateUser, "person": person, "ddb_process": ddb_process, "person1": person1, "email": email, "person2": person2}
                 template = jinja2_env.get_template('index.html')
                 self.response.out.write(template.render(template_values))
                 
@@ -188,10 +266,8 @@ application = webapp.WSGIApplication(
         ("/permissions", Permissions),
         ("/mainhandler", home.MainHandler),
         ("/OperateProcess", operate.OperateProcess),
-        ("/devOperateProcess", dev_operate.OperateProcess), 
         ("/postProcessRun", operate.PostProcessRun),
-        ("/SelectProcessStep", operate.SelectProcessStep),
-        ("/dev_SelectProcessStep", dev_operate.SelectProcessStep),
+        ("/CreateCase", operate.CreateCase),
         ("/MeasurePerformance", measure.MeasurePerformance),
         ("/postProcessSteps", design.PostProcessStep),
         ("/DevelopCapability", design.DevelopCapability),
@@ -203,7 +279,9 @@ application = webapp.WSGIApplication(
         ("/playground", PlayGroundHandler),
         ("/leftnav", LeftNavHandler),
         ("/ajax", AjaxHandler),
-        ("/ajaxjson", AjaxJSON)
+        ("/ajaxjson", AjaxJSON),
+        ("/jQueryJSON", jQueryJSON)
+        
 
     ],
     debug=True
