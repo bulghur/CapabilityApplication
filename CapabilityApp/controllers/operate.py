@@ -95,20 +95,57 @@ class CreateCase(webapp.RequestHandler):
         c.query(sqlscript)
         ddb_proc_step = c.results
         '''
+        
+        cursor.execute("SELECT proc_case.case_id, proc_case.emp_id, proc_case.case_key, proc_req.proc_req_id, proc_req.proc_step_id, process.proc_id "
+                            "FROM proc_case "
+                            "INNER JOIN proc_req on (proc_case.proc_step_id = proc_req.proc_step_id) "
+                            "INNER JOIN process_step on (proc_case.proc_step_id = process_step.proc_step_id) "
+                            "INNER JOIN process on (process_step.proc_id = process.proc_id) "
+                            " WHERE case_key = %s", (case_key))
+        caseMake = cursor.fetchall()
    
+        for row in caseMake:
+            t = (row)
+            cursor.execute("INSERT INTO proc_run (case_id, emp_id, case_key, proc_req_id, proc_step_id, proc_id) VALUES (%s, %s, %s, %s, %s, %s) ", t)  
+        conn.commit()
+        
+    
+        cursor.execute("SELECT proc_run.proc_run_id, proc_run.case_id, proc_case.case_nm, proc_run.emp_id, proc_run.case_key, " 
+               "proc_run.proc_req_id, proc_req.proc_req_nm, proc_req.proc_req_seq, proc_req.proc_req_desc, proc_run.proc_step_id, "
+               "process_step.proc_step_nm, process_step.proc_step_sop, process.proc_nm, proc_run.proc_output_conf "
+               "FROM proc_run "
+               "INNER JOIN proc_case on (proc_run.case_key = proc_case.case_key) "
+               "INNER JOIN proc_req on (proc_run.proc_req_id = proc_req.proc_req_id) "  
+               "INNER JOIN process_step on (proc_run.proc_step_id = process_step.proc_step_id) "
+               "INNER JOIN process on (proc_run.proc_id = process.proc_id) " 
+               "WHERE proc_run.case_key = %s", (case_key))  
+        case = cursor.fetchall()
+        '''
 
         cursor.execute("SELECT proc_case.case_id, proc_case.case_nm, proc_case.emp_id, proc_case.case_key, proc_req.proc_req_id, proc_req.proc_req_nm, proc_req.proc_req_seq, "
                        "proc_req.proc_req_desc, proc_req.proc_step_id, process_step.proc_step_nm, process_step.proc_step_sop, process.proc_nm "
                             "FROM proc_case "
                             "INNER JOIN proc_req on (proc_case.proc_step_id = proc_req.proc_step_id) "
                             "INNER JOIN process_step on (proc_case.proc_step_id = process_step.proc_step_id) "
-                            "INNER JOIN process on (process_step.proc_id = process.proc_id) "
-                            " WHERE case_key = %s", (case_key))
-        case = cursor.fetchall()  
+                            "INNER JOIN process on (process_step.proc_id = process.proc_id) ")  #" WHERE case_key = %s AND proc_output_conf IS NULL", (case_key))
+        case = cursor.fetchall()
+        '''
+        '''
+        rowArray_list = []
+        for row in case:
+            t = (row)
+            rowArray_list.append(t)
 
-        conn.close()
+        JSONcase = rowArray_list   
         
-        template_values = {'processAll': processAll, 'authenticateUser': authenticateUser, 'case': case}
+        if self.request.get('fmt') == "json": 
+            #data = {'name': 'bob', 'age': 55, 'name': 'sally', 'age': 45}
+            self.response.out.headers['Content-Type'] = ('text/json')
+            self.response.out.write(JSONcase)
+            return
+        '''
+        conn.close()     
+        template_values = {'processAll': processAll, 'authenticateUser': authenticateUser, 'case': case} 
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
     
@@ -117,34 +154,29 @@ class PostProcessRun(webapp.RequestHandler):
         now = config.UTCTime()
         authenticateUser = str(users.get_current_user())
         case_key = self.request.get('case_key')
-        proc_req_id = self.request.get('proc_req_id')
+        proc_output_conf = self.request.get('proc_output_conf')
+        proc_conseq = self.request.get('proc_conseq')
+        proc_innovation = self.request.get('proc_innovation')
+        proc_run_id = self.request.get('proc_run_id')
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO proc_run (proc_run_start_tm, proc_run_end_tm, proc_output_conf, proc_conseq, "
-                        "proc_innovation, proc_req_id, emp_id, proc_run_status, proc_step_id, case_key) "
-                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                       (
-                       (now),
-                       (now),
-                       self.request.get('proc_output_conf'),
-                       self.request.get('proc_conseq'),
-                       self.request.get('proc_innovation'),
-                       (proc_req_id),
-                       (authenticateUser),
-                       self.request.get('proc_run_status'),
-                       self.request.get('proc_step_id'),
-                       (case_key),
-                       ))
-        conn.commit()
+        
+        cursor.execute("UPDATE proc_run SET "
+                       "proc_run_start_tm =%s, proc_output_conf = %s, proc_conseq = %s, proc_innovation = %s "
+                       "WHERE proc_run_id = %s ",
+                       (now, proc_output_conf, proc_conseq, proc_innovation, proc_run_id))
 
-        cursor.execute("SELECT proc_case.case_id, proc_case.case_nm, proc_case.emp_id, proc_case.case_key, proc_req.proc_req_id, proc_req.proc_req_nm, proc_req.proc_req_seq, "
-                       "proc_req.proc_req_desc, proc_req.proc_step_id, process_step.proc_step_nm, process_step.proc_step_sop, process.proc_nm, proc_run.proc_output_conf " 
-                       "FROM proc_case "
-                       "INNER JOIN proc_run on (proc_case.case_key = proc_run.case_key) "
-                       "INNER JOIN proc_req on (proc_case.proc_step_id = proc_req.proc_step_id) "
-                       "INNER JOIN process_step on (proc_case.proc_step_id = process_step.proc_step_id) "
-                       "INNER JOIN process on (process_step.proc_id = process.proc_id) "
-                       "WHERE proc_case.case_key = %s AND proc_run.proc_req_id = %s", (case_key, proc_req_id))  
+        conn.commit()
+        
+        cursor.execute("SELECT proc_run.proc_run_id, proc_run.case_id, proc_case.case_nm, proc_run.emp_id, proc_run.case_key, " 
+               "proc_run.proc_req_id, proc_req.proc_req_nm, proc_req.proc_req_seq, proc_req.proc_req_desc, proc_run.proc_step_id, "
+               "process_step.proc_step_nm, process_step.proc_step_sop, process.proc_nm, proc_run.proc_output_conf "
+               "FROM proc_run "
+               "INNER JOIN proc_case on (proc_run.case_key = proc_case.case_key) "
+               "INNER JOIN proc_req on (proc_run.proc_req_id = proc_req.proc_req_id) "  
+               "INNER JOIN process_step on (proc_run.proc_step_id = process_step.proc_step_id) "
+               "INNER JOIN process on (proc_run.proc_id = process.proc_id) " 
+               "WHERE proc_run.case_key = %s AND proc_run.proc_output_conf IS NULL ", (case_key))   
         case = cursor.fetchall()  
         
         cursor.execute("SELECT * FROM process ORDER by proc_nm")

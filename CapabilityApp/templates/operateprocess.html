@@ -108,7 +108,7 @@
 		<table class=datatable>
 			<tr><td><b>Process<td><b>Process Step<td><b>Case Name<td><b>Standard Operating Procedure Link</b></tr>
 			{% for row in case %}
-			<tr><td>{{ row[11]|e }}<td>{{ row[9]|e }}<td>{{ row[1]|e }}<td><a href={{ row[10]|e }}>{{ row[5]|e }}</a></tr>
+			<tr><td>{{ row[12]|e }}<td>{{ row[10]|e }}<td>{{ row[2]|e }}<td><a href={{ row[11]|e }}>{{ row[6]|e }}</a></tr>
 			{% endfor %}
 	    </table>
 
@@ -124,9 +124,9 @@
 		<th class=datatable>Conformance</th>
 		<th class=datatable>Action</th><tr>
 			{% for row in case %}
-				<td>{{ row[6]|e }}
-				<td>{{ row[5]|e }}
 				<td>{{ row[7]|e }}
+				<td>{{ row[6]|e }}
+				<td>{{ row[8]|e }}
 				<td><input name="proc_conseq">
 				<td><input name="proc_innovation">
 				<td><select name="proc_output_conf">
@@ -137,9 +137,10 @@
 	                </optgroup></label>
                 </select>
                 <td><input type="submit" name = "proc_run_status" value="Submit">
-              	<td><input name="proc_req_id" value={{ row[4]|e }} ;">
-              	<td><input name="proc_step_id" value={{ row[8]|e }} ;">
-				<td><input name="case_key" value={{ row[3]|e }} ;"><tr>
+              	<td><input name="proc_req_id" value={{ row[5]|e }}>
+              	<td><input name="proc_step_id" value={{ row[9]|e }}>
+				<td><input name="case_key" value={{ row[4]|e }}>
+				<td><input name="proc_run_id" value={{ row[0]|e }}><tr>
 			{% endfor %}
 		</table>
 		</form>		
@@ -160,7 +161,7 @@
 		<th class=datatable>Owner</th>
 		<tr>
 					{% for row in case %}
-					<tr><td>{{ row[0]|e }}<td>{{ row[1]|e }}<td class=center>{{ row[2]|e }}<td>{{ row[3]|e }}<td class=center>{{ row[4]|e }}<td>{{ row[5]|e }}<td>{{ row[6]|e }}<td>{{ row[7]|e }}<td>{{ row[8]|e }}<td>{{ row[9]|e }}<td>{{ row[10]|e }}<td>{{ row[11]|e }}{{ row[12]|e }}{{ row[13]|e }}<tr>
+					<tr><td>{{ row[0]|e }}<td>{{ row[1]|e }}<td class=center>{{ row[2]|e }}<td>{{ row[3]|e }}<td class=center>{{ row[4]|e }}<td>{{ row[5]|e }}<td>{{ row[6]|e }}<td>{{ row[7]|e }}<td>{{ row[8]|e }}<td>{{ row[9]|e }}<td>{{ row[10]|e }}<td>{{ row[11]|e }}<td>{{ row[12]|e }}<td>{{ row[13]|e }}<tr>
 					{% endfor %}
 		</table>			
   </article><!-- END Display Processes -->
