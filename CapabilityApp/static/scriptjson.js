@@ -2,7 +2,8 @@ console.log('Loaded scriptjson.js');
 //Associated with /ajaxjson
 
 function handleResponse(data){
-	console.log("scriptjson: Got from the server: " + data);
+	console.log("scriptjson: Got from the server!: " + data);
+	$('#processsteps').append(data)
 }
 
 function handleDDBSelect(e){

@@ -1,0 +1,60 @@
+<label><h2>1. Select Process</h2></label>
+<fieldset style="width:46%; float:left; margin-left: 2%;"> 
+	<label>Select a Process</label>
+	<form action="/SelectProcessStep" method="GET">
+	<select name="proc_id" id="proc_id" onChange='this.form.submit()'>
+		<option>Process</option>
+			{% for row in ddb_process %}
+				<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
+			{% endfor %} 
+		</select>
+	</form><br>
+	
+	<form action="/CreateCase" method="POST">
+	
+		<tr><td><label>Create New Case</label><br><br>
+		<input type="text" name="case_nm" style="width:40%;"><tr>
+
+		<div class="submit_link">
+		<input type="submit" value="Create Case">
+		<input type="submit" value="Cancel">
+	</form>		
+
+</fieldset>
+<fieldset style="width:46%; float:right; margin-right: 2%;">
+	<form action="/CreateInstance" method="POST"> 				
+	<label>Select a Process Step</label>
+	<select name="proc_step_id" id="proc_step_id"'>
+ 		<option>Process Step</option>
+			{% for row in ddb_proc_step %}
+			<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
+			{% endfor %}
+	</select><br>
+	
+	<label>Select an Active Case</label>
+ 		<select name="case_id" id="case_id"'>
+  			<option>Active Case</option>
+			{% for row in ddb_active_case %}
+			<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
+			{% endfor %}
+
+	</select><tr><br><br>
+	
+	<div class="submit_link">
+		<input type="submit" value="Create Instance">
+		<input type="submit" value="Cancel">
+	</form></div><br><br>
+	
+
+		<table class=datatable>
+		<th class=datatable colspan="3"> Process Details </th><tr>
+		<th class=datatable>Case</th>
+		<th class=datatable>Process</th>
+		<th class=datatable>Link to SOP</th>
+			{% for row in case %}
+			<tr><td>{{ row[1]|e }}<td>{{ row[8]|e }}<td><a href={{ row[10]|e }}>{{ row[9]|e }}</a></tr>
+			{% endfor %}
+	    </table>
+	    
+
+</fieldset><div class="clear">

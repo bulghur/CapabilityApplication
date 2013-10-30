@@ -22,14 +22,6 @@ jinja2_env = jinja2.Environment(
 ) 
 
 
-
-
-def defineVariables():
-    global proc_id
-    value = 1
-    return proc_id
-    
-
 def get_connection():
     return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8')            
               
@@ -56,8 +48,6 @@ class AjaxHandler(webapp2.RequestHandler):
         template = jinja2_env.get_template("base.html")
         self.response.out.write(template.render(self.templateValues))
         '''
-        proc_id = self.request.get("proc_id")
-        proc_step_id = self.request.get("proc_step_id")
         
         conn = get_connection()
         cursor = conn.cursor()
@@ -66,16 +56,17 @@ class AjaxHandler(webapp2.RequestHandler):
         cursor.execute(sqlGetAllProcesses)
         ddb_process = cursor.fetchall()
 
-        cursor.execute("SELECT * FROM process_step WHERE process_step.proc_id=%s", (proc_id))
+        proc_id = self.request.get("proc_id")
+        
+        cursor.execute("SELECT * FROM process_step") # WHERE process_step.proc_id=%s", (proc_id))
         ddb_proc_step = cursor.fetchall()
 
-        cursor.execute("SELECT * FROM proc_req where proc_step_id=%s", (proc_step_id))
-        ddb_requirement = cursor.fetchall()
+
         
         conn.close()
         
-        title = 'jQuery Ajax: AjaxHandler()'
-        template_values = {'ddb_process': ddb_process, 'ddb_proc_step': ddb_proc_step, 'ddb_requirement': ddb_requirement, 'title': title, }
+        title = 'jQuery Ajax: AjaxHandler() with Process Steps'
+        template_values = {'ddb_process': ddb_process, 'ddb_proc_step': ddb_proc_step, 'title': title, }
         template = jinja2_env.get_template('base.html')
         self.response.out.write(template.render(template_values))
 
@@ -121,7 +112,7 @@ class jQueryJSON(webapp2.RequestHandler):
             return
 
         title = "jQuery JSON Tutorial-edited: jQueryJSON from SQL using ajaxjson.html"
-        self.template_values = {'title': title}
+        self.template_values = {'title': title, "t": t, 'rows': rows}
         template = jinja2_env.get_template('jQuery.html')
         self.response.out.write(template.render(self.template_values))
         
@@ -184,21 +175,30 @@ class AjaxJSON(webapp2.RequestHandler):
         
         cursor.execute("SELECT * FROM process ORDER by proc_nm")
         ddb_process = cursor.fetchall()
+        
+        proc_id = self.request.get("proc_id")
+        
+        cursor.execute("SELECT * FROM process_step") # WHERE process_step.proc_id=%s", (proc_id))
+        ddb_proc_step = cursor.fetchall()
 
         conn.close()
         
         title = 'jQuery Ajax/JSON: From AjaxJSON() in main.py, def get'
-        template_values = {'ddb_process': ddb_process, 'title': title, }
+        template_values = {'ddb_process': ddb_process, 'ddb_proc_step': ddb_proc_step, 'title': title, }
         template = jinja2_env.get_template('ajaxjson.html')
         self.response.out.write(template.render(template_values))
         
     def post(self):
         
 
-        com = Comment(proc_id=self.request.get('text'))        
-        com.put()
+        proc_id = self.request.get('text')    
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM process_step WHERE process_step.proc_id=%s", (proc_id))
+        ddb_proc_step = cursor.fetchall()
 
-        self.response.out.write('Got It!')   
+        self.response.out.write(ddb_proc_step)   
 
 #################################################            All Pages       ##############################################################
 ### these are temporary until the pages handlers are completely built, then destroy
@@ -212,14 +212,26 @@ class LeftNavHandler(webapp.RequestHandler):
         self.response.out.write("jinja2_env.get_template('leftnav.html').render({})")
         
 class Authenticate(webapp2.RequestHandler):
+    '''
+    This authenticates based on App Engine authentication with Google using a gmail user.  
+    See this: http://webapp-improved.appspot.com/tutorials/auth.html
+    '''
     def get(self):
         authenticateUser = users.get_current_user()
-        #email = authenticateUser.email()
+        #email = authenticateUser.email
+        nickname = '' #authenticateUser.nickname
         
         if authenticateUser: 
             
-            greeting = ('Welcome, %s! (<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/permissions">Go to Main Page</a></li>' %
-                        (authenticateUser.email(), users.create_logout_url("/")))
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute('SELECT email FROM person WHERE email = %s', (nickname))
+            person = cursor.fetchall()
+            conn.close()
+
+            greeting = ('Welcome, %s! email: person: %s nickname: %s  <li class="icn_edit_article">(<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/permissions">Go to Main Page</a></li>' %
+                (authenticateUser.email(), person, nickname, users.create_logout_url("/")))
+                      
         else:
             greeting = ('<a href="%s">Sorry, you are not authorised to use this application</a>.' %
                         users.create_login_url("/"))
@@ -236,9 +248,10 @@ class Permissions(webapp.RequestHandler): #This is messy -- clean it up
             cursor = conn.cursor()
             cursor.execute('SELECT email FROM person WHERE email = %s', (email))
             person = cursor.fetchall()
+            conn.close()
             
-            person1 = [str(person).encode('unicode-escape') for person in person]
-            person2 = '["' + "(u'" + email + "'," + ')"]'  #HACK!!!
+            #person1 = [str(person).encode('unicode-escape') for person in person]
+            #person2 = '["' + "(u'" + email + "'," + ')"]'  #HACK!!!
 
 
             if  email == "m4bulghur@gmail.com" or "paul.weber@philipcrosby.com" or "cheryl.salatino@philipcrosby.com" or "govberg@gmail.com":
@@ -249,7 +262,7 @@ class Permissions(webapp.RequestHandler): #This is messy -- clean it up
                 ddb_process = cursor.fetchall()
                 conn.close()
             
-                template_values = {"authenticateUser": authenticateUser, "person": person, "ddb_process": ddb_process, "person1": person1, "email": email, "person2": person2}
+                template_values = {"authenticateUser": authenticateUser, "person": person, "ddb_process": ddb_process }
                 template = jinja2_env.get_template('index.html')
                 self.response.out.write(template.render(template_values))
                 
@@ -266,6 +279,8 @@ application = webapp.WSGIApplication(
         ("/permissions", Permissions),
         ("/mainhandler", home.MainHandler),
         ("/OperateProcess", operate.OperateProcess),
+        ('/SelectProcessStep', operate.SelectProcessStep), 
+        ("/CreateInstance", operate.CreateInstance),
         ("/postProcessRun", operate.PostProcessRun),
         ("/CreateCase", operate.CreateCase),
         ("/MeasurePerformance", measure.MeasurePerformance),

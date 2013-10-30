@@ -31,7 +31,7 @@ ProcessSteps:<ol id="processsteps"></ol>
 			 	<tr><td><label>Process_Step</label>	
 			 	<select name="" id="" onChange=""()'>
 					<option>Choose a Process Step</option>
-					{% for row in ddb_proc_step %}
+					{% for row in processsteps %}
 					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
 					{% endfor %}
 								

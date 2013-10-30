@@ -24,27 +24,21 @@
     	{ 
       	  $(".tablesorter").tablesorter(); 
    	 } 
-	);
-	$(document).ready(function() {
-
-	//When page loads...
-	$(".tab_content").hide(); //Hide all content
-	$("ul.tabs li:first").addClass("active").show(); //Activate first tab
-	$(".tab_content:first").show(); //Show first tab content
-
-	//On Click Event
-	$("ul.tabs li").click(function() {
-
-		$("ul.tabs li").removeClass("active"); //Remove any "active" class
-		$(this).addClass("active"); //Add "active" class to selected tab
-		$(".tab_content").hide(); //Hide all tab content
-
+		);
+		$(document).ready(function() {	//When page loads...
+			$(".tab_content").hide(); //Hide all content
+			$("ul.tabs li:first").addClass("active").show(); //Activate first tab
+			$(".tab_content:first").show(); //Show first tab content 
+			//On Click Event
+		$("ul.tabs li").click(function() {
+			$("ul.tabs li").removeClass("active"); //Remove any "active" class
+			$(this).addClass("active"); //Add "active" class to selected tab
+			$(".tab_content").hide(); //Hide all tab content
 		var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
 		$(activeTab).fadeIn(); //Fade in the active ID content
 		return false;
+		});
 	});
-
-});
     </script>
     <script type="text/javascript">
     $(function(){
@@ -52,8 +46,6 @@
     });
 	</script>
 </head>
-
-
 <body>
 
 	<header id="header">
@@ -63,109 +55,31 @@
 		</hgroup>
 	</header> <!-- end of header bar -->
 	
-{% include 'userbar.html' %}
+			{% include 'userbar.html' %}
 	
-<aside id="sidebar" class="column">
-{% include 'leftnav.html' %}
-</aside><!-- end of sidebar -->
+		<aside id="sidebar" class="column">
+			{% include 'leftnav.html' %}
+		</aside><!-- end of sidebar -->
 	
-<section id="main" class="column">
+	<section id="main" class="column">
 		
-		<h4 class="alert_info">Let's operate some ZD capable processes comrades...</h4>
+		<h4 class="alert_info">Operate and Manage</h4>
 		
 		<div class="clear"></div>
 		
-	<article class="module width_full">	
-		<label><h2>1. Select the Process Step to Operate</h2></label>
-		<br>
-		Title: {{title}} Process: {{process}} proc_id: {{proc_id}}
-		<fieldset style="width:100%; float:center;">
-			<form action="/CreateCase" method="POST">
-			<tr><td><label>Case Name</label><input type="text" name="case_nm" style="width:50%;"><tr>
-			<table>
-   			<select name="proc_step_id" id="proc_step_id"'>
-    			<option>Select Process Step</option>
-					{% for row in ddb_proc_step %}
-					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
-					{% endfor %}
-            <tr><td><td><input type=hidden value="10" name="emp_id"></td><tr>
-			</select><tr>
-			</table>
-			<div class="submit_link">
-				 <input type="submit" value="Create a New Case">
-				 <input type="submit" value="Cancel">
-			</form>		
-					</head>
-					<body>
-					<div id="msg"></div>
-		</fieldset><div class="clear"></div>
-	</article><!-- END 1. Select a Process to Operate -->
-			
-	<article class="module width_full">	
-		<label><h2>Process Name:</h2> 
-		<br> 
-		</table><br></form>
-		<table class=datatable>
-			<tr><td><b>Process<td><b>Process Step<td><b>Case Name<td><b>Standard Operating Procedure Link</b></tr>
-			{% for row in case %}
-			<tr><td>{{ row[12]|e }}<td>{{ row[10]|e }}<td>{{ row[2]|e }}<td><a href={{ row[11]|e }}>{{ row[6]|e }}</a></tr>
-			{% endfor %}
-	    </table>
+<article class="module width_full">	
+	{% include 'sub_selectprocess.html' %}	
+</article><!-- END 1. Select a Process to Operate -->
 
-	<fieldset style="width:100%; float:center;"> 		
-	    <table class=datatable>
-		<form action="/postProcessRun" method="POST"> 
-		<th class=datatable colspan="7"> Operate the Process </th><tr>
-		<th class=datatable>Sequence</th>
-		<th class=datatable>Requirement</th>
-		<th class=datatable>RequirementDetails</th>
-		<th class=datatable>Innovations</th>
-		<th class=datatable>Operational Risks</th>
-		<th class=datatable>Conformance</th>
-		<th class=datatable>Action</th><tr>
-			{% for row in case %}
-				<td>{{ row[7]|e }}
-				<td>{{ row[6]|e }}
-				<td>{{ row[8]|e }}
-				<td><input name="proc_conseq">
-				<td><input name="proc_innovation">
-				<td><select name="proc_output_conf">
-	                <optgroup label="proc_output_conf">
-	                <option value="1">Conforming</option>
-	                <option value="0">Non-Conforming</option>
-	                <option value="2">Pending</option>
-	                </optgroup></label>
-                </select>
-                <td><input type="submit" name = "proc_run_status" value="Submit">
-              	<td><input name="proc_req_id" value={{ row[5]|e }}>
-              	<td><input name="proc_step_id" value={{ row[9]|e }}>
-				<td><input name="case_key" value={{ row[4]|e }}>
-				<td><input name="proc_run_id" value={{ row[0]|e }}><tr>
-			{% endfor %}
-		</table>
-		</form>		
-	</fieldset><div class="clear"></div>
-  	</article><!-- END 3. Record Conformance -->
-  		
-  	
-  <article class="module width_full">	
-		
-		<table class=datatable>
-		<caption>Active</caption><tr>
-		<th class=datatable colspan="5"> Processes </th>
-		<tr>
-		<th class=datatable>Parent Process</th>
-		<th class=datatable>Child Process</th>
-		<th class=datatable>Sequence</th>
-		<th class=datatable>Requirement</th>
-		<th class=datatable>Owner</th>
-		<tr>
-					{% for row in case %}
-					<tr><td>{{ row[0]|e }}<td>{{ row[1]|e }}<td class=center>{{ row[2]|e }}<td>{{ row[3]|e }}<td class=center>{{ row[4]|e }}<td>{{ row[5]|e }}<td>{{ row[6]|e }}<td>{{ row[7]|e }}<td>{{ row[8]|e }}<td>{{ row[9]|e }}<td>{{ row[10]|e }}<td>{{ row[11]|e }}<td>{{ row[12]|e }}<td>{{ row[13]|e }}<tr>
-					{% endfor %}
-		</table>			
-  </article><!-- END Display Processes -->
+	{% include 'sub_operateprocess.html' %}		
 	</div>
+	
+<article class="module width_full">	
+
+	<fieldset style="width:45%; float:right; margin-right: 3%;"> 	
+	<label><h2>Standard Operating Procedure:</h2></label>			
+	</fieldset><div class="clear">
+</article>
 	<footer>
 	</footer>
 </body>

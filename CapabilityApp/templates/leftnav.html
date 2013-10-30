@@ -10,35 +10,6 @@
 			<input type="text" value="Quick Search" onfocus="if(!this._haschanged){this.value=''};this._haschanged=true;">
 		</form>
 		<hr/>
-
-		<h3>Operate & Manage</h3>
-		
-		<ul class="toggle">
-		    <li><form action="/OperateProcess" method="GET">
-    			<select name="proc_id" id="proc_id" onChange='this.form.submit()'>
-				<option>Select a Process</option>
-				{% for row in ddb_process %}
-					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
-				{% endfor %} 
-				</select></form></li>
-			<li><select name="process" id="proc_id" onChange="handleDDBSelect(this)"()'>
-				<option>Select from Favourites</option>
-				{% for row in ddb_favourites %}
-					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
-				{% endfor %} 
-			</select></li>
-			<li><select name="process" id="proc_id" onChange="handleDDBSelect(this)"()'>
-				<option>Complete a Pending</option>
-				{% for row in ddb_pending %}
-					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
-				{% endfor %}\
-			</select></li> 
-			<li><select name="process" id="proc_id" onChange="handleDDBSelect(this)"()'>
-				<option>Update Completed</option>
-				{% for row in ddb_updated %}
-					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
-				{% endfor %} 
-			</select></li> 
 		<h3>Operate & Manage</h3>
 			</select></li>
 			<li class="icn_new_article">{{ item }}</li>
@@ -81,5 +52,4 @@
 		</ul>
 			<hr />
 			<p><strong>Copyright &copy; 2011 Website Admin</strong></p>
-			<p>Theme by <a href="http://www.medialoot.com">MediaLoot</a></p>
 		</footer>

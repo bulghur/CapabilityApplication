@@ -1,0 +1,62 @@
+  <article class="module width_full">	
+		<label><h2>2. Operate Process: {{case_key}}</h2></label>	
+	    <table class=datatable>
+		<form action="/postProcessRun" method="POST"> 
+		<th class=datatable colspan="7"> Operate the Process </th><tr>
+		<th class=datatable>Sequence</th>
+		<th class=datatable>Requirement</th>
+		<th class=datatable>RequirementDetails</th>
+		<th class=datatable>Innovations</th>
+		<th class=datatable>Operational Risks</th>
+		<th class=datatable>Conformance</th>
+		<th class=datatable>Action</th><tr>
+			{% for row in case %}
+				<td>{{ row[12]|e }}
+				<td>{{ row[13]|e }}
+				<td>{{ row[14]|e }}
+				<td><textarea rows="1" cols="40" name="proc_innovation" wrap="hard"></textarea>
+				<td><textarea rows="1" cols="40" name="proc_conseq" wrap="hard"></textarea>
+				<td><select name="proc_output_conf">
+	                <optgroup label="Select one">
+	                <option value="1">Conforming</option>
+	                <option value="0">Non-Conforming</option>
+	                <option value="2">Pending</option>
+	                </optgroup></label>
+                </select>
+                <td><input type="submit" name = "proc_run_status" value="Submit">
+              	<td><input type="hidden" name="proc_req_id" value={{ row[4]|e }}>
+              	<td><input type="hidden" name="proc_step_id" value={{ row[5]|e }}>
+				<td><input type="hidden" name="case_key" value={{ row[3]|e }}>
+				<td><input type="hidden" name="proc_run_id" value={{ row[0]|e }}><tr>
+			{% endfor %}
+		</table>
+		</form>	
+		<br>	
+  	</article><!-- END 3. Record Conformance -->
+  		
+  	
+  <article class="module width_full">	
+		
+		<table class=datatable>
+		<th class=datatable colspan="14"> Data Validation from case </th>
+		<tr>
+		<th class=datatable>0</th>
+		<th class=datatable>1</th>
+		<th class=datatable>2</th>
+		<th class=datatable>3</th>
+		<th class=datatable>4</th>
+		<th class=datatable>5</th>
+		<th class=datatable>6</th>
+		<th class=datatable>7</th>
+		<th class=datatable>8</th>
+		<th class=datatable>9</th>
+		<th class=datatable>10</th>
+		<th class=datatable>11</th>
+		<th class=datatable>12</th>
+		<th class=datatable>13</th>
+		<tr>
+					{% for row in case %}
+					<tr><td>{{ row[0]|e }}<td>{{ row[1]|e }}<td class=center>{{ row[2]|e }}<td>{{ row[3]|e }}<td class=center>{{ row[4]|e }}<td>{{ row[5]|e }}<td>{{ row[6]|e }}<td>{{ row[7]|e }}<td>{{ row[8]|e }}<td>{{ row[9]|e }}<td>{{ row[10]|e }}<td>{{ row[11]|e }}<td>{{ row[12]|e }}<td>{{ row[13]|e }}<tr>
+					{% endfor %}
+		</table>			
+  </article><!-- END Display Processes --
