@@ -19,8 +19,9 @@ DATABASE_NAME = 'capability'
 USER_NAME = 'root'
 PASSWORD = ''
 '''
+
 def get_connection():
-    return rdbms.connect(instance=CLOUDSQL_INSTANCE, database=DATABASE_NAME, user=USER_NAME, password=PASSWORD, charset='utf8')
+    return rdbms.connect(instance=CLOUDSQL_INSTANCE, database=DATABASE_NAME, user=USER_NAME, password=PASSWORD, charset='utf8', use_unicode = True)
 
 # Tools
 def UTCTime():
@@ -35,8 +36,7 @@ def IDGenerator():
 class Test(object):
     
     self.proc_step_id = SelectProcessStep("proc_step_id")
-        
-        def querySelectProcessSteps(self):
+    def querySelectProcessSteps(self):
             
         conn = get_connection()
         cursor = conn.cursor()
@@ -53,10 +53,9 @@ class Milk(object):
 
         self.name = "milk"
         self.price = 10
-    
+        
     def getName(self):  
         return self.name
-    
     def getPrice(self):
         return self.price
 '''

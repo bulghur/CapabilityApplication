@@ -23,7 +23,7 @@ jinja2_env = jinja2.Environment(
 
 
 def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8')            
+    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8', use_unicode = True)            
               
 class DevelopCapability(webapp.RequestHandler):
     def get(self):
@@ -210,18 +210,18 @@ class PlayGroundHandler(webapp.RequestHandler):
 class LeftNavHandler(webapp.RequestHandler):
     def get(self):
         self.response.out.write("jinja2_env.get_template('leftnav.html').render({})")
-        
+   
 class Authenticate(webapp2.RequestHandler):
     '''
-    This authenticates based on App Engine authentication with Google using a gmail user.  
-    See this: http://webapp-improved.appspot.com/tutorials/auth.html
-    '''
+This authenticates based on App Engine authentication with Google using a gmail user.
+See this: http://webapp-improved.appspot.com/tutorials/auth.html
+'''
     def get(self):
         authenticateUser = users.get_current_user()
         #email = authenticateUser.email
         nickname = '' #authenticateUser.nickname
         
-        if authenticateUser: 
+        if authenticateUser:
             
             conn = get_connection()
             cursor = conn.cursor()
@@ -229,14 +229,14 @@ class Authenticate(webapp2.RequestHandler):
             person = cursor.fetchall()
             conn.close()
 
-            greeting = ('Welcome, %s! email: person: %s nickname: %s  <li class="icn_edit_article">(<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/permissions">Go to Main Page</a></li>' %
+            greeting = ('Welcome, %s! email: person: %s nickname: %s <li class="icn_edit_article">(<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/permissions">Go to Main Page</a></li>' %
                 (authenticateUser.email(), person, nickname, users.create_logout_url("/")))
                       
         else:
             greeting = ('<a href="%s">Sorry, you are not authorised to use this application</a>.' %
                         users.create_login_url("/"))
 
-        self.response.out.write('<html><body>%s</body></html>' % greeting)        
+        self.response.out.write('<html><body>%s</body></html>' % greeting)
         
 class Permissions(webapp.RequestHandler): #This is messy -- clean it up
         def get(self):
@@ -251,10 +251,10 @@ class Permissions(webapp.RequestHandler): #This is messy -- clean it up
             conn.close()
             
             #person1 = [str(person).encode('unicode-escape') for person in person]
-            #person2 = '["' + "(u'" + email + "'," + ')"]'  #HACK!!!
+            #person2 = '["' + "(u'" + email + "'," + ')"]' #HACK!!!
 
 
-            if  email == "m4bulghur@gmail.com" or "paul.weber@philipcrosby.com" or "cheryl.salatino@philipcrosby.com" or "govberg@gmail.com":
+            if (email == "m4bulghur@gmail.com" or "paul.weber@philipcrosby.com" or "cheryl.salatino@philipcrosby.com" or "govberg@gmail.com"):
                 conn = get_connection()
                 cursor = conn.cursor()
 
@@ -270,8 +270,6 @@ class Permissions(webapp.RequestHandler): #This is messy -- clean it up
                 greeting = ('<a href="%s">Sorry, you are not authorised to use this application</a>.' %
                         users.create_login_url("/"))
                 self.response.out.write('<html><body>%s</body></html>' % greeting)
-                        
-#################################################            HANDLERS         #############################################################
               
 application = webapp.WSGIApplication(
     [

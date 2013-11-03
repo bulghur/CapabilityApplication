@@ -6,8 +6,8 @@ html, div, map, dt, isindex, form, header, aside, section, section, article, foo
 
 html, body {
 height: 100%;
-margin: 0;
-padding: 0;
+margin: 2;
+padding: 2;
 font-family: "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
 background: #F8F8F8;
 font-size: 12px;
@@ -755,6 +755,7 @@ margin: 0 10px;
 border: 1px solid #bbb;
 height: 20px;
 color: #666666;
+font-size: 10px;
 }
 
 fieldset textarea {
