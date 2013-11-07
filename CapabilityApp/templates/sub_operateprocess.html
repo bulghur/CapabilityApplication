@@ -1,39 +1,65 @@
   <article class="module width_full">	
-		<label><h2>2. Operate Process: {{case_key}}</h2></label>	
-	    <table class=datatable>
+  
+  		{% for row in case|batch(1)|first() %}
+		<label><h2>2. Process Name/Process Step: </b>{{ row[8]|e }}/{{ row[9]|e }}</h2></label>	
+<fieldset style="width:46%; float:left; margin-right: 2%;">
+		<ul>
+			<li><b>Process Case: </b>{{ row[1]|e }} - {{ row[7]|e }}</li>
+			<li><b>Process Instance: </b>{{ row[3]|e }}</li>
+			<li><b>Link to SOP: </b><a href={{ row[10]|e }} target="_blank">Click here for SOP</a></li>
+			<li><b>Link to PMW: </b><a href={{ row[14]|e }} target="_blank">Click here for PMW</a></li>
+
+		{% endfor %}
+		</ul>
+</fieldset>
+	
+<fieldset style="width:46%; float:right; margin-right: 2%;">	
+		<table class=datatable>
+		<th class=datatable>Type</th>
+		<th class=datatable>Control</th>
+		<th class=datatable>Requirements</th>
+		<tr><td  colwidth = fixed rowspan="3">Performance Standard<td>Zero Defects (Quality)<td>Meet Requirements the first time<tr>
+		<td>Zero Workaroundsv(Cost)<td>Follow the Procedures<tr>
+		<td>Zero Delays (Schedule)<td>Start work when conforming Inputs and Controls are available<tr>
+		</table>
+</fieldset>
+		<div class="clear"></div>
+	<div id="ProcRun" width:1200px;float:center;">
+	    <table class=tableentry>
 		<form action="/postProcessRun" method="POST"> 
-		<th class=datatable colspan="7"> Operate the Process </th><tr>
-		<th class=datatable>Sequence</th>
-		<th class=datatable>Requirement</th>
-		<th class=datatable>RequirementDetails</th>
-		<th class=datatable>Innovations</th>
-		<th class=datatable>Operational Risks</th>
-		<th class=datatable>Conformance</th>
-		<th class=datatable>Action</th><tr>
+		<th colspan="7"> Operate the Process </th><tr>
+		<th>Seq</th>
+		<th>Requirement</th>
+		<th>Requirement Details</th>
+		<th>Innovations</th>
+		<th>Operational Risks</th>
+		<th>Conformance</th>
+		<th>Action</th><tr>
 			{% for row in case %}
 				<td>{{ row[12]|e }}
 				<td>{{ row[13]|e }}
 				<td>{{ row[14]|e }}
-				<td><textarea rows="1" cols="40" name="proc_innovation" wrap="hard"></textarea>
-				<td><textarea rows="1" cols="40" name="proc_conseq" wrap="hard"></textarea>
-				<td><select name="proc_output_conf">
-	                <optgroup label="Select one">
-	                <option value="1">Conforming</option>
-	                <option value="0">Non-Conforming</option>
-	                <option value="2">Pending</option>
-	                </optgroup></label>
+				<td><textarea type=text rows="2" name="proc_innovation" wrap="hard"></textarea>
+				<td><textarea type=text rows="2" name="proc_conseq" wrap="hard"></textarea>
+				<td><select font-size="10px" name="proc_output_conf">
+	                <optgroup>
+	                <option font-size="10px" value="1">Conforming</option>
+	                <option font-size="10px" value="0">Non-Conforming</option>
+	                <option font-size="10px" value="2">Pending</option>
+	                </optgroup>
                 </select>
-                <td><input type="submit" name = "proc_run_status" value="Submit">
+                <td><input type="submit" name = "proc_run_status" font-size:10px; value="Submit">
               	<td><input type="hidden" name="proc_req_id" value={{ row[4]|e }}>
               	<td><input type="hidden" name="proc_step_id" value={{ row[5]|e }}>
 				<td><input type="hidden" name="case_key" value={{ row[3]|e }}>
 				<td><input type="hidden" name="proc_run_id" value={{ row[0]|e }}><tr>
 			{% endfor %}
 		</table>
+		<div class="clear"></div>
 		</form>	
 		<br>	
   	</article><!-- END 3. Record Conformance -->
-  		
+<!--		
   <article class="module width_full">	
 		
 		<table class=datatable>
@@ -58,4 +84,5 @@
 					<tr><td>{{ row[0]|e }}<td>{{ row[1]|e }}<td class=center>{{ row[2]|e }}<td>{{ row[3]|e }}<td class=center>{{ row[4]|e }}<td>{{ row[5]|e }}<td>{{ row[6]|e }}<td>{{ row[7]|e }}<td>{{ row[8]|e }}<td>{{ row[9]|e }}<td>{{ row[10]|e }}<td>{{ row[11]|e }}<td>{{ row[12]|e }}<td>{{ row[13]|e }}<tr>
 					{% endfor %}
 		</table>			
-  </article><!-- END Display Processes --
+  </article>
+-->

@@ -20,7 +20,7 @@ jinja2_env = jinja2.Environment(
 )
 
 def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8')
+    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8', use_unicode = True)
 
 class PostProcessStep(webapp.RequestHandler):
     def post(self): # post to DB

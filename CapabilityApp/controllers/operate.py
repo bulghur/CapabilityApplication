@@ -7,7 +7,7 @@ import webapp2
 import jinja2
 import itertools
 import json
-
+from array import *
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
 from google.appengine.api import users
@@ -117,8 +117,9 @@ class CreateCase(webapp.RequestHandler):
         self.response.out.write(template.render(template_values))
    
 class CreateInstance(webapp.RequestHandler): 
-    '''Purpose: This object supports selection of PROCESS STEP, creation of the process case grouping, loading it into 
-    the proc_run table and then pulling those entries back out to the display.  
+    '''
+    This object supports selection of PROCESS STEP, creation of the process case grouping, loading it into 
+    the proc_run table and then pulls those entries back out to the display.  
     Display: operateprocess.html      
     '''
     
@@ -142,6 +143,8 @@ class CreateInstance(webapp.RequestHandler):
         
         conn.commit()
         
+        
+        
         cursor.execute("SELECT proc_case.case_id, proc_case.emp_id, instance.instance_key, proc_req.proc_req_id, process_step.proc_step_id, process.proc_id "
                        "FROM proc_case "
                        "INNER JOIN instance on (proc_case.case_id = instance.case_id) "
@@ -156,11 +159,10 @@ class CreateInstance(webapp.RequestHandler):
             t = (row)
             cursor.execute("INSERT INTO proc_run (case_id, emp_id, instance_key, proc_req_id, proc_step_id, proc_id) VALUES (%s, %s, %s, %s, %s, %s) ", t)  
         conn.commit()
-        
 
         cursor.execute("SELECT proc_run.proc_run_id, proc_run.case_id, proc_run.emp_id, proc_run.instance_key, proc_run.proc_req_id, proc_run.proc_step_id, "
                        "process.proc_id, proc_case.case_nm, process.proc_nm, process_step.proc_step_nm, process_step.proc_step_sop, proc_run.proc_output_conf, "
-                       "proc_req.proc_req_seq, proc_req.proc_req_nm, proc_req.proc_req_desc "
+                       "proc_req.proc_req_seq, proc_req.proc_req_nm, proc_req.proc_req_desc, process_step.proc_model_link "
                        "FROM proc_run "
                        "INNER JOIN proc_case on (proc_run.case_id = proc_case.case_id) "
                        "INNER JOIN process on (proc_run.proc_id = process.proc_id) "
@@ -168,8 +170,8 @@ class CreateInstance(webapp.RequestHandler):
                        "INNER JOIN proc_req on (proc_run.proc_req_id = proc_req.proc_req_id) "
                        "WHERE proc_run.instance_key = %s", (case_key))  
         case = cursor.fetchall()
-
-        conn.close()     
+        conn.close() 
+        
         template_values = {'authenticateUser': authenticateUser, 'case': case, 'case_key': case_key} 
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))

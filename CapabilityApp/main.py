@@ -27,15 +27,18 @@ def get_connection():
               
 class DevelopCapability(webapp.RequestHandler):
     def get(self):
-        sqlMeasureAll = "SELECT person.last_nm, process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_nm, SUM(proc_run.proc_output_conf)/COUNT(*) FROM proc_run inner join person ON (proc_run.emp_id = person.emp_id) inner join proc_req ON (proc_run.proc_req_id = proc_req.proc_req_id) inner join process_step ON (proc_req.proc_step_id = process_step.proc_step_id) inner join process ON (process_step.proc_id = process.proc_id) WHERE proc_run.proc_run_status='C' AND person.emp_id = 1 GROUP BY proc_run.emp_id, proc_run.proc_req_id"
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute(sqlMeasureAll)
-        rows = cursor.fetchall()
+        cursor.execute("SELECT process.proc_nm, process_step.proc_step_nm, proc_run.proc_output_conf "
+                       "FROM proc_run "
+                       "inner join proc_req ON (proc_run.proc_req_id = proc_req.proc_req_id) "
+                       "inner join process_step ON (proc_req.proc_step_id = process_step.proc_step_id) "
+                       "inner join process ON (process_step.proc_id = process.proc_id) ") 
+        processSummary = cursor.fetchall()
         conn.close()
         
-        template_values = {'rows': rows, }
-        template = jinja2_env.get_template('developcapability.html')
+        template_values = {'processSummary': processSummary, }
+        template = jinja2_env.get_template('index.html')
         self.response.out.write(template.render(template_values))    
            
 ###################################################################Ajax########################################################################
@@ -258,11 +261,17 @@ class Permissions(webapp.RequestHandler): #This is messy -- clean it up
                 conn = get_connection()
                 cursor = conn.cursor()
 
-                cursor.execute("SELECT * FROM process ORDER by proc_nm")
-                ddb_process = cursor.fetchall()
+                cursor.execute("SELECT process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_nm, SUM(proc_run.proc_output_conf)/COUNT(*), COUNT(proc_run.proc_output_conf) "
+                               "FROM proc_run "
+                               "INNER JOIN proc_req ON (proc_run.proc_req_id = proc_req.proc_req_id) "
+                               "INNER JOIN process_step ON (proc_req.proc_step_id = process_step.proc_step_id) "
+                               "INNER JOIN process ON (process_step.proc_id = process.proc_id) "
+                               "GROUP BY process_step.proc_step_id, proc_req.proc_req_nm "
+                               "ORDER BY process.proc_id, process_step.proc_seq") 
+                processSummary = cursor.fetchall()
                 conn.close()
-            
-                template_values = {"authenticateUser": authenticateUser, "person": person, "ddb_process": ddb_process }
+                
+                template_values = {"authenticateUser": authenticateUser, 'processSummary': processSummary}
                 template = jinja2_env.get_template('index.html')
                 self.response.out.write(template.render(template_values))
                 
@@ -275,7 +284,7 @@ application = webapp.WSGIApplication(
     [
         ('/', Authenticate),
         ("/permissions", Permissions),
-        ("/mainhandler", home.MainHandler),
+        ("/MainHandler", home.MainHandler),
         ("/OperateProcess", operate.OperateProcess),
         ('/SelectProcessStep', operate.SelectProcessStep), 
         ("/CreateInstance", operate.CreateInstance),

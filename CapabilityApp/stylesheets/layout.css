@@ -10,7 +10,7 @@ margin: 2;
 padding: 2;
 font-family: "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
 background: #F8F8F8;
-font-size: 12px;
+font-size: 10px;
 }
 
 .clear {
@@ -379,6 +379,10 @@ margin: 8px 20px;
 
 /* Modules */
 
+optgroup { 
+font-size:10px;
+}
+
 .module {
 border: 1px solid #9BA0AF;
 width: 100%;
@@ -487,11 +491,34 @@ font-size: 10px;
 color: #999999;
 margin-bottom: 8px}
 
+/* Input Table */
+
+.tableentry {
+width: 100%;
+margin: -5px 1 1 1;
+}
+
+.tableentry td{
+text-align: left;
+border-top: 1px solid grey thin;
+border-bottom: solid grey thin;
+margin-right:1px;
+}
+
+.tableentry th{
+table-layout:fixed;
+background-color: #c0c0c0;
+border-top: 1px solid grey thin;
+border-bottom: solid grey thin;
+margin-right:1px;
+}
+
+
 /* Content Manager */
 
 .tablesorter {
 width: 100%;
-margin: -5px 0 0 0;
+margin: -5px 1 1 1;
 }
 
 .tablesorter td{
@@ -516,20 +543,23 @@ padding: 15px 10px;
 	text-align: center;
 }
 
-.datatable { border-collapse: collapse;
-		width: 70%
-		margin: auto}
-.datatable th { padding: 0.5em 0 0.5em;
+.datatable { border-collapse: collapse;	
+		width: 100%
+		margin-right:50px;}
+.datatable th { padding: 1em 0 1em;
 	background-color: #c0c0c0;
-	border-top: 1px solid black;
-	border-bottom: 1px solid black;
+	border-top: 1px solid grey thin;
+	border-bottom: solid grey thin;
+	margin-right:50px;
 }
-.datatable td { border: solid black thin;}
+.datatable td { border: solid grey thin;
+	width: 100%
+	margin-right:50px;}
 .datatable caption { font size: 5em; font-weigh: bold;}
 
 
 .tablesorter input[type=image] {
-margin-right: 10px;}
+margin-right: 50px;}
 
 ul.tabs {
 	margin: 3px 10px 0 0;
@@ -607,7 +637,7 @@ border: 1px solid #A8A9A8;
 -moz-box-shadow: 0 1px 0 #fff;
 box-shadow: 0 1px 0 #fff;
 font-weight: bold;
-height: 22px;
+height: 20px;
 -webkit-border-radius: 5px;
 -moz-border-radius: 5px;
 border-radius: 5px;
@@ -615,6 +645,7 @@ padding: 0 10px;
 color: #666;
 text-shadow: 0 1px 0 #fff;
 cursor: pointer;
+font-size:1em;
 }
 
 input[type=submit]:hover {
@@ -719,7 +750,7 @@ text-shadow: 0 1px 0 #fff;
 font-weight: bold;
 padding-left: 10px;
 margin: -5px 0 5px 0;
-text-transform: uppercase;
+
 }
 
 fieldset input[type=text] {
@@ -739,6 +770,7 @@ display: block;
 float: left;
 width: 96%;
 margin: 0 10px;
+font-size: 1em;
 }
 
 fieldset input[type=text]:focus {
@@ -747,15 +779,16 @@ border: 1px solid #77BACE;
 -webkit-box-shadow: inset 0 2px 2px #ccc, 0 0 10px #ADDCE6;
 -moz-box-shadow: inset 0 2px 2px #ccc, 0 0 10px #ADDCE6;
 box-shadow: inset 0 2px 2px #ccc, 0 0 10px #ADDCE6;
+font-size: 1em;
 }
 
 fieldset select {
-width: 96%;
+width: 70%;
 margin: 0 10px;
 border: 1px solid #bbb;
 height: 20px;
 color: #666666;
-font-size: 10px;
+font-size: 1em;
 }
 
 fieldset textarea {
@@ -767,13 +800,13 @@ color: #666666;
 -webkit-box-shadow: inset 0 2px 2px #ccc, 0 1px 0 #fff;
 -moz-box-shadow: inset 0 2px 2px #ccc, 0 1px 0 #fff;
 box-shadow: inset 0 2px 2px #ccc, 0 1px 0 #fff;
-padding-left: 10px;
+padding-left: 1px;
 background-position: 10px 6px;
 margin: 0 0.5%;
 display: block;
 float: left;
 width: 96%;
-margin: 0 10px;
+margin: 0 1px;
 }
 
 fieldset textarea:focus {
@@ -793,7 +826,7 @@ padding: 5px 0;
 .submit_link select {
 width: 150px;
 border: 1px solid #bbb;
-height: 20px;
+height: 30px;
 color: #666666;
 }
 

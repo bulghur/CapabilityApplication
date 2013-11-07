@@ -44,7 +44,7 @@ class UtilityHandler(webapp.RequestHandler):
         ddb_processsteps = cursor.fetchall()
         
         conn.close()
-
+        
         template_values = {'ddb_person': ddb_person, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps }
         template = jinja2_env.get_template('utilities.html')
         self.response.out.write(template.render(template_values))

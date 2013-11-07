@@ -12,7 +12,7 @@
 		<hr/>
 		<h3>Operate & Manage</h3>
 			</select></li>
-			<li class="icn_new_article">{{ item }}</li>
+			<li class="icn_edit_article"><a href="/MainHandler">Home</a></li>
 			<li class="icn_edit_article"><a href="/DevelopCapability">Develop Capability</a></li>
 			<li class="icn_categories"><a href="/OperateProcess">Operate & Manage</a></li>
 			<li class="icn_tags"><a href="/MeasurePerformance">Measure Performance</a></li>
@@ -42,13 +42,6 @@
 			<li class="icn_jump_back"><a href="/jQueryJSON">jQuery</a><br></li>
 			<li class="icn_jump_back"><a href="/playground">Playground</a><br></li>
 			<li class="icn_settings"><a href="/ajaxjson">AjaxJSON</a></li>
-					    <li><form action="/devOperateProcess" method="GET">
-    			<select name="dev_proc_id" id="dev_proc_id" onChange='this.form.submit()'>
-				<option>Select a Process</option>
-				{% for row in ddb_process %}
-					<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
-				{% endfor %} 
-				</select></form></li>
 		</ul>
 			<hr />
 			<p><strong>Copyright &copy; 2011 Website Admin</strong></p>
