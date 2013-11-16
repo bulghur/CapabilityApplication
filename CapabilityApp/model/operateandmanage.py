@@ -28,8 +28,6 @@ def sessionVariables(self):
     proc_id = 5
     JSONproc_id = self.response.out.write(json.dumps(proc_id))
 
-
-
 class OandMProcessData(object):
     '''
     Purpose: Runs query to get processes

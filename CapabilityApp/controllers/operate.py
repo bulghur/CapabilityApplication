@@ -12,7 +12,7 @@ from google.appengine.api import rdbms
 from google.appengine.ext import webapp
 from google.appengine.api import users
 from google.appengine.ext.webapp.util import run_wsgi_app
-from config import config
+from config import *
 from model import sql
 from model import operateandmanage
 template_path = os.path.join(os.path.dirname(__file__), '../templates')
@@ -22,14 +22,19 @@ jinja2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path))
 
 
 def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8', use_unicode = True)
+    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, 
+                         database=config.DATABASE_NAME, 
+                         user=config.USER_NAME, 
+                         password=config.PASSWORD, 
+                         charset='utf8', 
+                         use_unicode = True)
 
 class OperateProcess(webapp.RequestHandler):
     '''
     Initially displays the O&M page for Process Step Selection
     Uses: operateprocess.html and sub_selector
     '''
-    def get(self):
+    def get(self, *args, **kwargs):
         
         authenticateUser = str(users.get_current_user())
               
@@ -42,6 +47,7 @@ class OperateProcess(webapp.RequestHandler):
         sqlGetAllProcesses = "SELECT * FROM process ORDER by proc_nm"
         cursor.execute(sqlGetAllProcesses)
         ddb_process = cursor.fetchall()  
+
         
         cursor.execute('SELECT * FROM process_step')
         ddb_proc_step = cursor.fetchall()
@@ -54,7 +60,7 @@ class OperateProcess(webapp.RequestHandler):
         
 class SelectProcessStep(webapp.RequestHandler):
     '''
-
+    This process selects the parent process so that the process substeps can be easily selected.  
     '''
     def get(self):
         
@@ -83,7 +89,6 @@ class CreateCase(webapp.RequestHandler):
     '''
     This object creates a user case against which process run can be associated.  Cases are associated with specific users. 
     Renders to operateprocess.html.  
-
     '''
     def post(self):
 
@@ -120,7 +125,10 @@ class CreateInstance(webapp.RequestHandler):
     '''
     This object supports selection of PROCESS STEP, creation of the process case grouping, loading it into 
     the proc_run table and then pulls those entries back out to the display.  
+    Instances are built off the concatenation of timefunction (secs since 1/01/1970 and the username@ function in config to 
+    Ensure uniqueness.  If a process fails, it should be marked as a non-conformance and attempted again. 
     Display: operateprocess.html      
+    TODO: Instances should load with status value set to initialised, then it should move to submitted or pending. 
     '''
     
     def post(self): # post to DB
@@ -142,8 +150,6 @@ class CreateInstance(webapp.RequestHandler):
                        ))
         
         conn.commit()
-        
-        
         
         cursor.execute("SELECT proc_case.case_id, proc_case.emp_id, instance.instance_key, proc_req.proc_req_id, process_step.proc_step_id, process.proc_id "
                        "FROM proc_case "
@@ -168,7 +174,9 @@ class CreateInstance(webapp.RequestHandler):
                        "INNER JOIN process on (proc_run.proc_id = process.proc_id) "
                        "INNER JOIN process_step on (proc_run.proc_step_id = process_step.proc_step_id) "
                        "INNER JOIN proc_req on (proc_run.proc_req_id = proc_req.proc_req_id) "
-                       "WHERE proc_run.instance_key = %s", (case_key))  
+                       "WHERE proc_run.instance_key = %s"
+                       "ORDER BY proc_req.proc_req_seq", (case_key))  
+                
         case = cursor.fetchall()
         conn.close() 
         
@@ -179,7 +187,9 @@ class CreateInstance(webapp.RequestHandler):
     
 class PostProcessRun(webapp.RequestHandler): 
     '''
-    
+    This process posts the submission of each conforming or non-conforming requirement in seqence to the database.  
+    ToDo: Remove the proc_run.proc_run_output IS NULL statement and instead display all the entries until the entire requirement 
+    has been submitted. When no requirements exist to be fulfilled, then ask if the operator wants to exit or run another process. 
     '''
     def post(self): 
         now = config.UTCTime()
@@ -189,14 +199,15 @@ class PostProcessRun(webapp.RequestHandler):
         proc_conseq = self.request.get('proc_conseq')
         proc_innovation = self.request.get('proc_innovation')
         proc_run_id = self.request.get('proc_run_id')
+        proc_run_status = self.request.get('proc_run_status')
         
         conn = get_connection()
         cursor = conn.cursor()
         
         cursor.execute("UPDATE proc_run SET "
-                       "proc_run_start_tm =%s, proc_output_conf = %s, proc_conseq = %s, proc_innovation = %s "
+                       "proc_run_start_tm =%s, proc_output_conf = %s, proc_conseq = %s, proc_innovation = %s, proc_run_status = %s"
                        "WHERE proc_run_id = %s ",
-                       (now, proc_output_conf, proc_conseq, proc_innovation, proc_run_id))
+                       (now, proc_output_conf, proc_conseq, proc_innovation, proc_run_status, proc_run_id ))
 
         conn.commit()
         

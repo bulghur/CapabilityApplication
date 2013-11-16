@@ -84,7 +84,7 @@
 				<table id="data">
 					<tr><td><h4><b>Operator <tab><td><b>Process<tab> <td><b>Conformance<tab> </b></h4></tr>
 					{% for row in sqlMeasurebyPerson %}
-					<tr><td>{{ row[0]|e }} <td>{{ row[1]|e }} <td>{{ row[2]|e }} <td>{{ row[3]|e }} <td>{{ row[4]|e }} </tr>
+					<tr><td>{{ row[0]|e }} <td>{{ row[1]|e }} <td>{{ row[2]|e }} </tr>
 					{% endfor %}
 				</table>
 				<tr> 
@@ -102,21 +102,8 @@
 <br>
 		<div class="tab_container">
 		
-<article class="module width_full">	
-		  
-<table class=datatable>
-{% for group in summary|groupby(0) %}
-    <th class=datatable colspan="5">{{ group.grouper }}</th><tr>
-    {% for row in group.list %}
-        <td>{{ row[1]|e }}<td>{{ row[2]|e }}<td>{{ row[3]|e }}<td>{{ row[4]|e }}<td>{{ row[5]|e }}<tr>
-    {% endfor %}
-{% endfor %}
-</table>
-<br><br>
-					
-		</article><!-- end of messages article -->
-		  
-<article class="module width_full">	
+		  <article class="module width_full">	
+		
 		<table class=datatable>
 		<th class=datatable colspan="14"> Data Validation from case </th>
 		<tr>
@@ -135,40 +122,47 @@
 		<th class=datatable>12</th>
 		<th class=datatable>13</th>
 		<tr>
-		<br><br>
-					{% for row in summary %}
+					{% for row in rows %}
 					<tr><td>{{ row[0]|e }}<td>{{ row[1]|e }}<td>{{ row[2]|e }}<td>{{ row[3]|e }}<td>{{ row[4]|e }}<td>{{ row[5]|e }}<td>{{ row[6]|e }}<td>{{ row[7]|e }}<td>{{ row[8]|e }}<td>{{ row[9]|e }}<td>{{ row[10]|e }}<td>{{ row[11]|e }}<td>{{ row[12]|e }}<td>{{ row[13]|e }}<td>{{ row[14]|e }}<tr><tr>
 					{% endfor %}
-		</table>	
+		</table>			
+  </article>
 		
-				<table class=datatable>
-		<th class=datatable colspan="14"> Data Validation from case </th>
-		<tr>
-		<th class=datatable>0</th>
-		<th class=datatable>1</th>
-		<th class=datatable>2</th>
-		<th class=datatable>3</th>
-		<th class=datatable>4</th>
-		<th class=datatable>5</th>
-		<th class=datatable>6</th>
-		<th class=datatable>7</th>
-		<th class=datatable>8</th>
-		<th class=datatable>9</th>
-		<th class=datatable>10</th>
-		<th class=datatable>11</th>
-		<th class=datatable>12</th>
-		<th class=datatable>13</th>
-		<tr>
 		
-					{% for row in summary1 %}
-					<tr><td>{{ row|e }}<tr><tr>
-					{% endfor %}
-		</table>
-		<table>
-		<td>Result for summary: <td>{{ summary[0]}}<td>{{ summary[1] }}<td>{{ summary[3] }}	<tr>	
-		</table>
-		Result for summary1: {{ summary1|e }}		
- </article><!-- end of messages article -->
+		
+			<div id="tab1" class="tab_content">
+			<table class="tablesorter" cellspacing="0"> 
+			<thead> 
+				<tr> 
+   					<th></th> 
+    				<th>Operator</th> 
+    				<th>High Level Process</th> 
+    				<th>Process Step</th> 
+    				<th>Requirement</th> 
+    				<th>Conformance</th> 
+				</tr> 
+			</thead> 
+			<tbody> 
+				{% for row in rows %}
+				<tr> 
+   					<td><input type="checkbox"></td> 
+    				<td>{{ row[0]|e }}</td> 
+    				<td>{{ row[1]|e }}</td> 
+    				<td>{{ row[2]|e }}</td> 
+    				<td>{{ row[3]|e }}</td> 
+    				<td>{{ row[4]|e }}</td> 
+    				<td><input type="image" src="images/icn_edit.png" title="Edit"><input type="image" src="images/icn_trash.png" title="Trash"></td> 
+				</tr> 
+				{% endfor %}
+			</tbody> 
+			</table>
+			</div><!-- end of #tab1 -->
+
+			</div><!-- end of #tab2 -->
+			
+		</div><!-- end of .tab_container -->
+		
+		</article><!-- end of content manager article -->
 		
 		<article class="module width_full">
 			<header><h3>Process Status Messages</h3></header>

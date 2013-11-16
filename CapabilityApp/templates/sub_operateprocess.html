@@ -18,9 +18,10 @@
 		<th class=datatable>Type</th>
 		<th class=datatable>Control</th>
 		<th class=datatable>Requirements</th>
-		<tr><td  colwidth = fixed rowspan="3">Performance Standard<td>Zero Defects (Quality)<td>Meet Requirements the first time<tr>
-		<td>Zero Workaroundsv(Cost)<td>Follow the Procedures<tr>
-		<td>Zero Delays (Schedule)<td>Start work when conforming Inputs and Controls are available<tr>
+		<th class=datatable></th>		
+		<tr><td  colwidth = fixed rowspan="3">Performance Standard<td>Zero Defects (Quality)<td>Meet Requirements the first time<td><input type="checkbox" default value=0><tr>
+		<td>Zero Workaroundsv(Cost)<td>Follow the Procedures<td><input type="checkbox" default value=0><tr>
+		<td>Zero Delays (Schedule)<td>Start work when conforming Inputs and Controls are available<td><input type="checkbox" default value=0><tr>
 		</table>
 </fieldset>
 		<div class="clear"></div>
@@ -48,7 +49,7 @@
 	                <option font-size="10px" value="2">Pending</option>
 	                </optgroup>
                 </select>
-                <td><input type="submit" name = "proc_run_status" font-size:10px; value="Submit">
+                <td><input type="submit" name = "proc_run_status" font-size:10px; value="Submitted">
               	<td><input type="hidden" name="proc_req_id" value={{ row[4]|e }}>
               	<td><input type="hidden" name="proc_step_id" value={{ row[5]|e }}>
 				<td><input type="hidden" name="case_key" value={{ row[3]|e }}>

@@ -1,18 +1,7 @@
 http://handsontable.com/demo/fixed.html -- example of excel like table
 
 How to group in Jinja2: 	    
-		<ul>
-		{% for group in case|groupby('process') %}
-		    <li>{{ group.grouper }}<ul>
-		    {% for row in case.list %}
-		        <li>{{ process.proc_name }} {{ person.last_name }}</li>
-		    {% endfor %}</ul></li>
-		{% endfor %}
-		</ul>
-		
-		
-		Groupings in HTML5:
-		<hgroup>
+
     <h1> Heading Level 1 Used for Title</h1>
     <h2> Heading Level 2 Used for the Tagline</h2>
     

@@ -19,7 +19,6 @@ DATABASE_NAME = 'capability'
 USER_NAME = 'root'
 PASSWORD = ''
 '''
-
 def get_connection():
     return rdbms.connect(instance=CLOUDSQL_INSTANCE, database=DATABASE_NAME, user=USER_NAME, password=PASSWORD, charset='utf8', use_unicode = True)
 
@@ -48,14 +47,3 @@ class Test(object):
         
         return ddb_proc_step  
         '''
-'''
-class Milk(object):
-
-        self.name = "milk"
-        self.price = 10
-        
-    def getName(self):  
-        return self.name
-    def getPrice(self):
-        return self.price
-'''

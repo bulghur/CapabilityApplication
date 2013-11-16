@@ -12,7 +12,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.api import users
 from controllers import measure, operate, home, design, utilities
-from config import config
+from config import config, app_control
 from config import myhandler
 
 # Paths and Jinja2
@@ -23,7 +23,11 @@ jinja2_env = jinja2.Environment(
 
 
 def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8', use_unicode = True)            
+    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, 
+                         database=config.DATABASE_NAME, 
+                         user=config.USER_NAME, 
+                         password=config.PASSWORD, 
+                         charset='utf8', use_unicode = True)            
               
 class DevelopCapability(webapp.RequestHandler):
     def get(self):
@@ -221,68 +225,71 @@ See this: http://webapp-improved.appspot.com/tutorials/auth.html
 '''
     def get(self):
         authenticateUser = users.get_current_user()
+        authenticateUser = str(authenticateUser)
+        
         #email = authenticateUser.email
-        nickname = '' #authenticateUser.nickname
+        nickname = "" #authenticateUser.nickname
         
         if authenticateUser:
             
             conn = get_connection()
             cursor = conn.cursor()
-            cursor.execute('SELECT email FROM person WHERE email = %s', (nickname))
+            cursor.execute('SELECT google_user_id FROM person WHERE google_user_id = %s', (authenticateUser))
             person = cursor.fetchall()
             conn.close()
+            '''
+            TODO: Get the first name of the use and other user information, index to the get google_user_id,
+            determine authorisations and then fill in the left nav with areas available to the users.  Finally, 
+            turn the authenticate user into a user object in config used to determine all application  capabilities
+            of the session.             
+            '''
+            person = str(person)
+            authenticateUser = str(authenticateUser)
+            person = person.replace("((u'", "")
+            person = person.replace("',),)", "")
 
-            greeting = ('Welcome, %s! email: person: %s nickname: %s <li class="icn_edit_article">(<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/permissions">Go to Main Page</a></li>' %
-                (authenticateUser.email(), person, nickname, users.create_logout_url("/")))
-                      
+            
+            if person == authenticateUser:
+    
+                greeting = ('Welcome authenticateUser: %s! person: %s <li class="icn_edit_article">(<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/permissions">Go to Main Page</a></li>' %
+                (authenticateUser, person, users.create_logout_url("/")))
+             
+            else:
+                greeting = ('<a href="%s">Sorry INSIDE, you are not authorised to use this application</a>.' %
+                        users.create_login_url("/"))
+             
         else:
             greeting = ('<a href="%s">Sorry, you are not authorised to use this application</a>.' %
-                        users.create_login_url("/"))
+                    users.create_login_url("/"))
 
         self.response.out.write('<html><body>%s</body></html>' % greeting)
         
 class Permissions(webapp.RequestHandler): #This is messy -- clean it up
         def get(self):
             authenticateUser = users.get_current_user()
-            email = authenticateUser.email()
             
-
             conn = get_connection()
             cursor = conn.cursor()
-            cursor.execute('SELECT email FROM person WHERE email = %s', (email))
-            person = cursor.fetchall()
+
+            cursor.execute("SELECT process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_nm, "
+                           "SUM(proc_run.proc_output_conf)/COUNT(*), COUNT(proc_run.proc_output_conf) "
+                           "FROM proc_run "
+                           "INNER JOIN proc_req ON (proc_run.proc_req_id = proc_req.proc_req_id) "
+                           "INNER JOIN process_step ON (proc_req.proc_step_id = process_step.proc_step_id) "
+                           "INNER JOIN process ON (process_step.proc_id = process.proc_id) "
+                           "GROUP BY process_step.proc_step_id, proc_req.proc_req_nm "
+                           "ORDER BY process.proc_id, process_step.proc_seq") 
+            processSummary = cursor.fetchall()
             conn.close()
             
-            #person1 = [str(person).encode('unicode-escape') for person in person]
-            #person2 = '["' + "(u'" + email + "'," + ')"]' #HACK!!!
-
-
-            if (email == "m4bulghur@gmail.com" or "paul.weber@philipcrosby.com" or "cheryl.salatino@philipcrosby.com" or "govberg@gmail.com"):
-                conn = get_connection()
-                cursor = conn.cursor()
-
-                cursor.execute("SELECT process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_nm, SUM(proc_run.proc_output_conf)/COUNT(*), COUNT(proc_run.proc_output_conf) "
-                               "FROM proc_run "
-                               "INNER JOIN proc_req ON (proc_run.proc_req_id = proc_req.proc_req_id) "
-                               "INNER JOIN process_step ON (proc_req.proc_step_id = process_step.proc_step_id) "
-                               "INNER JOIN process ON (process_step.proc_id = process.proc_id) "
-                               "GROUP BY process_step.proc_step_id, proc_req.proc_req_nm "
-                               "ORDER BY process.proc_id, process_step.proc_seq") 
-                processSummary = cursor.fetchall()
-                conn.close()
-                
-                template_values = {"authenticateUser": authenticateUser, 'processSummary': processSummary}
-                template = jinja2_env.get_template('index.html')
-                self.response.out.write(template.render(template_values))
-                
-            else:
-                greeting = ('<a href="%s">Sorry, you are not authorised to use this application</a>.' %
-                        users.create_login_url("/"))
-                self.response.out.write('<html><body>%s</body></html>' % greeting)
+            template_values = {"authenticateUser": authenticateUser, 'processSummary': processSummary}
+            template = jinja2_env.get_template('index.html')
+            self.response.out.write(template.render(template_values))
               
 application = webapp.WSGIApplication(
     [
         ('/', Authenticate),
+        #('/', app_control.GrantAccess),
         ("/permissions", Permissions),
         ("/MainHandler", home.MainHandler),
         ("/OperateProcess", operate.OperateProcess),
