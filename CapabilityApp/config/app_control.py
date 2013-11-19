@@ -11,7 +11,7 @@ from google.appengine.api import rdbms
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.api import users
-from controllers import measure, operate, home, design, utilities
+from controllers import home, design, utilities
 import config
 import main
 import myhandler

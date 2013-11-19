@@ -209,7 +209,10 @@ class AjaxJSON(webapp2.RequestHandler):
 
 #################################################            All Pages       ##############################################################
 ### these are temporary until the pages handlers are completely built, then destroy
-        
+class ProcessModelHandler(webapp.RequestHandler):
+    def get(self):
+        self.response.out.write(jinja2_env.get_template('processmodel.html').render({}))        
+
 class PlayGroundHandler(webapp.RequestHandler):
     def get(self):
         self.response.out.write(jinja2_env.get_template('playground.html').render({}))
@@ -226,9 +229,6 @@ See this: http://webapp-improved.appspot.com/tutorials/auth.html
     def get(self):
         authenticateUser = users.get_current_user()
         authenticateUser = str(authenticateUser)
-        
-        #email = authenticateUser.email
-        nickname = "" #authenticateUser.nickname
         
         if authenticateUser:
             
@@ -292,6 +292,7 @@ application = webapp.WSGIApplication(
         #('/', app_control.GrantAccess),
         ("/permissions", Permissions),
         ("/MainHandler", home.MainHandler),
+        ("/ProcessModel", ProcessModelHandler),
         ("/OperateProcess", operate.OperateProcess),
         ('/SelectProcessStep', operate.SelectProcessStep), 
         ("/CreateInstance", operate.CreateInstance),

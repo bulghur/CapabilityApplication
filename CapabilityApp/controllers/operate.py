@@ -10,36 +10,34 @@ import json
 from array import *
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
+from google.appengine.ext import db
 from google.appengine.api import users
-from google.appengine.ext.webapp.util import run_wsgi_app
-from config import *
-from model import sql
-from model import operateandmanage
+from controllers import home, design, utilities
+from config import config, app_control
 template_path = os.path.join(os.path.dirname(__file__), '../templates')
 
 jinja2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path))
 
-
-
 def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, 
+    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE,
                          database=config.DATABASE_NAME, 
                          user=config.USER_NAME, 
                          password=config.PASSWORD, 
                          charset='utf8', 
-                         use_unicode = True)
+                         use_unicode = True,
+                         )
 
 class OperateProcess(webapp.RequestHandler):
     '''
     Initially displays the O&M page for Process Step Selection
     Uses: operateprocess.html and sub_selector
     '''
-    def get(self, *args, **kwargs):
+    def get(self):
         
-        authenticateUser = str(users.get_current_user())
-              
         conn = get_connection()
-        cursor = conn.cursor()      
+        cursor = conn.cursor()    
+        
+        authenticateUser = str(users.get_current_user())  
         
         cursor.execute("SELECT case_id, case_nm FROM proc_case WHERE status = 1 AND emp_id =%s", (authenticateUser))
         ddb_active_case = cursor.fetchall()
@@ -174,9 +172,10 @@ class CreateInstance(webapp.RequestHandler):
                        "INNER JOIN process on (proc_run.proc_id = process.proc_id) "
                        "INNER JOIN process_step on (proc_run.proc_step_id = process_step.proc_step_id) "
                        "INNER JOIN proc_req on (proc_run.proc_req_id = proc_req.proc_req_id) "
-                       "WHERE proc_run.instance_key = %s"
-                       "ORDER BY proc_req.proc_req_seq", (case_key))  
-                
+                       "INNER JOIN instance on (proc_run.instance_key = instance.instance_key) "
+                       "WHERE instance.instance_key = %s", (case_key))
+                        
+                        
         case = cursor.fetchall()
         conn.close() 
         
@@ -205,8 +204,8 @@ class PostProcessRun(webapp.RequestHandler):
         cursor = conn.cursor()
         
         cursor.execute("UPDATE proc_run SET "
-                       "proc_run_start_tm =%s, proc_output_conf = %s, proc_conseq = %s, proc_innovation = %s, proc_run_status = %s"
-                       "WHERE proc_run_id = %s ",
+                       "proc_run_start_tm =%s, proc_output_conf = %s, proc_conseq = %s, proc_innovation = %s, proc_run_status = %s "
+                       "WHERE proc_run_id = %s",
                        (now, proc_output_conf, proc_conseq, proc_innovation, proc_run_status, proc_run_id ))
 
         conn.commit()

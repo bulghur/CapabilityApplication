@@ -830,6 +830,25 @@ height: 30px;
 color: #666666;
 }
 
+.tabs a{
+  cursor: pointer;
+  padding: 5px;
+  background: #fff;
+  color: #000;
+  border: 1px solid #666;
+  border-bottom: 0;
+}
+.tabs a:hover, .tabs a.active{
+  background: #666;
+  color: #fff;
+}
+
+.tabContent{
+  border: 1px solid #aaa;
+  margin: 4px 0;
+  padding: 5px;
+}
+
 #main .module_content h1 {
 color: #333333;
 text-transform: none;
