@@ -43,8 +43,8 @@ class MeasurePerformance(webapp.RequestHandler):
                        "INNER JOIN process_step ON (proc_run.proc_step_id = process_step.proc_step_id) "
                        "INNER JOIN process ON (proc_run.proc_id = process.proc_id) "
                        "WHERE proc_run.emp_id = %s "
-                       "GROUP BY proc_run.proc_step_id "
-                       "ORDER BY process.proc_id, process_step.proc_step_id",  (authenticateUser))    
+                       "GROUP BY proc_run.case_id, proc_run.proc_step_id "
+                       "ORDER BY process.proc_id, proc_run.case_id, process_step.proc_step_id",  (authenticateUser))    
         
 
         summary = cursor.fetchall()     
@@ -67,8 +67,7 @@ class MeasurePerformance(webapp.RequestHandler):
                        "INNER JOIN proc_case ON (proc_run.case_id = proc_case.case_id) "      
                        "INNER JOIN process_step ON (proc_run.proc_step_id = process_step.proc_step_id) "
                        "INNER JOIN process ON (proc_run.proc_id = process.proc_id) "
-                       "WHERE proc_conseq IS NOT NULL OR proc_innovation IS NOT NULL "
-                       "OR proc_conseq NOT LIKE '% %' OR proc_innovation NOT LIKE '% %' "
+                       "WHERE proc_conseq != ' ' or not null or proc_innovation != ' ' or not null "
                        "ORDER BY process.proc_id, process_step.proc_step_id ")
                        
         innovations = cursor.fetchall()

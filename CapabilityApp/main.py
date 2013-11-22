@@ -210,6 +210,7 @@ class AjaxJSON(webapp2.RequestHandler):
 #################################################            All Pages       ##############################################################
 ### these are temporary until the pages handlers are completely built, then destroy
 class ProcessModelHandler(webapp.RequestHandler):
+    # sourced from http://code-tricks.com/create-a-simple-html5-tabs-using-jquery/
     def get(self):
         self.response.out.write(jinja2_env.get_template('processmodel.html').render({}))        
 
@@ -264,7 +265,7 @@ See this: http://webapp-improved.appspot.com/tutorials/auth.html
 
         self.response.out.write('<html><body>%s</body></html>' % greeting)
         
-class Permissions(webapp.RequestHandler): #This is messy -- clean it up
+class Permissions(webapp.RequestHandler): #This is messy coding -- clean it up
         def get(self):
             authenticateUser = users.get_current_user()
             
