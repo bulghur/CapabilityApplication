@@ -20,3 +20,16 @@ How to group in Jinja2:
 To do: 
 confirmation page for actions and a redirect to reload the page. 
 Basic error handling
+
+TODO:
+Query on open processes (with nulls) and prompt user to close them
+Facility for editing specific processs runs to convert them to non-conforming
+SOP selector
+PMW selector
+Create tabs for measurement and new queries against the view with:
+	case
+	process
+	process steps
+	person
+	All
+review process

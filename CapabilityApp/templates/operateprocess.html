@@ -61,24 +61,53 @@
 			{% include 'leftnav.html' %}
 		</aside><!-- end of sidebar -->
 	
-	<section id="main" class="column">
-		
-		<h4 class="alert_info">Operate and Manage</h4>
-		
+  <div class="tabs">
+    <a data-toggle="tab1">Select Process and Case</a>
+    <a data-toggle="tab2">Operate Process</a>
+    <a data-toggle="tab3">View SOP</a>
+    <a data-toggle="tab4">View PMW</a>
+    <a data-toggle="tab5">View Open Processes</a>
+  </div>
+	<div class="tabContent">  
+	  <div id="tab1">
+	    <h2>Select Process and/or Create Case</h2>
+	    <p>Select the process you wish to work on...</p>
+	    
+				<article class="module width_full">
+					{% include 'sub_selectprocess.html' %}	
+				</article>
+	  </div>
+	  
+	  <div id="tab2">
+	  			<article class="module width_full">
+					{% include 'sub_operateprocess.html' %}	
+				</article>
+	    
+
+	  </div>
+	  
+	  <div id="tab3">
+	    <h2>View SOP</h2>
+	    <p>Duis justo mi, egestas euismod placerat a, eleifend vitae lacus. Integer non odio nec libero lacinia vulputate. Phasellus ante lectus, congue vel volutpat vitae, dictum quis est. </p>
+	  </div>
+	  
+	  <div id="tab4">
+	    <h5>Process Model Worksheet</h5>
+	    <p>Nulla varius sit amet augue vel consequat. Aenean faucibus vehicula interdum. Integer eleifend, lectus eget vulputate feugiat, nibh nulla congue ipsum, eu mattis tortor nulla vitae diam. Maecenas rutrum risus non libero ullamcorper, nec vehicula sapien tincidunt. </p>
+	  </div>
+	  
+	  <div id="tab5">
+	    <h5>View Open Processes</h5>
+	    <p>Suspendisse vulputate ornare dui, sed luctus est mattis nec. Curabitur ut dolor eleifend, vulputate purus et, ullamcorper tortor. In posuere ultricies lectus. Vestibulum vitae odio ut est sagittis porta. </p>
+	  </div>
+	  
 	</div>
-		
-<article class="module width_full">
-	{% include 'sub_selectprocess.html' %}	
-</article><!-- END 1. Select a Process to Operate -->
-<article class="module width_full">
-
-	{% include 'sub_operateprocess.html' %}		
-</article><!-- END 2. Operate the Process-->
-</div>
-	
-
-	<footer>
-	</footer>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="/static/html5jtabs.js"></script>
+<script>
+$(function() {
+  $(".tabs a").html5jTabs();
+});
+</script>
 </body>
-
 </html>

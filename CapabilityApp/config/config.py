@@ -18,6 +18,7 @@ DATABASE_NAME = 'capability'
 USER_NAME = 'root'
 PASSWORD = ''
 '''
+
 def get_connection():
     return rdbms.connect(instance=CLOUDSQL_INSTANCE, database=DATABASE_NAME, user=USER_NAME, password=PASSWORD, charset='utf8', use_unicode = True)
 

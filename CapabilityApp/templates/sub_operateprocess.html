@@ -1,4 +1,4 @@
-  <article class="module width_full">	
+<article class="module width_full">	
   
   		{% for row in case|batch(1)|first() %}
 		<label><h2>2. Process Name/Process Step: </b>{{ row[8]|e }}/{{ row[9]|e }}</h2></label>	
@@ -42,11 +42,10 @@
 				<td>{{ row[14]|e }}
 				<td><textarea type=text rows="2" name="proc_innovation" wrap="hard"></textarea>
 				<td><textarea type=text rows="2" name="proc_conseq" wrap="hard"></textarea>
-				<td><select font-size="10px" name="proc_output_conf">
+				<td><select name="proc_output_conf">
 	                <optgroup>
-	                <option font-size="10px" value="1">Conforming</option>
-	                <option font-size="10px" value="0">Non-Conforming</option>
-	                <option font-size="10px" value="2">Pending</option>
+	                <option value="1">Conforming</option>
+	                <option value="0">Non-Conforming</option>
 	                </optgroup>
                 </select>
                 <td><input type="submit" name = "proc_run_status" font-size:10px; value="Submitted">

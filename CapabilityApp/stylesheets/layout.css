@@ -465,7 +465,7 @@ border-radius: 5px;
 }
 
 .overview_today, .overview_previous {
-width: 50%;
+wid: 50%;
 float: left;}
 
 .stats_overview p {
@@ -543,21 +543,31 @@ padding: 15px 10px;
 	text-align: center;
 }
 
-.datatable { border-collapse: collapse;	
+.datatable { border-collapse: collapse;
 		width: 100%
 		margin-right:50px;}
-.datatable th { padding: 1em 0 1em;
+.datatable th { padding: .5em 0 .5em;
+	padding: 10;
 	background-color: #c0c0c0;
-	border-top: 1px solid grey thin;
-	border-bottom: solid grey thin;
+	border-top: 1px solid #C8C8C8 thin;
+	border-bottom: solid #C8C8C8 thin;
+	margin-left:50px;
 	margin-right:50px;
 }
-.datatable td { border: solid grey thin;
-	width: 100%
-	margin-right:50px;}
-.datatable caption { font size: 5em; font-weigh: bold;}
+.datatable td { border: solid #C8C8C8 thin;
+	padding:2px;
+	vertical-align:top;
+	margin-right:50px;
+	margin-left:50px;}
+.datatable caption { font size: 5em; font-weight: bold;}
 
+tr:nth-child(even) {
+    background-color: white;
+}
 
+tr:nth-child(odd) {
+    background-color: #F0F0F0;
+}
 .tablesorter input[type=image] {
 margin-right: 50px;}
 
@@ -580,7 +590,7 @@ ul.tabs {
 ul.tabs li {
 	float: left;
 	margin: 0;
-	padding: 0;
+	padding: 10;
 	line-height: 24px;
 }
 ul.tabs li a {
