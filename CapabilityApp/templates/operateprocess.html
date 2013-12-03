@@ -19,7 +19,13 @@
 	<script type="text/javascript" src="/static/jquery-1.8.2.min.js"></script>
 	<script type="text/javascript" src="/static/getDate.js"></script>
 	<script type="text/javascript" src="/static/createcase.js"></script>
-	<script>
+	<script src="jquery.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		function loadContent(elementSelector, sourceUrl) {
+		$(""+elementSelector+"").load("http://yoursite.com/"+sourceURL+"");
+	}
+	</script>
+	<script>	
 	$(document).ready(function() 
     	{ 
       	  $(".tablesorter").tablesorter(); 
@@ -71,24 +77,24 @@
 	<div class="tabContent">  
 	  <div id="tab1">
 	    <h2>Select Process and/or Create Case</h2>
-	    <p>Select the process you wish to work on...</p>
-	    
-				<article class="module width_full">
+	    	  	<article class="module width_full">
+			    <p>Select the process you wish to work on...</p>
 					{% include 'sub_selectprocess.html' %}	
 				</article>
 	  </div>
 	  
 	  <div id="tab2">
-	  			<article class="module width_full">
-					{% include 'sub_operateprocess.html' %}	
-				</article>
-	    
+
+		{% include 'sub_operateprocess.html' %}	 
+
 
 	  </div>
 	  
 	  <div id="tab3">
 	    <h2>View SOP</h2>
-	    <p>Duis justo mi, egestas euismod placerat a, eleifend vitae lacus. Integer non odio nec libero lacinia vulputate. Phasellus ante lectus, congue vel volutpat vitae, dictum quis est. </p>
+	    <p>We can bring Google Docs into the application to control viewing and interaction. </p>
+<iframe align="middle" width="800" height="1200" src=""></iframe>
+
 	  </div>
 	  
 	  <div id="tab4">

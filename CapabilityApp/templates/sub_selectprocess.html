@@ -1,6 +1,6 @@
 <label><h2>1. Select Process</h2></label>
 
-<fieldset class=fieldsets style="width:45%; float:left; margin-left: 2%;"> 
+<fieldset class=fieldsets style="width:45%; margin-left: 5%;"> 
 	<form action="/SelectProcessStep" method="GET">
 	<label>Select a Process</label>
 	<select name="proc_id" id="proc_id" onChange='this.form.submit()'>
@@ -21,7 +21,7 @@
 	</form>
 </fieldset>
 
-<fieldset style="width:45%; float:right; margin-right: 5%;">
+<fieldset class=fieldsets style="width:45%;  margin-left: 5%;">
 	<form action="/CreateInstance" method="POST"> 				
 	<label>Select a Process Step</label>
 	<select name="proc_step_id" id="proc_step_id"'>

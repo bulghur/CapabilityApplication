@@ -16,10 +16,11 @@
         togglerRest.hide().removeClass("active");
         $(toggler).show().addClass("active");
 
+        
         //toggle Active Class on tab buttons
         $(this).parent("div").find("a").removeClass("active");
         $(this).addClass("active");
-
+        
         return false; //Stop event Bubbling and PreventDefault
       });
     });

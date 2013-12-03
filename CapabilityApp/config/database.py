@@ -6,22 +6,23 @@ def get_connection():
                          database=config.DATABASE_NAME, 
                          user=config.USER_NAME, 
                          password=config.PASSWORD, 
-                         harset='utf8', 
+                         charset='utf8', 
                          use_unicode = True)
-dbResults = {}
+    
+def query(query, condition1):
+       
+    conn = get_connection()
+    cursor = conn.cursor()      
 
-class Database():
+    cursor.execute(query + "'" + condition1 + "'" )
+    dbResults = cursor.fetchall()  
+    
+    conn.close()
+    
+    return dbResults
 
-    def __init__(self):
-           
-        conn = get_connection()
-        cursor = conn.cursor()      
-
-        q = "SELECT * FROM process ORDER by proc_nm"
-        cursor.execute(q)
-        self.dbResults = cursor.fetchall()  
-        
-        conn.close()
-        
-        return self.dbResults
-
+'''
+def sumProblemString(x, y):
+    sum = x + y
+    return 'The sum of {} and {} is {}.'.format(x, y, sum)
+'''

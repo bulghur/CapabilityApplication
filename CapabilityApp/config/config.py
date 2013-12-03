@@ -18,14 +18,18 @@ DATABASE_NAME = 'capability'
 USER_NAME = 'root'
 PASSWORD = ''
 '''
-
 def get_connection():
-    return rdbms.connect(instance=CLOUDSQL_INSTANCE, database=DATABASE_NAME, user=USER_NAME, password=PASSWORD, charset='utf8', use_unicode = True)
+    return rdbms.connect(instance=CLOUDSQL_INSTANCE, 
+                         database=DATABASE_NAME, 
+                         user=USER_NAME, 
+                         password=PASSWORD, 
+                         charset='utf8', 
+                         use_unicode = True)
 
 # Tools
 def UTCTime():
     rawNow = datetime.datetime.now()
-    now = rawNow.date().isoformat()
+    now = rawNow.isoformat()
     return now
 
 def IDGenerator():

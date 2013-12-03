@@ -195,6 +195,7 @@ class PostProcessRun(webapp.RequestHandler):
         authenticateUser = str(users.get_current_user())
         case_key = self.request.get('case_key')
         proc_output_conf = self.request.get('proc_output_conf')
+        proc_notes = self.request.get('proc_notes')
         proc_conseq = self.request.get('proc_conseq')
         proc_innovation = self.request.get('proc_innovation')
         proc_run_id = self.request.get('proc_run_id')
@@ -204,9 +205,9 @@ class PostProcessRun(webapp.RequestHandler):
         cursor = conn.cursor()
         
         cursor.execute("UPDATE proc_run SET "
-                       "proc_run_start_tm =%s, proc_output_conf = %s, proc_conseq = %s, proc_innovation = %s, proc_run_status = %s "
+                       "proc_run_start_tm =%s, proc_output_conf = %s, proc_notes = %s, proc_conseq = %s, proc_innovation = %s, proc_run_status = %s "
                        "WHERE proc_run_id = %s",
-                       (now, proc_output_conf, proc_conseq, proc_innovation, proc_run_status, proc_run_id ))
+                       (now, proc_output_conf, proc_notes, proc_conseq, proc_innovation, proc_run_status, proc_run_id ))
 
         conn.commit()
         

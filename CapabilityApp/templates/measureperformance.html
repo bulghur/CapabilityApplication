@@ -69,25 +69,26 @@
 </div>
   <div class="tabs">
     <a data-toggle="tab1">Organisational Performance</a>
-    <a data-toggle="tab2">By Process Step</a>
-    <a data-toggle="tab3">Adjustments/Innovations Summary</a>
-    <a data-toggle="tab4">Data Validation</a>
-    <a data-toggle="tab5">All Processes</a>
+    <a data-toggle="tab2">By Process</a>
+    <a data-toggle="tab3">By Case</a>
+    <a data-toggle="tab4">Adjustments/Innovations Summary</a>
+    <a data-toggle="tab5">Review Operator Notes</a>
+    <a data-toggle="tab6">DEV/DELETE</a>
   </div>
 <div class="tabContent">  
-  <div id="tab1">
+  	<div id="tab1">
     <h2>Organisational Performance</h2>
     <br>
-    <p>This table is an performance overview of all processes operated in the organisation.</p>
+    <p>This table is an performance overview of all processes operated for the entire organisation.</p>
  	 <br>
 			<table class=datatable align="center"> 
 				<th class=datatable>Process</th>
 				<th class=datatable>Process Step</th>
 				<th class=datatable>Perf %</th>
 				<th class=datatable>Success</th>
-				<th class=datatable>No of Operations</th>
+				<th class=datatable>No of Operations</th><tr>
 					{% for row in sqlMeasurebyPerson %}
-					<tr><td width=25%>{{ row[1]|e }}
+					<td width=25%>{{ row[1]|e }}
 					<td width=30%>{{ row[3]|e }}
 					<td align="center" width=10%>{{ (row[9]*100)|round(method='common') }} 
 					<td align="center" width=10%>{{ row[10]|e }}
@@ -96,18 +97,18 @@
 				</table>
 			</table>
 
-  </div>
+  	</div>
   
-  <div id="tab2">
+  	<div id="tab2">
     
-    <h2>Performance by Process Step</h2>
+    <h2>Performance by Process</h2>
     <br>
-    <p>This table displays your performance by process step by case.</p>
+    <p>This table displays your performance by Process.</p>
     <br>
 
 			<table class=datatable align="center"> 
 				{% for group in summary|groupby(1) %}
-				    <th class=datatable colspan="5" align="left" font size="24">{{ group.grouper }}</th><tr>
+				    <th colspan="5" align="left" !important color="2A2A2A" font-color="white" font-size="1.5em">{{ group.grouper }}</th><tr>
 				    <th class=datatable>Process Step</th>
 					<th class=datatable>Case</th>
 					<th class=datatable>Perf %</th>
@@ -123,9 +124,35 @@
 				{% endfor %}
 			</table>
 
-  </div>
+  	</div>
   
-  <div id="tab3">
+    <div id="tab3">
+    
+    <h2>Performance by Case</h2>
+    <br>
+    <p>This table displays your performance by Case.</p>
+    <br>
+
+			<table class=datatable align="center"> 
+				{% for group in summary|groupby(6) %}
+				    <th colspan="5" align="left" >{{ group.grouper }}</th><tr>
+				    <th class=datatable>Process</th>
+					<th class=datatable>Process Step</th>
+					<th class=datatable>Perf %</th>
+					<th class=datatable>Success</th>
+					<th class=datatable>No of Operations</th><tr>
+				    {% for row in group.list %}
+				        <td width=30%>{{ row[1]|e }}
+				        <td width=40%>{{ row[3]|e }}
+				        <td align="center" width=10%>{{ (row[9]*100)|round(method='common') }}
+				        <td align="center" width=10%>{{ row[10]|e }}
+				        <td align="center" width=10%>{{ row[11]|e }}<tr>
+				    {% endfor %}
+				{% endfor %}
+			</table>
+
+  </div>
+  <div id="tab4">
     <h2>Adjustments/Innovations Summary</h2>
 
     <p>This table displays all the comments recorded for processes operated by all Operators.</p>
@@ -152,44 +179,55 @@
 			</table>	
 		
 	</div>
-	  
-	<div id="tab4">
-    <h5>Tab4</h5>
- 	<table class=datatable>
-		<th class=datatable colspan="14" align="left"> Data Validation from case </th>
-		<tr>
-		<th class=datatable>0</th>
-		<th class=datatable>1</th>
-		<th class=datatable>2</th>
-		<th class=datatable>3</th>
-		<th class=datatable>4</th>
-		<th class=datatable>5</th>
-		<th class=datatable>6</th>
-		<th class=datatable>7</th>
-		<th class=datatable>8</th>
-		<th class=datatable>9</th>
-		<th class=datatable>10</th>
-		<th class=datatable>11</th>
-		<th class=datatable>12</th>
-		<th class=datatable>13</th><tr>
-		
-					{% for row in summary1 %}
-					<tr><td>{{ row|e }}<tr>
-					{% endfor %}
-		</table>
-  </div>
 	<div id="tab5">
-    <h1>All Processes</h1>
- 		<table class="tablesorter" cellspacing="50"> 
-			<table class ="datatable" id="data">
-				<tr><td><h4><b>Process					<td><b>Process Step						<td><b>Requirement<td><b>Conformance </b><td><b> of Operations</b></h4></tr>
-				{% for row in processSummary %}
-				<tr><td>{{ row[0]|e }} 		<td>{{ row[1]|e }} <td>{{ row[2]|e }} <td class ="center">{{ row[3]|e }} <td class='center'>{{ row[4]|e }}</tr>
-				{% endfor %}
+    <h2>Review Operation Notes</h2>
+			<table class=datatable align="center"> 
+			<th class=datatable colspan="15" align="left" font=16px> Summary of Adjustments and Suggested Innovations </th><tr>
+			<th class=datatable>Process</th>
+			<th class=datatable>Process Step</th>
+			<th class=datatable>Case</th>
+			<th class=datatable>Reported by</th>
+			<th class=datatable>Date</th>
+			<th class=datatable>Notes</th>
+			<th class=datatable>Risks</th>
+			<th class=datatable>Innovations</th><tr>
+						{% for row in notes %}
+						<td width=10%>{{ row[0]|e }}
+						<td width=10%>{{ row[1]|e }}
+						<td width=10%>{{ row[2]|e }}
+						<td width=5%>{{ row[6]|e }}
+						<td width=5%>{{ row[3]|e }}
+						<td width=20%>{{ row[4]|e }}
+						<td width=20%>{{ row[5]|e }}
+						<td width=20%>{{ row[6]|e }}<tr>
+						{% endfor %}
 			</table>
-
-		</table>
-  </div>
+	</div>
+	<div id="tab6">
+    <h2>DEV/DELETE: Pass Args to Class/SQL</h2>
+		 	<table class=datatable>
+			<th class=datatable colspan="14" align="left"> Data Validation from case </th>
+			<tr>
+			<th class=datatable>0</th>
+			<th class=datatable>1</th>
+			<th class=datatable>2</th>
+			<th class=datatable>3</th>
+			<th class=datatable>4</th>
+			<th class=datatable>5</th>
+			<th class=datatable>6</th>
+			<th class=datatable>7</th>
+			<th class=datatable>8</th>
+			<th class=datatable>9</th>
+			<th class=datatable>10</th>
+			<th class=datatable>11</th>
+			<th class=datatable>12</th>
+			<th class=datatable>13</th><tr>
+			
+						{% for row in summary8 %}
+						<td>{{ row[0]|e }}<td>{{ row[1]|e }}<td>{{ row[2]|e }}<td>{{ row[3]|e }}<td>{{ row[4]|e }}<td>{{ row[5]|e }}<td>{{ row[6]|e }}<tr>
+						{% endfor %}
+			</table>
+	</div>
 </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
