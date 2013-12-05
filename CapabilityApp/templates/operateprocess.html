@@ -4,8 +4,7 @@
 <head>
 	<meta charset="utf-8"/>
 	<title>Philip Crosby Associates - Operate Processes</title>
-
-
+	
 	<link rel="stylesheet" href="/stylesheets/layout.css" type="text/css" media="screen" />
 	<!--[if lt IE 9]>
 	<link rel="images" href="/images/" type="" media="screen" />
@@ -15,41 +14,50 @@
 	<script src="js/hideshow.js" type="text/javascript"></script>
 	<script src="js/jquery.tablesorter.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="js/jquery.equalHeight.js"></script>
-	<script type="text/javascript"></script>
-	<script type="text/javascript" src="/static/jquery-1.8.2.min.js"></script>
-	<script type="text/javascript" src="/static/getDate.js"></script>
-	<script type="text/javascript" src="/static/createcase.js"></script>
-	<script src="jquery.js" type="text/javascript"></script>
 	<script type="text/javascript">
-		function loadContent(elementSelector, sourceUrl) {
-		$(""+elementSelector+"").load("http://yoursite.com/"+sourceURL+"");
-	}
-	</script>
-	<script>	
-	$(document).ready(function() 
-    	{ 
-      	  $(".tablesorter").tablesorter(); 
-   	 } 
+		$(document).ready(function() 
+	    	{ 
+	      	  $(".tablesorter").tablesorter(); 
+	   	 } 
 		);
-		$(document).ready(function() {	//When page loads...
-			$(".tab_content").hide(); //Hide all content
-			$("ul.tabs li:first").addClass("active").show(); //Activate first tab
-			$(".tab_content:first").show(); //Show first tab content 
-			//On Click Event
+		$(document).ready(function() {
+	
+		//When page loads...
+		$(".tab_content").hide(); //Hide all content
+		$("ul.tabs li:first").addClass("active").show(); //Activate first tab
+		$(".tab_content:first").show(); //Show first tab content
+	
+		//On Click Event
 		$("ul.tabs li").click(function() {
+	
 			$("ul.tabs li").removeClass("active"); //Remove any "active" class
 			$(this).addClass("active"); //Add "active" class to selected tab
 			$(".tab_content").hide(); //Hide all tab content
-		var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
-		$(activeTab).fadeIn(); //Fade in the active ID content
-		return false;
+	
+			var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
+			$(activeTab).fadeIn(); //Fade in the active ID content
+			return false;
 		});
-	});
+		});
     </script>
     <script type="text/javascript">
-    $(function(){
-        $('.column').equalHeight();
-    });
+	    $(function(){
+	        $('.column').equalHeight();
+	    });
+	</script>
+	 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<script>
+		$(function() {
+		$( "#tabs" ).tabs({active: 1});
+		});
+	</script>
+	<script>
+		 $(function() {
+		$( "#datepicker" ).datepicker({ dateFormat: "yy-mm-dd" });
+		});
 	</script>
 </head>
 <body>
@@ -61,59 +69,116 @@
 		</hgroup>
 	</header> <!-- end of header bar -->
 	
+		<section id="secondary_bar">
 			{% include 'userbar.html' %}
-	
+		</section><!-- end of secondary bar -->
+			
 		<aside id="sidebar" class="column">
 			{% include 'leftnav.html' %}
 		</aside><!-- end of sidebar -->
-	
-  <div class="tabs">
-    <a data-toggle="tab1">Select Process and Case</a>
-    <a data-toggle="tab2">Operate Process</a>
-    <a data-toggle="tab3">View SOP</a>
-    <a data-toggle="tab4">View PMW</a>
-    <a data-toggle="tab5">View Open Processes</a>
-  </div>
-	<div class="tabContent">  
-	  <div id="tab1">
+			
+		<section id="main" class="column">
+		
+		<h4 class="alert_info">This is a temporary method for creating processes</h4>
+		<p>Processes are owned by process owners.  We have several ways of thinking about this: Anyone can create a process for themselves.  Other can leverage it by subscribing to it. A process is ZD when it has gone through SPS or whatever we call the design process. 
+		</p>
+		
+<div class="clear"></div>
+<div id="tabs">
+<ul>
+	<li><a href="#tabs-1">Select Process and Case</a></li>
+	<li><a href="#tabs-2">Operate Process</a></li>
+	<li><a href="#tabs-3">View Open Processes</a></li>
+</ul>
+<div id="tabs-1">
+	<article class="module width_full">
 	    <h2>Select Process and/or Create Case</h2>
-	    	  	<article class="module width_full">
-			    <p>Select the process you wish to work on...</p>
-					{% include 'sub_selectprocess.html' %}	
-				</article>
-	  </div>
-	  
-	  <div id="tab2">
+		<p>Select the process you wish to work on...</p>
+		{% include 'sub_selectprocess.html' %}	
+	</article>	
+</div>
+<div id="tabs-2">
+	<fieldset class=fieldsets style="width:1000px; margin-right: 0%;"> 	
+	  		{% for row in case|batch(1)|first() %}
+		<header><h2>2. Process Name/Process Step: </b>{{ row[8]|e }}/{{ row[9]|e }}</h2></header><br>
+		<table><td width=50%>
+		<ul>
+			<li><b>Process Case: </b>{{ row[1]|e }} - {{ row[7]|e }}</li>
+			<li><b>Process Instance: </b>{{ row[3]|e }}</li>
+			<li><b>Link to SOP: </b><a href={{ row[10]|e }} target="_blank">Click here for SOP</a></li>
+			<li><b>Link to PMW: </b><a href={{ row[14]|e }} target="_blank">Click here for PMW</a></li>
 
-		{% include 'sub_operateprocess.html' %}	 
-
-
-	  </div>
-	  
-	  <div id="tab3">
-	    <h2>View SOP</h2>
-	    <p>We can bring Google Docs into the application to control viewing and interaction. </p>
-<iframe align="middle" width="800" height="1200" src=""></iframe>
-
-	  </div>
-	  
-	  <div id="tab4">
-	    <h5>Process Model Worksheet</h5>
-	    <p>Nulla varius sit amet augue vel consequat. Aenean faucibus vehicula interdum. Integer eleifend, lectus eget vulputate feugiat, nibh nulla congue ipsum, eu mattis tortor nulla vitae diam. Maecenas rutrum risus non libero ullamcorper, nec vehicula sapien tincidunt. </p>
-	  </div>
-	  
-	  <div id="tab5">
+		{% endfor %}
+		</ul>
+		<td width=50%>	
+		<table class=datatable align="right"> 
+		<th class=datatable>Type</th>
+		<th class=datatable>Control</th>
+		<th class=datatable>Requirements</th>
+		<th class=datatable></th>		
+		<tr><td  colwidth = fixed rowspan="3">Performance Standard<td>Zero Defects (Quality)<td>Meet Requirements the first time<td><input type="checkbox" default value=0><tr>
+		<td>Zero Workaroundsv(Cost)<td>Follow the Procedures<td><input type="checkbox" default value=0><tr>
+		<td>Zero Delays (Schedule)<td>Start work when conforming Inputs and Controls are available<td><input type="checkbox" default value=0><tr>
+		</table><br>
+		<tr>
+		    <table class=datatable align="left"> 
+			<form action="/postProcessRun" method="POST" screen.showTab("Tab2");> 
+			<th colspan="8" align="left" font size=72> Operate the Process </th><tr>
+			<th>Seq</th>
+			<th>Requirement</th>
+			<th>Requirement Details</th>
+			<th>Process Notes</th>
+			<th>Operational Risks</th>
+			<th>Innovations</th>
+			<th>Conformance</th>
+			<th>Action</th><tr>
+				{% for row in case %}
+					<td align="center" width=1%>{{ row[12]|e }}
+					<td width=12%>{{ row[13]|e }}
+					<td width=18%>{{ row[14]|e }}
+					<td width=25%><textarea width="100%" type=text rows="2" name="proc_notes" wrap="hard"></textarea>
+					<td width=25%><textarea width="100%" type=text rows="2" name="proc_conseq" wrap="hard"></textarea>
+					<td width=25%><textarea width=100% type=text rows="2" name="proc_innovation" wrap="hard"></textarea>
+					<td width=10%><select font-size="10px" name="proc_output_conf">
+		                <optgroup>
+		                <option font-size="10px" value="1">Conforming</option>
+		                <option font-size="10px" value="0">Non-Conforming</option>
+		                </optgroup>
+	                </select>
+	                <td width=10%><input type="submit" name = "proc_run_status" font-size:10px; value="Submit">
+	              	<input type="hidden" name="proc_req_id" value={{ row[4]|e }}>
+	              	<input type="hidden" name="proc_step_id" value={{ row[5]|e }}>
+					<input type="hidden" name="case_key" value={{ row[3]|e }}>
+					<input type="hidden" name="proc_run_id" value={{ row[0]|e }}><tr>
+				{% endfor %}
+			</form>	
+			</table>
+			<br>	
+	</fieldset>
+</div>
+<div id="tabs-3">
+	<article class="module width_full">
 	    <h5>View Open Processes</h5>
-	    <p>Suspendisse vulputate ornare dui, sed luctus est mattis nec. Curabitur ut dolor eleifend, vulputate purus et, ullamcorper tortor. In posuere ultricies lectus. Vestibulum vitae odio ut est sagittis porta. </p>
-	  </div>
-	  
-	</div>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<script type="text/javascript" src="/static/html5jtabs.js"></script>
-<script>
-$(function() {
-  $(".tabs a").html5jTabs();
-});
-</script>
+	    
+		 	<table class=datatable>
+			<th class=datatable colspan="14" align="left"> Data Validation from case </th>
+			<tr>
+			<th class=datatable>Process</th>
+			<th class=datatable>Process Step</th>
+			<th class=datatable>Case</th>
+			<th class=datatable>Case ID</th>
+			<th class=datatable>Instance ID</th><tr>
+			
+						{% for row in openoperations %}
+						<td>{{ row[1]|e }}
+						<td>{{ row[4]|e }}
+						<td>{{ row[5]|e }}
+						<td>{{ row[6]|e }}
+						<td>{{ row[7]|e }}<tr>
+						{% endfor %}
+			</table>
+</article>
+</div>
+</div>
 </body>
 </html>

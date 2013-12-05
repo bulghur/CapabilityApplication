@@ -15,51 +15,40 @@
 	<script src="js/jquery.tablesorter.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="js/jquery.equalHeight.js"></script>
 	<script type="text/javascript">
-		$(document).ready(function() 
-	    	{ 
-	      	  $(".tablesorter").tablesorter(); 
-	   	 } 
-		);
-		$(document).ready(function() {
-	
-		//When page loads...
-		$(".tab_content").hide(); //Hide all content
-		$("ul.tabs li:first").addClass("active").show(); //Activate first tab
-		$(".tab_content:first").show(); //Show first tab content
-	
-		//On Click Event
-		$("ul.tabs li").click(function() {
-	
-			$("ul.tabs li").removeClass("active"); //Remove any "active" class
-			$(this).addClass("active"); //Add "active" class to selected tab
-			$(".tab_content").hide(); //Hide all tab content
-	
-			var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
-			$(activeTab).fadeIn(); //Fade in the active ID content
-			return false;
-		});
-		});
+	$(document).ready(function() 
+    	{ 
+      	  $(".tablesorter").tablesorter(); 
+   	 } 
+	);
+	$(document).ready(function() {
+
+	//When page loads...
+	$(".tab_content").hide(); //Hide all content
+	$("ul.tabs li:first").addClass("active").show(); //Activate first tab
+	$(".tab_content:first").show(); //Show first tab content
+
+	//On Click Event
+	$("ul.tabs li").click(function() {
+
+		$("ul.tabs li").removeClass("active"); //Remove any "active" class
+		$(this).addClass("active"); //Add "active" class to selected tab
+		$(".tab_content").hide(); //Hide all tab content
+
+		var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
+		$(activeTab).fadeIn(); //Fade in the active ID content
+		return false;
+	});
+
+});
     </script>
     <script type="text/javascript">
-	    $(function(){
-	        $('.column').equalHeight();
-	    });
-	</script>
-	 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
-	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-	<link rel="stylesheet" href="/resources/demos/style.css">
-	<script>
-		$(function() {
-		$( "#tabs" ).tabs({active: 2});
-		});
-	</script>
-	<script>
-		 $(function() {
-		$( "#datepicker" ).datepicker({ dateFormat: "yy-mm-dd" });
-		});
+    $(function(){
+        $('.column').equalHeight();
+    });
 	</script>
 </head>
+
+
 <body>
 
 	<header id="header">
@@ -86,16 +75,16 @@
 		</p>
 		
 <div class="clear"></div>
-<div id="tabs">
-<ul>
-	<li><a href="#tabs-1">Create a Process</a></li>
-	<li><a href="#tabs-2">Create a Process Step</a></li>
-	<li><a href="#tabs-3">Create a Process Requirement</a></li>
-	<li><a href="#tabs-4">To be moved: Create a Person</a></li>
-	<li><a href="#tabs-5">Public Processes</a></li>
-	<li><a href="#tabs-6">Your Local Processes</a></li>
-</ul>
-<div id="tabs-1">
+  <div class="tabs">
+    <a data-toggle="tab1">Create a Process</a>
+    <a data-toggle="tab2">Create a Process Step</a>
+    <a data-toggle="tab3">Create a Process Requirement</a>
+    <a data-toggle="tab4">To be moved: Create a Person</a>
+    <a data-toggle="tab5">Review Active Processes</a>
+  </div>
+<div class="tabContent">  
+<div id="tab1">	
+		
 	<article class="module width_half">
 		<label><h2>1. Create a Process</h2></label>
 		<fieldset style="width:100%; float:left;"> 		
@@ -108,7 +97,7 @@
 							<option value={{ row[4]|e }}>{{ row[1]|e }}{{ row[2]|e }}</option>
 					{% endfor %}
 				</select><tr>
-					<tr><td><label>Process Start Date Picker</label><input type="text" id="datepicker" name="proc_start_dt" style="width:50%;">
+					<tr><td><label>Process Start Date</label><input type="text" name="proc_start_dt" style="width:90%;">
 					<td><input type="submit" value="Create Process">
 						<input type="submit" value="Cancel"><tr>
 				</table>
@@ -117,8 +106,9 @@
 			</form>		
 		</fieldset><div class="clear"></div>
   	</article><!-- END 1. Record Process -->	
-</div>
-<div id="tabs-2">
+</div>  	
+<div id="tab2">		
+		
 	<article class="module width_half">	
 		<label><h2>2. Create a Process Step</h2></label>
 		<fieldset style="width:100%; float:left;"> 		
@@ -145,8 +135,9 @@
 			</form>		
 		</fieldset><div class="clear"></div>
   	</article><!-- END 2. Record Process Step -->
-  	</div>
-<div id="tabs-3">
+</div>  	
+<div id="tab3">	
+  			
 	<article class="module width_half">	
 		<label><h2>3. Create Requirement</h2></label>
 		<fieldset style="width:100%; float:left;"> 		
@@ -154,7 +145,6 @@
 				<table>
 					<tr><td><label>Requirement Name</label><input type="text" name="proc_req_nm" style="width:50%;"><tr>
 					<tr><td><label>Requirement Description</label><input type="text" name="proc_req_desc" style="width:50%;"><tr>
-					<tr><td><label>Sequence</label><input type="text" name="proc_req_seq" style="width:50%;"><tr>
 					<tr><td><label>Process Step</label><select name="proc_step_id">
 					{% for row in ddb_processsteps %}
 							<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
@@ -165,8 +155,11 @@
 				</table>
 			</form>		
 		</fieldset><div class="clear"></div>
-  	</article><!-- End 3. Create Requirement --></div>
-<div id="tabs-4">
+  	</article><!-- End 3. Create Requirement -->	
+  	
+</div>  	
+<div id="tab4">		
+		
 	<article class="module width_half">
 		<label><h2>Create Person</h2></label>
 		<fieldset style="width:100%; float:left;"> 		
@@ -180,65 +173,45 @@
 				</table>
 			</form>		
 		</fieldset><div class="clear"></div>
-  	</article><!-- END 4. Create Person -->	</div>
-<div id="tabs-5">
+  	</article><!-- END 4. Create Person -->		
+</div>
+<div id="tab5">
+
 	<article class="module width_full">
-		<label><h2>PCA ZD Capable Processes</h2></label>
+		<label><h2>Review Active Processes</h2></label>
 			<table class=datatable align="center"> 
-				{% for group in processlist|groupby(1) %}
-				    <th colspan="7" align="left" !important color="2A2A2A" font-color="white" font-size="2em">{{ group.grouper }}</th><tr>
-				    {% for group in group.list|groupby(6)  %}
-				    <th colspan="7" align="left" !important color="2A2A2A" font-color="white" font-size="1.5em">{{ group.grouper }}</th><tr>
-				    <th class=datatable>Seq</th>
+				{% for group in processlist|groupby(0) %}
+				    <th colspan="6" align="left" !important color="2A2A2A" font-color="white" font-size="2em">{{ group.grouper }}</th><tr>
+				    {% for group in group.list|groupby(7)  %}
+				    <th colspan="6" align="left" !important color="2A2A2A" font-color="white" font-size="1.5em">{{ group.grouper }}</th><tr>
 				    <th class=datatable>Process Step</th>
-					<th class=datatable>Process Step Description</th>
-					<th class=datatable>Seq</th>
-					<th class=datatable>Requirement Name</th>
-					<th class=datatable>Requirement Description</th>
-					<th class=datatable>Process Owner</th><tr>
+				    <th class=datatable>Seq</th>
+					<th class=datatable>Process Requirement</th>
+					<th class=datatable>Requirement Details</th>
+					<th class=datatable>Process Step/Req Owner</th><tr>
 					    {% for row in group.list %}
-					    	<td width=1% align="center">{{ row[6]|e }}
-					        <td width=10%>{{ row[7]|e }}
-					        <td width=20%>{{ row[8]|e }}
-					        <td width=1% align="center">{{ row[14]|e }}
-					        <td width=10%>{{ row[12]|e }}
-					        <td width=40%>{{ row[13]|e }}
-					        <td width=2%>{{ row[9]|e }}<tr>
+					    	<td width=5%>{{ row[1]|e }}
+					        <td width=1% align="center">{{ row[2]|e }}
+					        <td width=5%>{{ row[3]|e }}
+					        <td width=20%>{{ row[4]|e }}
+					        <td width=3%>{{ row[6]|e }}<tr>
 					    {% endfor %}
 					{% endfor %}  
 				{% endfor %}
 			</table>
 	</article>
+
 </div>
-<div id="tabs-6">
-	<article class="module width_full">
-		<label><h2>Your Local Processes</h2></label>
-			<table class=datatable align="center"> 
-				{% for group in localprocesslist|groupby(1) %}
-				    <th colspan="7" align="left" !important color="2A2A2A" font-color="white" font-size="2em">{{ group.grouper }}</th><tr>
-				    {% for group in group.list|groupby(6)  %}
-				    <th colspan="7" align="left" !important color="2A2A2A" font-color="white" font-size="1.5em">{{ group.grouper }}</th><tr>
-				    <th class=datatable>Seq</th>
-				    <th class=datatable>Process Step</th>
-					<th class=datatable>Process Step Description</th>
-					<th class=datatable>Seq</th>
-					<th class=datatable>Requirement Name</th>
-					<th class=datatable>Requirement Description</th>
-					<th class=datatable>Local Owner</th><tr>
-					    {% for row in group.list %}
-					    	<td width=1% align="center">{{ row[6]|e }}
-					        <td width=10%>{{ row[7]|e }}
-					        <td width=20%>{{ row[8]|e }}
-					        <td width=1% align="center">{{ row[14]|e }}
-					        <td width=10%>{{ row[12]|e }}
-					        <td width=40%>{{ row[13]|e }}
-					        <td width=2%>{{ row[9]|e }}<tr>
-					    {% endfor %}
-					{% endfor %}  
-				{% endfor %}
-			</table>
-	</article>
-</div>
-</div>
+</div>		
+
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="/static/html5jtabs.js"></script>
+<script>
+$(function() {
+  $(".tabs a").html5jTabs();
+});
+</script>	
 </body>
+
 </html>

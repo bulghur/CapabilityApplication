@@ -36,29 +36,25 @@ class UtilityHandler(webapp.RequestHandler):
         conn = get_connection()
         cursor = conn.cursor()
         
-        sqlGetAllPersons = "SELECT * FROM person ORDER by first_nm"
-        cursor.execute(sqlGetAllPersons)
+        cursor.execute("SELECT * FROM person ORDER by first_nm")
         ddb_person = cursor.fetchall()
         
         cursor.execute("SELECT * FROM process ORDER by proc_nm")
         ddb_process = cursor.fetchall()
         
-        cursor.execute("SELECT * FROM process_step "
-                       "WHERE owner = 'organisation' OR %s "
-                       "ORDER by proc_id", (authenticateUser))
+        cursor.execute("SELECT * FROM process_step ORDER by proc_step_nm")
         ddb_processsteps = cursor.fetchall()
 
-        cursor.execute("SELECT process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_seq, proc_req.proc_req_nm, proc_req.proc_req_desc, "
-                       "process.proc_desc, process_step.owner, process_step.proc_seq "
-                       "FROM process_step "
-                       "INNER JOIN process ON (process_step.proc_id = process.proc_id) "
-                       "INNER JOIN proc_req ON (process_step.proc_step_id = proc_req.proc_step_id) "
-                       "ORDER BY process.proc_id, process_step.proc_seq, proc_req.proc_req_seq")
+        cursor.execute("SELECT * FROM capability.vw_processes WHERE proc_step_status = 'active'")
         processlist = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM capability.vw_processes WHERE proc_step_status = 'local' AND proc_step_owner = %s", (authenticateUser))
+        localprocesslist = cursor.fetchall()
                 
         conn.close()
         
-        template_values = {'ddb_person': ddb_person, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 'processlist': processlist, 'authenticateUser': authenticateUser }
+        template_values = {'ddb_person': ddb_person, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 
+                           'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser }
         template = jinja2_env.get_template('utilities.html')
         self.response.out.write(template.render(template_values))
         
@@ -66,24 +62,49 @@ class PostProcess(webapp.RequestHandler):
     def post(self): # post to DB
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO process (proc_nm, proc_desc, emp_id, proc_start_dt) '
+        cursor.execute('INSERT INTO process (proc_nm, proc_desc, proc_owner, proc_start_dt) '
                        'VALUES (%s, %s, %s, %s)',
                        (
                        self.request.get('proc_nm'),
                        self.request.get('proc_desc'),
                        self.request.get('emp_id'),
-                       self.request.get('proc_start_dt'),
+                       self.request.get('proc_start_dt')
                        ))
         conn.commit()
-        conn.close()
-
-        self.response.out.write(jinja2_env.get_template('utilities.html').render({}))
         
+        cursor.execute("SELECT * FROM person ORDER by first_nm")
+        ddb_person = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM process ORDER by proc_nm")
+        ddb_process = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM process_step ORDER by proc_step_nm")
+        ddb_processsteps = cursor.fetchall()
+
+        cursor.execute("SELECT * FROM capability.vw_processes WHERE proc_step_status = 'active'")
+        processlist = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM capability.vw_processes WHERE proc_step_status = 'local' AND proc_step_owner = %s", (authenticateUser))
+        localprocesslist = cursor.fetchall()
+                
+        conn.close()
+        
+        template_values = {'ddb_person': ddb_person, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 
+                           'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser }
+        template = jinja2_env.get_template('utilities.html')
+        self.response.out.write(template.render(template_values))
+     
+        dialoguemessage  = self.request.get('proc_nm') + " successfully created."
+        
+        template_values1 = {'dialoguemessage': dialoguemessage}
+        template = jinja2_env.get_template('dialoguebox.html')
+        self.response.out.write(template.render(template_values1))
+     
 class PostProcessStep(webapp.RequestHandler):
     def post(self): # post to DB
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO process_step (proc_step_nm, proc_seq, proc_step_desc, proc_id, proc_step_sop, proc_model_link, owner)'
+        cursor.execute('INSERT INTO process_step (proc_step_nm, proc_seq, proc_step_desc, proc_id, proc_step_sop, proc_model_link, process_step.proc_step_owner)'
                        'VALUES (%s, %s, %s, %s, %s, %s, %s)',
                        (
                        self.request.get('proc_step_nm'),
@@ -96,25 +117,76 @@ class PostProcessStep(webapp.RequestHandler):
                                                                                             
                        ))
         conn.commit()
+        
+        cursor.execute("SELECT * FROM person ORDER by first_nm")
+        ddb_person = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM process ORDER by proc_nm")
+        ddb_process = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM process_step ORDER by proc_step_nm")
+        ddb_processsteps = cursor.fetchall()
+
+        cursor.execute("SELECT * FROM capability.vw_processes WHERE proc_step_status = 'active'")
+        processlist = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM capability.vw_processes WHERE proc_step_status = 'local' AND proc_step_owner = %s", (authenticateUser))
+        localprocesslist = cursor.fetchall()
+                
         conn.close()
-        self.response.out.write(jinja2_env.get_template('utilities.html').render({}))
+        
+        template_values = {'ddb_person': ddb_person, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 
+                          'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser }
+        template = jinja2_env.get_template('utilities.html')
+        self.response.out.write(template.render(template_values))
+     
+        dialoguemessage  = self.request.get('proc_step_nm') + " successfully created."
+        
+        template_values1 = {'dialoguemessage': dialoguemessage}
+        template = jinja2_env.get_template('dialoguebox.html')
+        self.response.out.write(template.render(template_values1))
         
 class PostRequirement(webapp.RequestHandler):
-    def post(self): # post to DB
+    def post(self): 
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO proc_req (proc_req_nm, proc_req_desc, proc_step_id)'
-                       'VALUES (%s, %s, %s)',
+        cursor.execute('INSERT INTO proc_req (proc_req_nm, proc_req_desc, proc_req_seq, proc_step_id)'
+                       'VALUES (%s, %s, %s, %s)',
                        (
                        self.request.get('proc_req_nm'),
                        self.request.get('proc_req_desc'),
-                       self.request.get('proc_step_id'),
-                                                                                            
+                       self.request.get('proc_req_seq'), 
+                       self.request.get('proc_step_id'),                                  
                        ))
         conn.commit()
-        conn.close()
 
-        self.response.out.write(jinja2_env.get_template('utilities.html').render({}))
+        cursor.execute("SELECT * FROM person")
+        ddb_person = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM process ORDER by proc_nm")
+        ddb_process = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM process_step ORDER by proc_step_nm")
+        ddb_processsteps = cursor.fetchall()
+
+        cursor.execute("SELECT * FROM capability.vw_processes WHERE proc_step_status = 'active'")
+        processlist = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM capability.vw_processes WHERE proc_step_status = 'local' AND proc_step_owner = %s", (authenticateUser))
+        localprocesslist = cursor.fetchall()
+                
+        conn.close()
+        
+        template_values = {'ddb_person': ddb_person, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 
+                           'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser }
+        template = jinja2_env.get_template('utilities.html')
+        self.response.out.write(template.render(template_values))
+     
+        dialoguemessage  = self.request.get('proc_req_nm') + " successfully created."
+        
+        template_values1 = {'dialoguemessage': dialoguemessage}
+        template = jinja2_env.get_template('dialoguebox.html')
+        self.response.out.write(template.render(template_values1))
         
 class PostPerson(webapp.RequestHandler):
     def post(self): # post to DB

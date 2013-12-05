@@ -37,7 +37,7 @@ class MeasurePerformance(webapp.RequestHandler):
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT proc_id, proc_nm, proc_step_id, proc_step_nm, proc_seq, case_id, case_nm, instance_key, emp_id, "
-                       "SUM(proc_step_conf)/COUNT(proc_step_id) AS conf_summary, SUM(proc_step_conf) AS proc_success, COUNT(proc_step_id) AS proc_step_total "
+                       "ROUND(SUM(proc_step_conf)/COUNT(proc_step_id)*100) AS conf_summary, SUM(proc_step_conf) AS proc_success, COUNT(proc_step_id) AS proc_step_total "
                        "FROM vw_proc_run_sum "
                        "WHERE emp_id = %s "
                        "GROUP BY proc_step_id, proc_id, case_id "
@@ -48,7 +48,7 @@ class MeasurePerformance(webapp.RequestHandler):
         summary1 = summary1[1:4]
         
         cursor.execute("SELECT proc_id, proc_nm, proc_step_id, proc_step_nm, proc_seq, case_id, case_nm, instance_key, emp_id, "
-                       "SUM(proc_step_conf)/COUNT(proc_step_id) AS conf_summary, SUM(proc_step_conf) AS proc_success, COUNT(proc_step_id) AS proc_step_total "
+                       "ROUND(SUM(proc_step_conf)/COUNT(proc_step_id)*100) AS conf_summary, SUM(proc_step_conf) AS proc_success, COUNT(proc_step_id) AS proc_step_total "
                        "FROM vw_proc_run_sum "
                        "WHERE emp_id = %s "
                        "GROUP BY proc_step_id "

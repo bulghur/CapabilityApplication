@@ -46,37 +46,49 @@
         $('.column').equalHeight();
     });
 </script>
-
+	 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<script>
+		$(function() {
+		$( "#tabs" ).tabs({active: 0});
+		});
+	</script>
 </head>
-
-
 <body>
 	<header id="header">
 		<hgroup>
-			<h1 class="site_title"><a href="/MainHandler">Quality Integrator</a></h1>
-			<h2 class="section_title">Measure Capability</h2><div class="btn_view_site"><a href="http://www.theonion.com/">View Site</a></div>
+			<h1 class="site_title"><a href="/">Integrated Capability</a></h1>
+			<h2 class="section_title">Operate & Manage</h2><div class="btn_view_site"><a href="http://http://www.theonion.com/">View Site</a></div>
 		</hgroup>
 	</header> <!-- end of header bar -->
 	
-<section id="secondary_bar">
-	{% include 'userbar.html' %}
-</section><!-- end of secondary bar -->
-	
-<aside id="sidebar" class="column">
-	{% include 'leftnav.html' %}
-</aside><!-- end of sidebar -->
-
-</div>
-  <div class="tabs">
-    <a data-toggle="tab1">Organisational Performance</a>
-    <a data-toggle="tab2">By Process</a>
-    <a data-toggle="tab3">By Case</a>
-    <a data-toggle="tab4">Adjustments/Innovations Summary</a>
-    <a data-toggle="tab5">Review Operator Notes</a>
-    <a data-toggle="tab6">DEV/DELETE</a>
-  </div>
-<div class="tabContent">  
-  	<div id="tab1">
+		<section id="secondary_bar">
+			{% include 'userbar.html' %}
+		</section><!-- end of secondary bar -->
+			
+		<aside id="sidebar" class="column">
+			{% include 'leftnav.html' %}
+		</aside><!-- end of sidebar -->
+			
+		<section id="main" class="column">
+		
+		<h4 class="alert_info">This is a temporary method for creating processes</h4>
+		<p>Processes are owned by process owners.  We have several ways of thinking about this: Anyone can create a process for themselves.  Other can leverage it by subscribing to it. A process is ZD when it has gone through SPS or whatever we call the design process. 
+		</p>
+<div class="clear"></div>
+<div id="tabs">
+<ul>
+	<li><a href="#tabs-1">Organisational Performance</a></li>
+	<li><a href="#tabs-2">By Process</a></li>
+	<li><a href="#tabs-3">By Case</a></li>
+	<li><a href="#tabs-4">Adjustments/Innovations Summary</a></li>
+	<li><a href="#tabs-5">Review Operator Notes</a></li>
+	<li><a href="#tabs-6">DEV/DELETE</a></li>
+</ul>
+<div id="tabs-1">
+  	
     <h2>Organisational Performance</h2>
     <br>
     <p>This table is an performance overview of all processes operated for the entire organisation.</p>
@@ -90,16 +102,15 @@
 					{% for row in sqlMeasurebyPerson %}
 					<td width=25%>{{ row[1]|e }}
 					<td width=30%>{{ row[3]|e }}
-					<td align="center" width=10%>{{ (row[9]*100)|round(method='common') }} 
+					<td align="center" width=10%>{{ row[9] }}% <!--round(method='common'-->
 					<td align="center" width=10%>{{ row[10]|e }}
 					<td align="center" width=10%>{{ (row[11]|e) }}</tr>
 					{% endfor %}
 				</table>
 			</table>
 
-  	</div>
-  
-  	<div id="tab2">
+</div>
+<div id="tabs-2">
     
     <h2>Performance by Process</h2>
     <br>
@@ -117,16 +128,15 @@
 				    {% for row in group.list %}
 				        <td width=30%>{{ row[3]|e }}
 				        <td width=40%>{{ row[6]|e }}
-				        <td align="center" width=10%>{{ (row[9]*100)|round(method='common') }}
+				        <td align="center" width=10%>{{ row[9]|e }}%
 				        <td align="center" width=10%>{{ row[10]|e }}
 				        <td align="center" width=10%>{{ row[11]|e }}<tr>
 				    {% endfor %}
 				{% endfor %}
 			</table>
 
-  	</div>
-  
-    <div id="tab3">
+</div>
+<div id="tabs-3">
     
     <h2>Performance by Case</h2>
     <br>
@@ -144,15 +154,15 @@
 				    {% for row in group.list %}
 				        <td width=30%>{{ row[1]|e }}
 				        <td width=40%>{{ row[3]|e }}
-				        <td align="center" width=10%>{{ (row[9]*100)|round(method='common') }}
+				        <td align="center" width=10%>{{ row[9]|e }}%
 				        <td align="center" width=10%>{{ row[10]|e }}
 				        <td align="center" width=10%>{{ row[11]|e }}<tr>
 				    {% endfor %}
 				{% endfor %}
 			</table>
 
-  </div>
-  <div id="tab4">
+</div>
+<div id="tabs-4">
     <h2>Adjustments/Innovations Summary</h2>
 
     <p>This table displays all the comments recorded for processes operated by all Operators.</p>
@@ -168,18 +178,18 @@
 			<th class=datatable>Risks</th>
 			<th class=datatable>Innovations</th><tr>
 						{% for row in innovations %}
-						<td width=10%>{{ row[0]|e }}
-						<td width=10%>{{ row[1]|e }}
-						<td width=10%>{{ row[2]|e }}
-						<td width=5%>{{ row[6]|e }}
-						<td width=5%>{{ row[3]|e }}
-						<td width=25%>{{ row[4]|e }}
-						<td width=25%>{{ row[5]|e }}<tr>
+						<td width=10%>	{{ row[0]|e }}
+						<td width=10%>	{{ row[1]|e }}
+						<td width=10%>	{{ row[2]|e }}
+						<td width=5%>	{{ row[6]|e }}
+						<td width=5%>	{{ row[3]|e }}
+						<td width=25%>	{{ row[4]|e }}
+						<td width=25%>	{{ row[5]|e }}	<tr>
 						{% endfor %}
 			</table>	
 		
-	</div>
-	<div id="tab5">
+</div>
+<div id="tabs-5">
     <h2>Review Operation Notes</h2>
 			<table class=datatable align="center"> 
 			<th class=datatable colspan="15" align="left" font=16px> Summary of Adjustments and Suggested Innovations </th><tr>
@@ -195,15 +205,15 @@
 						<td width=10%>{{ row[0]|e }}
 						<td width=10%>{{ row[1]|e }}
 						<td width=10%>{{ row[2]|e }}
-						<td width=5%>{{ row[6]|e }}
+						<td width=5%>{{ row[7]|e }}
 						<td width=5%>{{ row[3]|e }}
 						<td width=20%>{{ row[4]|e }}
 						<td width=20%>{{ row[5]|e }}
 						<td width=20%>{{ row[6]|e }}<tr>
 						{% endfor %}
 			</table>
-	</div>
-	<div id="tab6">
+</div>
+<div id="tabs-6">
     <h2>DEV/DELETE: Pass Args to Class/SQL</h2>
 		 	<table class=datatable>
 			<th class=datatable colspan="14" align="left"> Data Validation from case </th>
@@ -227,16 +237,9 @@
 						<td>{{ row[0]|e }}<td>{{ row[1]|e }}<td>{{ row[2]|e }}<td>{{ row[3]|e }}<td>{{ row[4]|e }}<td>{{ row[5]|e }}<td>{{ row[6]|e }}<tr>
 						{% endfor %}
 			</table>
-	</div>
+</div>
 </div>
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<script type="text/javascript" src="/static/html5jtabs.js"></script>
-<script>
-$(function() {
-  $(".tabs a").html5jTabs();
-});
-</script>
 </body>
 
 </html>

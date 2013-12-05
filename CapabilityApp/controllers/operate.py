@@ -26,7 +26,7 @@ def get_connection():
                          charset='utf8', 
                          use_unicode = True,
                          )
-
+      
 class OperateProcess(webapp.RequestHandler):
     '''
     Initially displays the O&M page for Process Step Selection
@@ -42,17 +42,19 @@ class OperateProcess(webapp.RequestHandler):
         cursor.execute("SELECT case_id, case_nm FROM proc_case WHERE status = 1 AND emp_id =%s", (authenticateUser))
         ddb_active_case = cursor.fetchall()
 
-        sqlGetAllProcesses = "SELECT * FROM process ORDER by proc_nm"
-        cursor.execute(sqlGetAllProcesses)
+        cursor.execute("SELECT * FROM process ORDER by proc_nm")
         ddb_process = cursor.fetchall()  
-
         
         cursor.execute('SELECT * FROM process_step')
         ddb_proc_step = cursor.fetchall()
         
+        cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
+        openoperations = cursor.fetchall()
+        
         conn.close()
 
-        template_values = {'ddb_proc_step': ddb_proc_step, 'ddb_active_case': ddb_active_case, 'ddb_process': ddb_process, 'authenticateUser': authenticateUser}
+        template_values = {'ddb_proc_step': ddb_proc_step, 'ddb_active_case': ddb_active_case, 'ddb_process': ddb_process, 
+                           'authenticateUser': authenticateUser, 'openoperations': openoperations}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
         
@@ -76,6 +78,9 @@ class SelectProcessStep(webapp.RequestHandler):
                 
         cursor.execute("SELECT * FROM process_step WHERE proc_id=%s", (proc_id))
         ddb_proc_step = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
+        openoperations = cursor.fetchall()
         
         conn.close()
 
@@ -113,6 +118,9 @@ class CreateCase(webapp.RequestHandler):
         cursor.execute("SELECT * FROM process_step")
         ddb_proc_step = cursor.fetchall()
         
+        cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
+        openoperations = cursor.fetchall()        
+        
         conn.close()
 
         template_values = {'ddb_proc_step': ddb_proc_step, 'ddb_active_case': ddb_active_case, 'ddb_process': ddb_process, 'authenticateUser': authenticateUser}
@@ -129,11 +137,11 @@ class CreateInstance(webapp.RequestHandler):
     TODO: Instances should load with status value set to initialised, then it should move to submitted or pending. 
     '''
     
-    def post(self): # post to DB
-        
+    def post(self): # post to DB        
         idGenerator = config.IDGenerator() # generates a unique key
         authenticateUser = str(users.get_current_user())
         case_key = str(idGenerator) + authenticateUser
+        now = config.UTCTime()
         
         conn = get_connection()
         cursor = conn.cursor()
@@ -142,7 +150,7 @@ class CreateInstance(webapp.RequestHandler):
         cursor.execute('INSERT INTO instance (case_id, proc_step_id, instance_key) '
                        'VALUES (%s, %s, %s)',
                        (
-                       self.request.get('case_id'), 
+                        self.request.get('case_id'), 
                         self.request.get('proc_step_id'),  
                         (case_key)        
                        ))
@@ -177,6 +185,10 @@ class CreateInstance(webapp.RequestHandler):
                         
                         
         case = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
+        openoperations = cursor.fetchall()
+        
         conn.close() 
         
         template_values = {'authenticateUser': authenticateUser, 'case': case, 'case_key': case_key} 
@@ -222,12 +234,16 @@ class PostProcessRun(webapp.RequestHandler):
                        "WHERE proc_run.proc_output_conf IS NULL AND proc_run.instance_key = %s", (case_key))
         case = cursor.fetchall()  
         
+        cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
+        openoperations = cursor.fetchall()
+        
         cursor.execute("SELECT * FROM process ORDER by proc_nm")
         ddb_process = cursor.fetchall()
 
         conn.close()
         
-        template_values = {'ddb_process': ddb_process, 'authenticateUser': authenticateUser, 'case': case, 'case_key': case_key}
+        template_values = {'ddb_process': ddb_process, 'authenticateUser': authenticateUser, 'case': case, 'case_key': case_key, 
+                           'openoperations': openoperations}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
 

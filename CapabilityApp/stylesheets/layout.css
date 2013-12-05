@@ -555,9 +555,10 @@ padding: 15px 10px;
 	margin-right:50px;
 }
 
-.datatable th1 { padding: .5em 0 .5em;
+.datatable groupheader { padding: .5em 0 .5em;
 	padding: 10;
-	background-color: #D1D1D1;
+	font-size:16px;
+	background-color: gray;
 	border-top: 1px solid #C8C8C8 thin;
 	border-bottom: solid #C8C8C8 thin;
 	margin-left:50px;
