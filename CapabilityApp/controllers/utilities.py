@@ -36,12 +36,15 @@ class UtilityHandler(webapp.RequestHandler):
         conn = get_connection()
         cursor = conn.cursor()
         
+        
         cursor.execute("SELECT * FROM person ORDER by first_nm")
         ddb_person = cursor.fetchall()
         
+
         cursor.execute("SELECT * FROM process ORDER by proc_nm")
         ddb_process = cursor.fetchall()
-        
+
+
         cursor.execute("SELECT * FROM process_step ORDER by proc_step_nm")
         ddb_processsteps = cursor.fetchall()
 
@@ -57,6 +60,8 @@ class UtilityHandler(webapp.RequestHandler):
                            'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser }
         template = jinja2_env.get_template('utilities.html')
         self.response.out.write(template.render(template_values))
+        
+        
         
 class PostProcess(webapp.RequestHandler):
     def post(self): # post to DB
@@ -74,6 +79,7 @@ class PostProcess(webapp.RequestHandler):
         
         cursor.execute("SELECT * FROM person ORDER by first_nm")
         ddb_person = cursor.fetchall()
+        
         
         cursor.execute("SELECT * FROM process ORDER by proc_nm")
         ddb_process = cursor.fetchall()
@@ -121,6 +127,7 @@ class PostProcessStep(webapp.RequestHandler):
         cursor.execute("SELECT * FROM person ORDER by first_nm")
         ddb_person = cursor.fetchall()
         
+
         cursor.execute("SELECT * FROM process ORDER by proc_nm")
         ddb_process = cursor.fetchall()
         

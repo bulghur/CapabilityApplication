@@ -12,8 +12,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.api import users
 from controllers import measure, operate, home, design, utilities
-from config import config, app_control
-from config import myhandler
+from config import *
 
 # Paths and Jinja2
 template_path = os.path.join(os.path.dirname(__file__), 'templates')
@@ -216,7 +215,22 @@ class ProcessModelHandler(webapp.RequestHandler):
 
 class PlayGroundHandler(webapp.RequestHandler):
     def get(self):
-        self.response.out.write(jinja2_env.get_template('playground.html').render({}))
+        
+        authenticateUser = users.get_current_user()
+        authenticateUser = str(authenticateUser)
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT DISTINCT proc_id, proc_nm, proc_step_id, proc_step_seq, proc_step_nm "
+                       "FROM vw_processes "
+                       "WHERE proc_step_status = 'active' OR proc_step_owner = %s "
+                       "ORDER BY proc_id, proc_step_seq", (authenticateUser))
+        processmenu = cursor.fetchall()
+        conn.close()
+        
+        template_values = {"processmenu": processmenu, }
+        template = jinja2_env.get_template('playground.html')
+        self.response.out.write(template.render(template_values))
         
 class LeftNavHandler(webapp.RequestHandler):
     def get(self):
@@ -226,6 +240,8 @@ class Authenticate(webapp2.RequestHandler):
     '''
 This authenticates based on App Engine authentication with Google using a gmail user.
 See this: http://webapp-improved.appspot.com/tutorials/auth.html
+
+Fix authentication issues/bug by watching this: https://www.youtube.com/watch?v=yCS6cwYjl8o
 '''
     def get(self):
         authenticateUser = users.get_current_user()
@@ -294,12 +310,12 @@ application = webapp.WSGIApplication(
         ("/permissions", Permissions),
         ("/MainHandler", home.MainHandler),
         ("/ProcessModel", ProcessModelHandler),
-        ("/OperateProcess", operate.OperateProcess),
-        ('/SelectProcessStep', operate.SelectProcessStep), 
+        ("/OperateProcess", operate.OperateProcess), 
         ("/CreateInstance", operate.CreateInstance),
         ("/postProcessRun", operate.PostProcessRun),
         ("/CreateCase", operate.CreateCase),
         ("/MeasurePerformance", measure.MeasurePerformance),
+        ("/PoncCalulator", measure.PoncCalulator),
         ("/postProcessSteps", design.PostProcessStep),
         ("/DevelopCapability", design.DevelopCapability),
         ("/utilities", utilities.UtilityHandler),

@@ -5,6 +5,7 @@ import time
 from google.appengine.api import rdbms
 #from controllers import measure
 '''
+
 #Database Connections: LOCAL
 CLOUDSQL_INSTANCE = 'MySQL56'
 HOST = 'localhost'
@@ -17,7 +18,6 @@ CLOUDSQL_INSTANCE = 'noble-freehold-326:learndb'
 DATABASE_NAME = 'capability'
 USER_NAME = 'root'
 PASSWORD = ''
-
 
 def get_connection():
     return rdbms.connect(instance=CLOUDSQL_INSTANCE, 

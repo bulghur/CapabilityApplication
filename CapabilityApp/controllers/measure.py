@@ -10,7 +10,6 @@ from google.appengine.ext import db
 from google.appengine.api import users
 from controllers import operate, home, design, utilities
 from config import *
-from config import myhandler
 
 template_path = os.path.join(os.path.dirname(__file__), '../templates')
 
@@ -18,6 +17,8 @@ jinja2_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_path)
 )
 
+authenticateUser = users.get_current_user()
+authenticateUser = str(authenticateUser)
 
 def get_connection():
     return rdbms.connect(instance=config.CLOUDSQL_INSTANCE,
@@ -30,10 +31,7 @@ def get_connection():
 
 class MeasurePerformance(webapp.RequestHandler):
     def get(self):
-        authenticateUser = users.get_current_user()
-        authenticateUser = str(authenticateUser)
 
-        summary = []
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT proc_id, proc_nm, proc_step_id, proc_step_nm, proc_seq, case_id, case_nm, instance_key, emp_id, "
@@ -62,7 +60,7 @@ class MeasurePerformance(webapp.RequestHandler):
                        "INNER JOIN proc_case ON (proc_run.case_id = proc_case.case_id) "      
                        "INNER JOIN process_step ON (proc_run.proc_step_id = process_step.proc_step_id) "
                        "INNER JOIN process ON (proc_run.proc_id = process.proc_id) "
-                       "WHERE proc_run.emp_id = %s AND (proc_conseq != ' ' OR not null OR proc_innovation != ' ' OR not null) "
+                       "WHERE (proc_conseq != ' ' OR not null OR proc_innovation != ' ' OR not null) AND proc_run.emp_id = %s "
                        "ORDER BY process.proc_id, process_step.proc_step_id", (authenticateUser))                     
         innovations = cursor.fetchall()
         
@@ -86,28 +84,41 @@ class MeasurePerformance(webapp.RequestHandler):
                        "WHERE proc_run.emp_id = %s AND (proc_notes != ' ' OR not null) "
                        "ORDER BY process.proc_id, process_step.proc_step_id", (authenticateUser))                     
         notes = cursor.fetchall()
-    
-        
+             
         conn.close()
         #query = ("SELECT * from person WHERE google_user_id ='" + str(authenticateUser) + "'")
         query = "SELECT * from person WHERE google_user_id = "
         condition1 = authenticateUser
         summary8 = database.query(query, condition1)
-        
-        
-        '''
-        def main():
-            print(sumProblemString(2, 3))
-            print(sumProblemString(1234567890123, 535790269358))
-            a = int(input("Enter an integer: "))
-            b = int(input("Enter another integer: "))
-            print(sumProblemString(a, b))
-        
-        main() 
-        '''
-        
-        template_values = {'summary': summary, 'sqlMeasurebyPerson' : sqlMeasurebyPerson, 'summary1': summary1, 'authenticateUser': authenticateUser, 'innovations': innovations,
-                           "authenticateUser": authenticateUser, 'processSummary': processSummary, 'notes': notes, 'summary8': summary8 }
+               
+        template_values = {'summary': summary, 'sqlMeasurebyPerson' : sqlMeasurebyPerson, 'summary1': summary1, 'innovations': innovations, 
+                           'authenticateUser': authenticateUser, 'processSummary': processSummary, 'notes': notes, 
+                           'summary8': summary8}
         template = jinja2_env.get_template('measureperformance.html')
         self.response.out.write(template.render(template_values))
+        
+class PoncCalulator(webapp.RequestHandler):    
+    def get(self):
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT proc_run_start_tm, proc_nm, proc_seq, proc_step_nm, case_nm, instance_key, emp_id, "
+               "COUNT(proc_step_conf) AS tot_ops, SUM(proc_step_conf) AS tot_success, "
+               "(COUNT(proc_step_conf) - SUM(proc_step_conf)) AS failure, "
+               "SUM(proc_ponc) AS sum_ponc, "
+               "SUM(proc_poc) AS sum_poc, "
+               "SUM(proc_efc) AS sum_efc, "
+               "(SUM(proc_poc) + SUM(proc_ponc)) AS tot_cost "
+               "FROM vw_proc_run_sum "
+               "WHERE emp_id = %s "
+               "GROUP BY proc_step_id "
+               "ORDER BY proc_id", (authenticateUser))
+        capability = cursor.fetchall()
+        conn.close()
+               
+        template_values = {'capability': capability}
+        template = jinja2_env.get_template('ponccalculator.html')
+        self.response.out.write(template.render(template_values))
+ 
+        
             

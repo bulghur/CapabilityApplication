@@ -186,9 +186,9 @@
 		<label><h2>PCA ZD Capable Processes</h2></label>
 			<table class=datatable align="center"> 
 				{% for group in processlist|groupby(1) %}
-				    <th colspan="7" align="left" !important color="2A2A2A" font-color="white" font-size="2em">{{ group.grouper }}</th><tr>
+				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="7" align="left">{{ group.grouper }}</th><tr>
 				    {% for group in group.list|groupby(6)  %}
-				    <th colspan="7" align="left" !important color="2A2A2A" font-color="white" font-size="1.5em">{{ group.grouper }}</th><tr>
+				    <th colspan="7" align="left">{{ group.grouper }}</th><tr>
 				    <th class=datatable>Seq</th>
 				    <th class=datatable>Process Step</th>
 					<th class=datatable>Process Step Description</th>
@@ -215,7 +215,7 @@
 		<label><h2>Your Local Processes</h2></label>
 			<table class=datatable align="center"> 
 				{% for group in localprocesslist|groupby(1) %}
-				    <th colspan="7" align="left" !important color="2A2A2A" font-color="white" font-size="2em">{{ group.grouper }}</th><tr>
+				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="7" align="left">{{ group.grouper }}</th><tr>
 				    {% for group in group.list|groupby(6)  %}
 				    <th colspan="7" align="left" !important color="2A2A2A" font-color="white" font-size="1.5em">{{ group.grouper }}</th><tr>
 				    <th class=datatable>Seq</th>

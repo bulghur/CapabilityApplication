@@ -14,7 +14,6 @@ from google.appengine.api import users
 from controllers import home, design, utilities
 import config
 import main
-import myhandler
 
 authenticateUser = users.get_current_user()
 

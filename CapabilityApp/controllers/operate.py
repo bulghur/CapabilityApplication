@@ -41,50 +41,20 @@ class OperateProcess(webapp.RequestHandler):
         
         cursor.execute("SELECT case_id, case_nm FROM proc_case WHERE status = 1 AND emp_id =%s", (authenticateUser))
         ddb_active_case = cursor.fetchall()
-
-        cursor.execute("SELECT * FROM process ORDER by proc_nm")
-        ddb_process = cursor.fetchall()  
         
-        cursor.execute('SELECT * FROM process_step')
-        ddb_proc_step = cursor.fetchall()
-        
-        cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
-        openoperations = cursor.fetchall()
-        
-        conn.close()
-
-        template_values = {'ddb_proc_step': ddb_proc_step, 'ddb_active_case': ddb_active_case, 'ddb_process': ddb_process, 
-                           'authenticateUser': authenticateUser, 'openoperations': openoperations}
-        template = jinja2_env.get_template('operateprocess.html')
-        self.response.out.write(template.render(template_values))
-        
-class SelectProcessStep(webapp.RequestHandler):
-    '''
-    This process selects the parent process so that the process substeps can be easily selected.  
-    '''
-    def get(self):
-        
-        authenticateUser = str(users.get_current_user())
-        proc_id = self.request.get("proc_id")
-              
-        conn = get_connection()
-        cursor = conn.cursor()      
-        
-        cursor.execute("SELECT case_id, case_nm FROM proc_case WHERE status = 1 AND emp_id =%s", (authenticateUser))
-        ddb_active_case = cursor.fetchall()
-
-        cursor.execute("SELECT * FROM process ORDER by proc_nm")
-        ddb_process = cursor.fetchall()  
-                
-        cursor.execute("SELECT * FROM process_step WHERE proc_id=%s", (proc_id))
-        ddb_proc_step = cursor.fetchall()
+        cursor.execute("SELECT DISTINCT proc_id, proc_nm, proc_step_id, proc_step_seq, proc_step_nm "
+               "FROM vw_processes "
+               "WHERE proc_step_status = 'active' OR proc_step_owner = %s "
+               "ORDER BY proc_id, proc_step_seq", (authenticateUser))
+        processmenu = cursor.fetchall()
         
         cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
         openoperations = cursor.fetchall()
         
         conn.close()
 
-        template_values = {'ddb_proc_step': ddb_proc_step, 'ddb_active_case': ddb_active_case, 'ddb_process': ddb_process, 'authenticateUser': authenticateUser}
+        template_values = {'ddb_active_case': ddb_active_case, 'processmenu': processmenu, 'authenticateUser': authenticateUser, 
+                           'openoperations': openoperations}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
         
@@ -112,18 +82,18 @@ class CreateCase(webapp.RequestHandler):
         cursor.execute("SELECT case_id, case_nm FROM proc_case WHERE status = 1 AND emp_id =%s", (authenticateUser))
         ddb_active_case = cursor.fetchall()
 
-        cursor.execute("SELECT * FROM process ORDER by proc_nm")
-        ddb_process = cursor.fetchall()  
-                
-        cursor.execute("SELECT * FROM process_step")
-        ddb_proc_step = cursor.fetchall()
-        
+        cursor.execute("SELECT DISTINCT proc_id, proc_nm, proc_step_id, proc_step_seq, proc_step_nm "
+               "FROM vw_processes "
+               "WHERE proc_step_status = 'active' OR proc_step_owner = %s "
+               "ORDER BY proc_id, proc_step_seq", (authenticateUser))
+        processmenu = cursor.fetchall()
+      
         cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
         openoperations = cursor.fetchall()        
         
         conn.close()
 
-        template_values = {'ddb_proc_step': ddb_proc_step, 'ddb_active_case': ddb_active_case, 'ddb_process': ddb_process, 'authenticateUser': authenticateUser}
+        template_values = {'ddb_active_case': ddb_active_case, 'processmenu': processmenu, 'authenticateUser': authenticateUser}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
    
@@ -237,12 +207,18 @@ class PostProcessRun(webapp.RequestHandler):
         cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
         openoperations = cursor.fetchall()
         
-        cursor.execute("SELECT * FROM process ORDER by proc_nm")
-        ddb_process = cursor.fetchall()
+        cursor.execute("SELECT case_id, case_nm FROM proc_case WHERE status = 1 AND emp_id =%s", (authenticateUser))
+        ddb_active_case = cursor.fetchall()
+
+        cursor.execute("SELECT DISTINCT proc_id, proc_nm, proc_step_id, proc_step_seq, proc_step_nm "
+               "FROM vw_processes "
+               "WHERE proc_step_status = 'active' OR proc_step_owner = %s "
+               "ORDER BY proc_id, proc_step_seq", (authenticateUser))
+        processmenu = cursor.fetchall()
 
         conn.close()
         
-        template_values = {'ddb_process': ddb_process, 'authenticateUser': authenticateUser, 'case': case, 'case_key': case_key, 
+        template_values = {'processmenu': processmenu, 'authenticateUser': authenticateUser, 'case': case, 'case_key': case_key, 
                            'openoperations': openoperations}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
