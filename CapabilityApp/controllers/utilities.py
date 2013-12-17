@@ -28,10 +28,12 @@ def get_connection():
                          password=config.PASSWORD, 
                          charset='utf8')
 
-authenticateUser = str(users.get_current_user())  
+
 
 class UtilityHandler(webapp.RequestHandler):
     def get(self):
+        
+        authenticateUser = str(users.get_current_user())  
        
         conn = get_connection()
         cursor = conn.cursor()
@@ -65,6 +67,9 @@ class UtilityHandler(webapp.RequestHandler):
         
 class PostProcess(webapp.RequestHandler):
     def post(self): # post to DB
+        
+        authenticateUser = str(users.get_current_user())  
+        
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute('INSERT INTO process (proc_nm, proc_desc, proc_owner, proc_start_dt) '
@@ -108,10 +113,14 @@ class PostProcess(webapp.RequestHandler):
      
 class PostProcessStep(webapp.RequestHandler):
     def post(self): # post to DB
+        
+        authenticateUser = str(users.get_current_user())  
+        
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO process_step (proc_step_nm, proc_seq, proc_step_desc, proc_id, proc_step_sop, proc_model_link, process_step.proc_step_owner)'
-                       'VALUES (%s, %s, %s, %s, %s, %s, %s)',
+        cursor.execute("INSERT INTO process_step (proc_step_nm, proc_seq, proc_step_desc, proc_id, proc_step_sop, proc_model_link, process_step.proc_step_owner, "
+                       "proc_poc, proc_ponc, proc_efc ) "
+                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                        (
                        self.request.get('proc_step_nm'),
                        self.request.get('proc_seq'),
@@ -119,8 +128,10 @@ class PostProcessStep(webapp.RequestHandler):
                        self.request.get('proc_id'),
                        self.request.get('proc_step_sop'),
                        self.request.get('proc_model_link'),
-                       self.request.get('owner')
-                                                                                            
+                       self.request.get('owner'),
+                       self.request.get('proc_poc'),
+                       self.request.get('proc_ponc'),
+                       self.request.get('proc_efc')                                                                                
                        ))
         conn.commit()
         
@@ -155,6 +166,9 @@ class PostProcessStep(webapp.RequestHandler):
         
 class PostRequirement(webapp.RequestHandler):
     def post(self): 
+        
+        authenticateUser = str(users.get_current_user())  
+        
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute('INSERT INTO proc_req (proc_req_nm, proc_req_desc, proc_req_seq, proc_step_id)'
@@ -197,6 +211,9 @@ class PostRequirement(webapp.RequestHandler):
         
 class PostPerson(webapp.RequestHandler):
     def post(self): # post to DB
+        
+        authenticateUser = str(users.get_current_user())  
+        
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute('INSERT INTO person (first_nm, last_nm, email)'

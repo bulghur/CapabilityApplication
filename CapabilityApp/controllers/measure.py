@@ -1,24 +1,25 @@
 import os
+import config
 import cgi
 import logging
 import time
+import webapp2
 import jinja2
 import itertools
+import json
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.api import users
 from controllers import operate, home, design, utilities
 from config import *
+from array import *
 
 template_path = os.path.join(os.path.dirname(__file__), '../templates')
 
 jinja2_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_path)
-)
-
-authenticateUser = users.get_current_user()
-authenticateUser = str(authenticateUser)
+    )
 
 def get_connection():
     return rdbms.connect(instance=config.CLOUDSQL_INSTANCE,
@@ -30,10 +31,16 @@ def get_connection():
                          )
 
 class MeasurePerformance(webapp.RequestHandler):
+    '''
+    Queries on measurment 
+    '''
     def get(self):
 
         conn = get_connection()
         cursor = conn.cursor()
+        
+        authenticateUser = str(users.get_current_user()) 
+        
         cursor.execute("SELECT proc_id, proc_nm, proc_step_id, proc_step_nm, proc_seq, case_id, case_nm, instance_key, emp_id, "
                        "ROUND(SUM(proc_step_conf)/COUNT(proc_step_id)*100) AS conf_summary, SUM(proc_step_conf) AS proc_success, COUNT(proc_step_id) AS proc_step_total "
                        "FROM vw_proc_run_sum "
@@ -102,13 +109,23 @@ class PoncCalulator(webapp.RequestHandler):
         
         conn = get_connection()
         cursor = conn.cursor()
+        
+        authenticateUser = str(users.get_current_user())
+        
+        cursor.execute("SELECT DISTINCT proc_nm, proc_step_seq, proc_step_nm, proc_step_desc, proc_step_owner, proc_step_status, proc_step_ponc, "
+                       "proc_step_poc, proc_step_efc "
+                       "FROM vw_processes "
+                       "WHERE proc_step_status = 'active' OR (proc_step_status = 'local' AND proc_step_owner = %s) "
+                       "ORDER BY proc_id, proc_step_seq", (authenticateUser))
+        processcost = cursor.fetchall()
+                
         cursor.execute("SELECT proc_run_start_tm, proc_nm, proc_seq, proc_step_nm, case_nm, instance_key, emp_id, "
-               "COUNT(proc_step_conf) AS tot_ops, SUM(proc_step_conf) AS tot_success, "
-               "(COUNT(proc_step_conf) - SUM(proc_step_conf)) AS failure, "
-               "SUM(proc_ponc) AS sum_ponc, "
-               "SUM(proc_poc) AS sum_poc, "
-               "SUM(proc_efc) AS sum_efc, "
-               "(SUM(proc_poc) + SUM(proc_ponc)) AS tot_cost "
+               "COUNT(proc_step_conf) AS tot_ops, SUM(proc_step_conf) AS tot_success, " #7, #9
+               "(COUNT(proc_step_conf) - SUM(proc_step_conf)) AS failure, " #10
+               "SUM(proc_ponc) AS sum_ponc, " #11
+               "SUM(proc_poc) AS sum_poc, " #12
+               "SUM(proc_efc) AS sum_efc, "  #13
+               "(SUM(proc_poc) + SUM(proc_ponc)) AS tot_cost " #14
                "FROM vw_proc_run_sum "
                "WHERE emp_id = %s "
                "GROUP BY proc_step_id "
@@ -116,7 +133,7 @@ class PoncCalulator(webapp.RequestHandler):
         capability = cursor.fetchall()
         conn.close()
                
-        template_values = {'capability': capability}
+        template_values = {'capability': capability, 'authenticateUser': authenticateUser, 'processcost': processcost}
         template = jinja2_env.get_template('ponccalculator.html')
         self.response.out.write(template.render(template_values))
  

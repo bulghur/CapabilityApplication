@@ -7,16 +7,19 @@ import webapp2
 import jinja2
 import itertools
 import json
-from array import *
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.api import users
 from controllers import home, design, utilities
-from config import config, app_control
+from config import *
+from array import *
+
 template_path = os.path.join(os.path.dirname(__file__), '../templates')
 
-jinja2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path))
+jinja2_env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(template_path)
+    )
 
 def get_connection():
     return rdbms.connect(instance=config.CLOUDSQL_INSTANCE,

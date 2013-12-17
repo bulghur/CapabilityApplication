@@ -11,7 +11,7 @@ from google.appengine.api import rdbms
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.api import users
-from controllers import measure, operate, home, design, utilities
+from controllers import collaborate, design, home, measure, operate, utilities
 from config import *
 
 # Paths and Jinja2
@@ -309,6 +309,7 @@ application = webapp.WSGIApplication(
         #('/', app_control.GrantAccess),
         ("/permissions", Permissions),
         ("/MainHandler", home.MainHandler),
+        ("/YourProfile", collaborate.YourProfile),
         ("/ProcessModel", ProcessModelHandler),
         ("/OperateProcess", operate.OperateProcess), 
         ("/CreateInstance", operate.CreateInstance),

@@ -77,7 +77,7 @@
 	<header id="header">
 		<hgroup>
 			<h1 class="site_title"><a href="/">Integrated Capability</a></h1>
-			<h2 class="section_title">Operate & Manage</h2><div class="btn_view_site"><a href="http://http://www.theonion.com/">View Site</a></div>
+			<h2 class="section_title">Collaborate</h2><div class="btn_view_site"><a href="http://http://www.theonion.com/">View Site</a></div>
 		</hgroup>
 	</header> <!-- end of header bar -->
 	
@@ -97,85 +97,59 @@
 <div id="tabs">
 		
 <ul>
-	<li><a href="#tabs-1">PONC/POC/EFC Analysis</a></li>
-	<li><a href="#tabs-2">Costs by Case</a></li>
-	<li><a href="#tabs-3">Cost by Process</a></li>
-	<li><a href="#tabs-4">Process Costs Reference</a></li>
+	<li><a href="#tabs-1">You</a></li>
+	<li><a href="#tabs-2">Your Team</a></li>
+	<li><a href="#tabs-3">Your Network</a></li>
+	<li><a href="#tabs-4">tab4</a></li>
 	<li><a href="#tabs-5">tab5</a></li>
 	<li><a href="#tabs-6">tab6</a></li>
 	<li><a href="#tabs-7">tab6</a></li>
 </ul>
 <div id="tabs-1">
-    <h2>Capability Analysis</h2>
+    <h2>Your Profile</h2>
     
-    <p>Processes are owned by process owners.  We have several ways of thinking about this: Anyone can create a process for themselves.  Other can leverage it by subscribing to it. A process is ZD when it has gone through SPS when completed through all stages. </p>
+    <p>This is you...</p>
+    <br>
 		 	<table class=datatable>
-			<th class=datatable id="group1_header" style="color: #FFFFFF" colspan="14" align="left"> Capability By Process </th>
+			<th class=datatable colspan="14" align="left"> </th>
 			<tr>
-			<th class=datatable>Process</th>
-			<th class=datatable>Seq</th>
-			<th class=datatable>Process Step</th>
-			<th class=datatable>Case</th>
-			<th class=datatable>Operator</th>
-			<th class=datatable>No of Ops</th>
-			<th class=datatable>POC</th>
-			<th class=datatable>No of Failures</th>
-			<th class=datatable>PONC</th>
-			<th class=datatable>EFC</th>
-			<th class=datatable>Total Cost</th><tr>
+			<th class=datatable align="center" width=1%>Emp ID</th>	
+			<th class=datatable width=20%>Name</th>
+			<th class=datatablewidth=10%>Email</th>
+			<th class=datatablewidth=10%>Google User ID</th><tr>
 			
-						{% for row in capability %}
-						<td width=5%>{{ row[1]|e }}
-						<td width=1% align="center" >{{ row[2]|e }}
-						<td width=5%>{{ row[3]|e }}
-						<td width=5%>{{ row[4]|e }}
-						<td width=5%>{{ row[6]|e }}
-						<td width=1% align="center" > {{ row[7]|e }}
-						<td width=1% align="center" >$ {{ row[11]|round|int|e }}
-						<td width=1% align="center" >{{ row[9]|e  }}
-						<td width=1% align="center" >$ {{ row[10]|round|int|e }}
-						<td width=1% align="center" >$ {{ row[12]|round|int|e }}
-						<td width=1% align="center" >$ {{ row[13]|round|int|e  }}
-						<tr>
+						{% for row in yourprofile %}
+						<td>{{ row[0]|e }}
+						<td>{{ row[1]|e }} {{ row[2]|e }}
+						<td>{{ row[3]|e }}
+						<td>{{ row[4]|e }}<tr>
 						{% endfor %}
 			</table>
 
 </div>
 <div id="tabs-2">
-<h2>Process Cost by Case</h2>
-			<table class=datatable align="center"> 
-				{% for group in capability|groupby(4) %}
-				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="13" align="left">{{ group.grouper }}</th><tr>
-				    <th class=datatable>Process</th>
-					<th class=datatable>Seq</th>
-					<th class=datatable>Process Step</th>
-					<th class=datatable>Operator</th>
-					<th class=datatable>Tot Ops</th>
-					<th class=datatable>Conf Ops</th>
-					<th class=datatable>Failed</th>
-					<th class=datatable>POC</th>
-					<th class=datatable>PONC</th>
-					<th class=datatable>EFC</th>
-					<th class=datatable>Tot Cost</th><tr>
-				    {% for row in group.list %}
-				   	 	<td width=10% align="center" >{{ row[1]|e }}
-				        <td width=2%>{{ row[2]|e }}
-				        <td width=10%>{{ row[3]|e }}
-				        <td width=10%>{{ row[6]|e }}
-				        <td align="center" width=5%>{{ row[7]|e }}
-				        <td align="center" width=5%>{{ row[8]|e }}
-				        <td align="center" width=5%>{{ row[9]|e }}
-				        <td align="center" width=5%>${{ row[11]|round|int|e }}
-				        <td align="center" width=5%>${{ row[10]|round|int|e }}
-				        <td align="center" width=5%>${{ row[12]|round|int|e }}
-				        <td align="center" width=5%>${{ row[13]|round|int|e }}<tr>
-				    {% endfor %}
-				{% endfor %}
+
+			    <h2>People in your Organization</h2>
+		 	<table class=datatable>
+			<th class=datatable colspan="14" align="left"> </th>
+			<tr>
+			<th class=datatable align="center" width=2%>Emp ID</th>	
+			<th class=datatable width=20%>Name</th>
+			<th class=datatablewidth=10%>Email</th>
+			<th class=datatablewidth=10%>Google User ID</th><tr>
+			
+						{% for row in yourteam %}
+						<td>{{ row[0]|e }}
+						<td>{{ row[1]|e }} {{ row[2]|e }}
+						<td>{{ row[3]|e }}
+						<td>{{ row[4]|e }}<tr>
+						{% endfor %}
 			</table>
+
 
 </div>
 <div id="tabs-3">
-<h2>Process Cost by Process</h2>
+<h2>Your Networks</h2>
 			<table class=datatable align="center"> 
 				{% for group in capability|groupby(1) %}
 				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="13" align="left">{{ group.grouper }}</th><tr>
