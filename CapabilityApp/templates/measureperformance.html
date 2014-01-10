@@ -114,7 +114,7 @@
 			<table class=datatable align="center"> 
 				<th class=datatable>Process</th>
 				<th class=datatable>Process Step</th>
-				<th class=datatable>Perf %</th>
+				<th class=datatable>Conf Rate</th>
 				<th class=datatable>Success</th>
 				<th class=datatable>No of Operations</th><tr>
 					{% for row in sqlMeasurebyPerson %}
@@ -140,7 +140,7 @@
 				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="6" align="left">{{ group.grouper }}</th><tr>
 				    <th class=datatable>Process Step</th>
 					<th class=datatable>Case</th>
-					<th class=datatable>Perf %</th>
+					<th class=datatable>Conf Rate %</th>
 					<th class=datatable>Success</th>
 					<th class=datatable>No of Operations</th><tr>
 				    {% for row in group.list %}
@@ -166,8 +166,8 @@
 				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="5" align="left">{{ group.grouper }}</th1><tr>
 				    <th class=datatable>Process</th>
 					<th class=datatable>Process Step</th>
-					<th class=datatable>Perf %</th>
-					<th class=datatable>Success</th>
+					<th class=datatable>Conf Rate%</th>
+					<th class=datatable>Conforming</th>
 					<th class=datatable>No of Operations</th><tr>
 				    {% for row in group.list %}
 				        <td width=30%>{{ row[1]|e }}
@@ -194,7 +194,7 @@
 			<th class=datatable>Reported by</th>
 			<th class=datatable>Date</th>
 			<th class=datatable>Risks</th>
-			<th class=datatable>Innovations</th><tr>
+			<th class=datatable>Adjustments</th><tr>
 						{% for row in innovations %}
 						<td width=10%>	{{ row[0]|e }}
 						<td width=10%>	{{ row[1]|e }}
@@ -218,7 +218,7 @@
 			<th class=datatable>Date</th>
 			<th class=datatable>Notes</th>
 			<th class=datatable>Risks</th>
-			<th class=datatable>Innovations</th><tr>
+			<th class=datatable>Adjustments</th><tr>
 						{% for row in notes %}
 						<td width=10%>{{ row[0]|e }}
 						<td width=10%>{{ row[1]|e }}
