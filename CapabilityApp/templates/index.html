@@ -87,48 +87,28 @@
 				</article>
 				
 				<article class="stats_overview">
-					<div class="overview_today">
-						<p class="overview_day">Today</p>
-						<p class="overview_count">1,876</p>
-						<p class="overview_type">Conforming Processes</p>
-						<p class="overview_count">2,103</p>
-						<p class="overview_type">Total Processes</p>
-					</div>
-					<div class="overview_previous">
-						<p class="overview_day">Yesterday</p>
-						<p class="overview_count">1,646</p>
-						<p class="overview_type">Conforming Processes</p>
-						<p class="overview_count">2,054</p>
-						<p class="overview_type">Total Processes</p>
-					</div>
+			<table class=datatable align="center"> 
+			<h2>Operations in Last 7 Days</h2>
+				<th class=datatable>Process</th>
+				<th class=datatable>Conf Ops</th>
+				<th class=datatable>No of Ops</th>
+				<th class=datatable>Conf Rate</th>
+				<th class=datatable>Total PONC</th>
+				<th class=datatable>Total POC</th><tr>
+					{% for row in activitySummary %}
+					<td width=30%>{{ row[1]|e }}
+					<td width=10%>{{ row[2]|e }}
+					<td align="center" width=10%>{{ row[3]|round|int|e }} 
+					<td align="center" width=10%>{{ (row[4]*100)|round|int|e }}% <!--round(method='common'-->
+					<td align="center" width=10%>${{ (row[5]|round|int|e) }}
+					<td align="center" width=10%>${{ (row[6]|round|int|e) }}</tr>
+					{% endfor %}
+				</table>
+			</table>
 				</article>
 				<div class="clear"></div>
 			</div>
 		</article><!-- end of stats article -->
-		
-		<article class="module width_3_quarter">
-		<header><h3 class="tabs_involved">Performance by Most Frequently Operated Processes</h3>
-		<ul class="tabs">
-   			<li><a href="#tab1">Posts</a></li>
-    		<li><a href="#tab2">Comments</a></li>
-		</ul>
-		</header>
-
-		<div class="tab_container">
-			<div id="tab1" class="tab_content">
-	<div class="tab_container">
-			<div id="tab1" class="tab_content">
-			Tab 1
-			</div><!-- end of #tab1 -->
-			<div id="tab2" class="tab_content">
-			Tab 2
-			</div><!-- end of #tab2 -->
-			
-
-
-			
-		</div><!-- end of .tab_container -->
-		
 </body>
 
 </html>

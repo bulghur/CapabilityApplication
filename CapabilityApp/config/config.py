@@ -3,22 +3,27 @@
 import datetime
 import time
 from google.appengine.api import rdbms
-#from controllers import measure
+'''
+Configure
+1. Change from Local to the appropriate CLOUD SQL instance
+2. Change the password
+3. Update the Yaml File
+'''
 
 #Database Connections: LOCAL
 CLOUDSQL_INSTANCE = 'MySQL56'
 HOST = 'localhost'
 DATABASE_NAME = 'capability'
 USER_NAME = 'root'
-PASSWORD = 'cdnfom1'
+PASSWORD = 'cDnfom100!' # this will be set to your local password: for Bulghur, coldDaring
 '''
 #Database Connections: CLOUD
-CLOUDSQL_INSTANCE = 'noble-freehold-326:learndb'
+CLOUDSQL_INSTANCE = 'noble-freehold-326:learndb' # 'noble-freehold-326:learndb' OR 'pca-dev-capability:capability'
 DATABASE_NAME = 'capability'
+HOST = 'localhost'
 USER_NAME = 'root'
 PASSWORD = ''
 '''
-
 def get_connection():
     return rdbms.connect(instance=CLOUDSQL_INSTANCE, 
                          database=DATABASE_NAME, 

@@ -40,6 +40,7 @@ class MeasurePerformance(webapp.RequestHandler):
         cursor = conn.cursor()
         
         authenticateUser = str(users.get_current_user()) 
+        featureList = database.memcacheNavBuilder()
         
         cursor.execute("SELECT proc_id, proc_nm, proc_step_id, proc_step_nm, proc_seq, case_id, case_nm, instance_key, emp_id, "
                        "ROUND(SUM(proc_step_conf)/COUNT(proc_step_id)*100) AS conf_summary, SUM(proc_step_conf) AS proc_success, COUNT(proc_step_id) AS proc_step_total "
@@ -100,7 +101,7 @@ class MeasurePerformance(webapp.RequestHandler):
                
         template_values = {'summary': summary, 'sqlMeasurebyPerson' : sqlMeasurebyPerson, 'summary1': summary1, 'innovations': innovations, 
                            'authenticateUser': authenticateUser, 'processSummary': processSummary, 'notes': notes, 
-                           'summary8': summary8}
+                           'summary8': summary8, 'featureList': featureList}
         template = jinja2_env.get_template('measureperformance.html')
         self.response.out.write(template.render(template_values))
         
@@ -111,6 +112,7 @@ class PoncCalulator(webapp.RequestHandler):
         cursor = conn.cursor()
         
         authenticateUser = str(users.get_current_user())
+        featureList = database.memcacheNavBuilder()
         
         cursor.execute("SELECT DISTINCT proc_nm, proc_step_seq, proc_step_nm, proc_step_desc, proc_step_owner, proc_step_status, proc_step_ponc, "
                        "proc_step_poc, proc_step_efc "
@@ -133,7 +135,7 @@ class PoncCalulator(webapp.RequestHandler):
         capability = cursor.fetchall()
         conn.close()
                
-        template_values = {'capability': capability, 'authenticateUser': authenticateUser, 'processcost': processcost}
+        template_values = {'capability': capability, 'authenticateUser': authenticateUser, 'processcost': processcost, 'featureList': featureList}
         template = jinja2_env.get_template('ponccalculator.html')
         self.response.out.write(template.render(template_values))
  

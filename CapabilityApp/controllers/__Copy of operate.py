@@ -54,10 +54,10 @@ class CreateCase(webapp.RequestHandler):
         conn.commit() 
         
         cursor.execute("SELECT case_id, case_nm FROM proc_case WHERE status = 1 AND emp_id =%s", (authenticateUser))
-        ddb_active_case = cursor.fetchall()
+        activecase = cursor.fetchall()
         
         client = memcache.Client() 
-        client.set('ddb_active_case', ddb_active_case, 120) 
+        client.set('activecase', activecase, 120) 
       
         cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
         openoperations = cursor.fetchall()        
@@ -66,7 +66,7 @@ class CreateCase(webapp.RequestHandler):
         
         tabindex = 2
 
-        template_values = {'ddb_active_case': ddb_active_case, 'processmenu': processmenu, 'openoperations': openoperations, 
+        template_values = {'activecase': activecase, 'processmenu': processmenu, 'openoperations': openoperations, 
                            'authenticateUser': authenticateUser, 'tabindex': tabindex, 'featureList': featureList }
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
@@ -81,7 +81,7 @@ class OperateProcess(webapp.RequestHandler):
         authenticateUser = str(users.get_current_user()) 
         featureList = database.memcacheNavBuilder()
         processmenu = database.memcacheProcessMenu()
-        ddb_active_case = database.memcacheActiveCase()
+        activecase = database.memcacheActiveCase()
         
         conn = get_connection()
         cursor = conn.cursor()    
@@ -95,7 +95,7 @@ class OperateProcess(webapp.RequestHandler):
         conn.close()
         tabindex = 2
 
-        template_values = {'ddb_active_case': ddb_active_case, 'processmenu': processmenu, 'authenticateUser': authenticateUser, 
+        template_values = {'activecase': activecase, 'processmenu': processmenu, 'authenticateUser': authenticateUser, 
                            'openoperations': openoperations, 'featureList': featureList, 'tabindex': tabindex}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
@@ -111,18 +111,9 @@ TODO: Instances should load with status value set to initialised, then it should
 '''
     
     def post(self): # post to DB
+        idGenerator = config.IDGenerator() # generates a unique key
         authenticateUser = str(users.get_current_user())
-        idGenerator = config.IDGenerator() # generates a unique key
         case_key = str(idGenerator) + authenticateUser
-        now = config.UTCTime()
-        featureList = database.memcacheNavBuilder()
-        processmenu = database.memcacheProcessMenu()
-        ddb_active_case = database.memcacheActiveCase()
-        
-        idGenerator = config.IDGenerator() # generates a unique key
-        case_key = str(idGenerator) + authenticateUser
-        client = memcache.Client()
-        client.set('case_key', case_key, 6000) 
         now = config.UTCTime()
         
         conn = get_connection()
@@ -165,16 +156,15 @@ TODO: Instances should load with status value set to initialised, then it should
                        "INNER JOIN instance on (proc_run.instance_key = instance.instance_key) "
                        "WHERE instance.instance_key = %s", (case_key))
                         
-        tabindex = 3                
+                        
         case = cursor.fetchall()
         
         cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
         openoperations = cursor.fetchall()
         
         conn.close()
-
-        template_values = {'authenticateUser': authenticateUser, 'case': case, 'case_key': case_key, 'processmenu': processmenu, 'featureList': featureList,
-                           'ddb_active_case': ddb_active_case, 'ddb_active_case': ddb_active_case, 'tabindex': tabindex, 'openoperations': openoperations }
+        
+        template_values = {'authenticateUser': authenticateUser, 'case': case, 'case_key': case_key}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
         self.response.out.write(case_key)
@@ -189,8 +179,9 @@ class PostProcessRun(webapp.RequestHandler):
         now = config.UTCTime()
         authenticateUser = str(users.get_current_user())
         featureList = database.memcacheNavBuilder()
+        case_key = self.request.get('case_key')
         client = memcache.Client()
-        case_key = client.get('case_key')
+        client.add('case_key', case_key, 600)
         proc_output_conf = self.request.get('proc_output_conf')
         proc_notes = self.request.get('proc_notes')
         proc_conseq = self.request.get('proc_conseq')
@@ -237,14 +228,14 @@ class PostProcessRun(webapp.RequestHandler):
         
         if casecount > 0:
             tabindex = 3
-            template_values = {'processmenu': processmenu, 'authenticateUser': authenticateUser, 'case': case, 'case_key': case_key, 
+        else:
+            tabindex = 4
+        
+        template_values = {'processmenu': processmenu, 'authenticateUser': authenticateUser, 'case': case, 'case_key': case_key, 
                            'openoperations': openoperations, 'ddb_active_case': ddb_active_case, 'featureList': featureList,
                            'tabindex': tabindex, 'casecount':casecount}
-            template = jinja2_env.get_template('operateprocess.html')
-            self.response.out.write(template.render(template_values))
-        else:
-            self.redirect("/AssessPerformance")
-            
+        template = jinja2_env.get_template('operateprocess.html')
+        self.response.out.write(template.render(template_values))
 
 class AssessPerformance(webapp.RequestHandler):
     '''
@@ -257,84 +248,25 @@ class AssessPerformance(webapp.RequestHandler):
         featureList = database.memcacheNavBuilder()
         client = memcache.Client()
         case_key = client.get('case_key')
+        #processmenu = database.memcacheProcessDDB()
         tabindex = 4
         conn = get_connection()
         cursor = conn.cursor()    
         
-        cursor.execute("SELECT proc_run.proc_run_id, proc_run.emp_id, proc_run.instance_key, proc_case.case_nm, process.proc_nm, process_step.proc_step_nm, "
-                       "proc_run.proc_output_conf, proc_req.proc_req_seq, proc_req.proc_req_nm, proc_req.proc_req_desc, proc_run.proc_notes, "
-                       "proc_run.proc_conseq, proc_run.proc_innovation "
+        cursor.execute("SELECT proc_run.proc_run_id, proc_run.case_id, proc_run.emp_id, proc_run.instance_key, proc_run.proc_req_id, proc_run.proc_step_id, "
+                       "process.proc_id, proc_case.case_nm, process.proc_nm, process_step.proc_step_nm, process_step.proc_step_sop, proc_run.proc_output_conf, "
+                       "proc_req.proc_req_seq, proc_req.proc_req_nm, proc_req.proc_req_desc "
                        "FROM proc_run "
                        "INNER JOIN proc_case on (proc_run.case_id = proc_case.case_id) "
                        "INNER JOIN process on (proc_run.proc_id = process.proc_id) "
                        "INNER JOIN process_step on (proc_run.proc_step_id = process_step.proc_step_id) "
-                       "INNER JOIN proc_req on (proc_run.proc_req_id = proc_req.proc_req_id) "
+                       "INNER JOIN proc_req on (proc_run.proc_req_id = proc_req.proc_req_id)"
                        "WHERE proc_run.instance_key = %s", (case_key)) #rename this -- bad name!!
         
-        assessinstance = cursor.fetchall()  
+        case = cursor.fetchall()  
         
         conn.close()
 
-        template_values = {'authenticateUser': authenticateUser, 'featureList': featureList, 'tabindex': tabindex,
-                           'assessinstance': assessinstance, 'case_key': case_key }
-        template = jinja2_env.get_template('operateprocess.html')
-        self.response.out.write(template.render(template_values))
-        
-class PostProcessAssessment(webapp.RequestHandler): 
-    '''
-    This handler loads the completed process step on to the Assessment page and then sets it up so that he user can assess
-    their behaviour and submit it.  The key is case_key (name should be changed) as stored in memcache.  Plan to use JS to load the 
-    tickboxes    
-    '''
-    def post(self): 
-        now = config.UTCTime()
-        authenticateUser = str(users.get_current_user())
-        featureList = database.memcacheNavBuilder()
-        processmenu = database.memcacheProcessMenu()
-        ddb_active_case = database.memcacheActiveCase()
-        
-        perf_stnd_1 = self.request.get('perf_stnd_1')
-        perf_stnd_2 = self.request.get('perf_stnd_2')
-        perf_stnd_3 = self.request.get('perf_stnd_3')
-        perf_stnd_notes_1 = self.request.get('perf_stnd_notes_1')
-        perf_stnd_notes_2 = self.request.get('perf_stnd_notes_2')
-        perf_stnd_notes_3 = self.request.get('perf_stnd_notes_3')
-        client = memcache.Client()
-        case_key = client.get('case_key')
-        
-        if perf_stnd_1 is '':
-            perf_stnd_1 = 0
-        else:
-            perf_stnd_1 = 1
-        if perf_stnd_2 is '':
-            perf_stnd_2 = 0
-        else:
-            perf_stnd_2 = 1
-        if perf_stnd_3 is '':
-            perf_stnd_3 = 0
-        else:
-            perf_stnd_3 = 1
-            
-        if case_key is None:
-            pass # query for last entry for expired memcache
-        else:
-            pass 
-        
-        conn = get_connection()
-        cursor = conn.cursor()
-        
-        #perf_stnd_1 =%s, perf_stnd_2 = %s, perf_stnd_3 = %s, // perf_stnd_1, perf_stnd_2, perf_stnd_3, //perf_stnd_notes_ts
-        cursor.execute("UPDATE instance SET "
-                       "perf_stnd_1 = %s, perf_stnd_2 = %s,perf_stnd_3 = %s, perf_stnd_notes_1 = %s, perf_stnd_notes_2 = %s, perf_stnd_notes_3 = %s, perf_stnd_notes_ts = %s "
-                       "WHERE instance_key = %s ",
-                       (perf_stnd_1, perf_stnd_2, perf_stnd_3, perf_stnd_notes_1, perf_stnd_notes_2, perf_stnd_notes_3, now, case_key ))
-
-        conn.commit()
-        conn.close()       
-
-        tabindex = 2
-        
-        template_values = {'processmenu': processmenu, 'authenticateUser': authenticateUser, 'ddb_active_case': ddb_active_case, 'featureList': featureList,
-                           'tabindex': tabindex, 'case_key': case_key}
+        template_values = {'authenticateUser': authenticateUser, 'featureList': featureList, 'case': case, 'tabindex': tabindex }
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))

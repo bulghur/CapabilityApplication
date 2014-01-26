@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8"/>
+	<title>Philip Crosby Associates - Operate Processes</title>
+	
+	<link rel="stylesheet" href="/stylesheets/layout.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="/stylesheets/widgets.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" type="text/css" media="screen" />
+	
+	<!--[if lt IE 9]>
+	<link rel="images" href="/images/" type="" media="screen" />
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	
+	<script type="text/javascript" src="js/jquery.equalHeight.js"></script>
+	<script src="js/jquery-1.5.2.min.js" type="text/javascript"></script>
+	<script src="js/hideshow.js" type="text/javascript"></script>
+	<script src="js/jquery.tablesorter.min.js" type="text/javascript"></script>
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<script src="/static/jQueryWidgets.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() 
+	    	{
+	    	$(".tablesorter").tablesorter();
+	    	}
+	    	);
+   	</script>
+	<script>
+	var selected_tab = 1;
+	$(function () {
+	    var tabs = $("#tabs").tabs({
+	        select: function (e, i) {
+	            selected_tab = i.index;
+	        }
+	    });
+	    selected_tab = $("[id$=selected_tab]").val() != "" ? parseInt($("[id$=selected_tab]").val()) : 0;
+	    tabs.tabs('select', selected_tab);
+	    $("form").submit(function () {
+	        $("[id$=selected_tab]").val(selected_tab);
+	    });
+	});
+	</script>
+<style>.ui-menu { width: 150px; }</style>
+</head>
+<body>
+
+	<header id="header">
+		<hgroup>
+			<h1 class="site_title"><a href="/">Integrated Capability</a></h1>
+			<h2 class="section_title">Operate</h2><div class="btn_view_site"><a href="http://http://www.theonion.com/">View Site</a></div>
+		</hgroup>
+	</header> <!-- end of header bar -->
+	
+		<section id="secondary_bar">
+			{% include 'userbar.html' %}
+		</section><!-- end of secondary bar -->
+			
+		<aside id="sidebar" class="column">
+			{% include 'leftnav.html' %}
+		</aside><!-- end of sidebar -->
+			
+		<section id="main" class="column">
+		
+		<h4 class="alert_info">This is a temporary method for creating processes</h4>
+		<p>Processes are owned by process owners.  We have several ways of thinking about this: Anyone can create a process for themselves.  Other can leverage it by subscribing to it. A process is ZD when it has gone through SPS or whatever we call the design process. 
+		</p>
+		
+<div class="clear"></div>
+
+<article class="module width_full">
+<h2>Operate the Process</h2>
+<p>The moment of reckoning has come.  You have designed the process, tested the output and proofed it as a demonstration of your profound commitment.  
+You are now certified to operate it.  Provided below is the SOP, PMW, the Performance Standard, etc.; an environment with everything you need to operate the process
+successfully</p>
+<p>To operate the process, view the SOP and other documentation.  As you meet each requirement, submit it.  Feel free to provide notes on the operation, risks and potential
+innovations for each requirement.  Indicate a failure with risks and possible innovations.  </p>
+<p>When you have completed all requirements, the process step is complete.</p>
+	<fieldset class=fieldsets style="width:900px; margin-right: 0%;"> 	
+	  		{% for row in case|batch(1)|first() %}
+		<header><h2>2. Process Name/Process Step: </b>{{ row[8]|e }}/{{ row[9]|e }}</h2></header><br>
+		<table><td width=50%>
+		<ul>
+			<li><b>Process Case: </b>{{ row[1]|e }} - {{ row[7]|e }}</li>
+			<li><b>Process Instance: </b>{{ row[3]|e }}</li>
+			<li><b>Link to SOP: </b><a href={{ row[10]|e }} target="_blank">Click here for SOP</a></li>
+			<li><b>Link to Local SOP (under construction): </b><a href={{ row[10]|e }} target="_blank">Click here for Personal SOP</a></li>
+			<li><b>Link to Process Model Worksheet: </b><a href={{ row[15]|e }} target="_blank">Click here for PMW</a></li>
+
+		{% endfor %}
+		</ul>
+		<td width=500%>	
+		<table class=datatable align="right"> 
+		<th class=datatable>Type</th>
+		<th class=datatable>Control</th>
+		<th class=datatable>Requirements</th>
+		<th class=datatable></th>		
+		<tr><td  colwidth = fixed rowspan="3">Performance Standard<td>Zero Defects (Quality)<td>Meet Requirements the first time<td><input type="checkbox" default value=0><tr>
+		<td>Zero Workarounds(Cost)<td>Follow the Procedures<td><input type="checkbox" default value=0><tr>
+		<td>Zero Delays (Schedule)<td>Start work when conforming Inputs and Controls are available<td><input type="checkbox" default value=0><tr>
+		</table><br>
+		<tr>
+		    <table class=datatable align="left"> 
+			<form action="/postProcessRun" method="POST" screen.showTab("Tab2");> 
+			<th colspan="8" align="left" font size=72> Operate the Process </th><tr>
+			<th>Seq</th>
+			<th>Requirement</th>
+			<th>Requirement Details</th>
+			<th>Notes</th>
+			<th>Consequences</th>
+			<th>Process Adjustments</th>
+			<th>Conformance</th>
+			<th>Action</th><tr>
+				{% for row in case %}
+					<td align="center" width=1%>{{ row[12]|e }}
+					<td width=12%>{{ row[13]|e }}
+					<td width=18%>{{ row[14]|e }}
+					<td width=25%><textarea width="100%" type=text rows="2" name="proc_notes" wrap="hard"></textarea>
+					<td width=25%><textarea width="100%" type=text rows="2" name="proc_conseq" wrap="hard"></textarea>
+					<td width=25%><textarea width=100% type=text rows="2" name="proc_innovation" wrap="hard"></textarea>
+					<td width=10%><select font-size="10px" name="proc_output_conf">
+		                <optgroup>
+		                <option font-size="10px" value="1">Capable</option>
+		                <option font-size="10px" value="0">Not Capable</option>
+		                </optgroup>
+	                </select>
+	                <td width=10%><input type="submit" name = "proc_run_status" font-size:10px; value="Submit">
+	              	<input type="hidden" name="proc_req_id" value={{ row[4]|e }}>
+	              	<input type="hidden" name="proc_step_id" value={{ row[5]|e }}>
+					<input type="hidden" name="case_key" value={{ row[3]|e }}>
+					<input type="hidden" name="proc_run_id" value={{ row[0]|e }}><tr>
+				{% endfor %}
+			</form>	
+			</table>
+			<br>	
+	</fieldset>
+</article>
+</body>
+</html>

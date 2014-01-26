@@ -1,16 +1,16 @@
-# bulghur-capability-01
 import os
 import webapp2
 import jinja2
 import logging
 import string
 import json
-import collections
-import unicodedata
+import time
+
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.api import users
+from google.appengine.api import memcache
 from controllers import collaborate, design, home, measure, operate, utilities
 from config import *
 
@@ -20,14 +20,13 @@ jinja2_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_path)
 ) 
 
-
 def get_connection():
     return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, 
                          database=config.DATABASE_NAME, 
                          user=config.USER_NAME, 
                          password=config.PASSWORD, 
-                         charset='utf8', use_unicode = True)            
-              
+                         charset='utf8', use_unicode = True)    
+                 
 class DevelopCapability(webapp.RequestHandler):
     def get(self):
         conn = get_connection()
@@ -272,11 +271,11 @@ Fix authentication issues/bug by watching this: https://www.youtube.com/watch?v=
                 (authenticateUser, person, users.create_logout_url("/")))
              
             else:
-                greeting = ('<a href="%s">Sorry INSIDE, you are not authorised to use this application</a>.' %
+                greeting = ('<a href="%s">Sorry Stranger, you are not authorised to use this application.  The application administrator must grant you access via your PCA or Google credentials.  If you have your log-on credentials, please click this to access the log-in screen.</a>' %
                         users.create_login_url("/"))
              
         else:
-            greeting = ('<a href="%s">Sorry, you are not authorised to use this application</a>.' %
+            greeting = ('<a href="%s">Sorry OUTSIDE, you are not authorised to use this application</a>.' %
                     users.create_login_url("/"))
 
         self.response.out.write('<html><body>%s</body></html>' % greeting)
@@ -284,29 +283,64 @@ Fix authentication issues/bug by watching this: https://www.youtube.com/watch?v=
 class Permissions(webapp.RequestHandler): #This is messy coding -- clean it up
         def get(self):
             authenticateUser = users.get_current_user()
-            
+            authenticateUser = str(authenticateUser)
+            featureList = database.memcacheNavBuilder()
+                        
             conn = get_connection()
             cursor = conn.cursor()
-
-            cursor.execute("SELECT process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_nm, "
-                           "SUM(proc_run.proc_output_conf)/COUNT(*), COUNT(proc_run.proc_output_conf) "
-                           "FROM proc_run "
-                           "INNER JOIN proc_req ON (proc_run.proc_req_id = proc_req.proc_req_id) "
-                           "INNER JOIN process_step ON (proc_req.proc_step_id = process_step.proc_step_id) "
-                           "INNER JOIN process ON (process_step.proc_id = process.proc_id) "
-                           "GROUP BY process_step.proc_step_id, proc_req.proc_req_nm "
-                           "ORDER BY process.proc_id, process_step.proc_seq") 
-            processSummary = cursor.fetchall()
+            cursor.execute("SELECT proc_id, proc_nm, SUM(proc_step_conf), COUNT(proc_id), SUM(proc_step_conf)/COUNT(proc_id) AS conformance_rate, "
+                           "SUM(proc_ponc), SUM(proc_poc), SUM(proc_efc) "
+                           "FROM `capability`.`vw_proc_run_sum` "
+                           "WHERE proc_run_start_tm > (NOW() - INTERVAL 7 DAY)"
+                           "GROUP BY proc_id") 
+            activitySummary = cursor.fetchall()
             conn.close()
             
-            template_values = {"authenticateUser": authenticateUser, 'processSummary': processSummary}
+            template_values = {"authenticateUser": authenticateUser, 'activitySummary': activitySummary, 'featureList': featureList}
             template = jinja2_env.get_template('index.html')
             self.response.out.write(template.render(template_values))
-              
+            
+class MemcacheTest(webapp2.RequestHandler):
+
+    def queryNavBuilder(self): # this is the query
+        authenticateUser = str(users.get_current_user())
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT app_feat_cat_0, app_feat_0, app_feat_1, app_feat_2, app_feat_type, app_feat_display_index "
+                               "FROM map_person_to_feature "
+                               "INNER JOIN app_feature ON (map_person_to_feature.app_feat_cat_id = app_feature.app_feat_cat_id) "
+                               "INNER JOIN person ON (map_person_to_feature.emp_id = person.emp_id) "
+                               "WHERE person.google_user_id = %s AND app_feat_active = 1 "
+                               "ORDER BY app_feat_display_index", (authenticateUser)) 
+        navList = cursor.fetchall()
+        conn.close()
+        return navList
+
+    def memcacheNavBuilder(self): #if the Memcache is empty, load it with the query data
+        client = memcache.Client()
+        featureList = client.get('navList')
+        
+        if featureList is not None:
+            pass
+        else:
+            featureList = self.queryNavBuilder()
+            client.add('navList', featureList, 120)
+        
+        return featureList
+
+    
+    def get(self):
+        generatedData = self.queryNavBuilder()
+        memcacheData = self.memcacheNavBuilder()
+        
+        template_values = {'generatedData': generatedData, 'memcacheData': memcacheData}
+        template = jinja2_env.get_template('memcache.html')
+        self.response.out.write(template.render(template_values))
+            
 application = webapp.WSGIApplication(
     [
         ('/', Authenticate),
-        #('/', app_control.GrantAccess),
+        ('/Memcache', MemcacheTest),
         ("/permissions", Permissions),
         ("/MainHandler", home.MainHandler),
         ("/YourProfile", collaborate.YourProfile),
@@ -314,11 +348,13 @@ application = webapp.WSGIApplication(
         ("/OperateProcess", operate.OperateProcess), 
         ("/CreateInstance", operate.CreateInstance),
         ("/postProcessRun", operate.PostProcessRun),
+        ("/AssessPerformance", operate.AssessPerformance),
+        ("/PostProcessAssessment", operate.PostProcessAssessment),
         ("/CreateCase", operate.CreateCase),
         ("/MeasurePerformance", measure.MeasurePerformance),
         ("/PoncCalulator", measure.PoncCalulator),
         ("/postProcessSteps", design.PostProcessStep),
-        ("/DevelopCapability", design.DevelopCapability),
+        ("/DevelopCapability", utilities.DevelopCapability),
         ("/utilities", utilities.UtilityHandler),
         ("/postprocess", utilities.PostProcess),
         ("/postprocessstep", utilities.PostProcessStep),

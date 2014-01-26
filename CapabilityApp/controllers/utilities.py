@@ -11,7 +11,7 @@ from google.appengine.api import rdbms
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import users
-from config import config
+from config import *
 template_path = os.path.join(os.path.dirname(__file__), '../templates')
 
 #from ProcessRun import *
@@ -28,12 +28,32 @@ def get_connection():
                          password=config.PASSWORD, 
                          charset='utf8')
 
-
+class DevelopCapability(webapp.RequestHandler):
+    def get(self): 
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT person.last_nm, process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_nm, "
+                       "SUM(proc_run.proc_output_conf)/COUNT(*) "
+                       "FROM proc_run "
+                       "inner join person ON (proc_run.emp_id = person.emp_id) "
+                       "inner join proc_req ON (proc_run.proc_req_id = proc_req.proc_req_id) "
+                       "inner join process_step ON (proc_req.proc_step_id = process_step.proc_step_id) "
+                       "inner join process ON (process_step.proc_id = process.proc_id) "
+                       "WHERE proc_run.proc_run_status='C' AND person.emp_id = 1 "
+                       "GROUP BY proc_run.emp_id, proc_run.proc_req_id")
+        rows = cursor.fetchall()
+        conn.close()
+    
+        
+        template_values = {'rows': rows, }
+        template = jinja2_env.get_template('developcapability.html')
+        self.response.out.write(template.render(template_values)) 
 
 class UtilityHandler(webapp.RequestHandler):
     def get(self):
         
-        authenticateUser = str(users.get_current_user())  
+        authenticateUser = str(users.get_current_user())
+        featureList = database.memcacheNavBuilder()  
        
         conn = get_connection()
         cursor = conn.cursor()
@@ -59,7 +79,7 @@ class UtilityHandler(webapp.RequestHandler):
         conn.close()
         
         template_values = {'ddb_person': ddb_person, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 
-                           'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser }
+                           'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser, 'featureList': featureList }
         template = jinja2_env.get_template('utilities.html')
         self.response.out.write(template.render(template_values))
         
@@ -68,7 +88,8 @@ class UtilityHandler(webapp.RequestHandler):
 class PostProcess(webapp.RequestHandler):
     def post(self): # post to DB
         
-        authenticateUser = str(users.get_current_user())  
+        authenticateUser = str(users.get_current_user()) 
+        featureList = database.memcacheNavBuilder() 
         
         conn = get_connection()
         cursor = conn.cursor()
@@ -101,20 +122,23 @@ class PostProcess(webapp.RequestHandler):
         conn.close()
         
         template_values = {'ddb_person': ddb_person, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 
-                           'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser }
+                           'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser,
+                           'featureList': featureList }
         template = jinja2_env.get_template('utilities.html')
         self.response.out.write(template.render(template_values))
      
-        dialoguemessage  = self.request.get('proc_nm') + " successfully created."
+        dialoguemessage  = '<b>' + self.request.get('proc_nm') + '</b>' + ' successfully created.'
+        dialoguetitle = "Create Process"
         
-        template_values1 = {'dialoguemessage': dialoguemessage}
+        dialoguebox = {'dialoguemessage': dialoguemessage, 'dialoguetitle': dialoguetitle}
         template = jinja2_env.get_template('dialoguebox.html')
-        self.response.out.write(template.render(template_values1))
+        self.response.out.write(template.render(dialoguebox))
      
 class PostProcessStep(webapp.RequestHandler):
     def post(self): # post to DB
         
         authenticateUser = str(users.get_current_user())  
+        featureList = database.memcacheNavBuilder() 
         
         conn = get_connection()
         cursor = conn.cursor()
@@ -154,11 +178,12 @@ class PostProcessStep(webapp.RequestHandler):
         conn.close()
         
         template_values = {'ddb_person': ddb_person, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 
-                          'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser }
+                          'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser,
+                          'featureList': featureList }
         template = jinja2_env.get_template('utilities.html')
         self.response.out.write(template.render(template_values))
      
-        dialoguemessage  = self.request.get('proc_step_nm') + " successfully created."
+        dialoguemessage  = self.request.get('<b>proc_step_nm</b>') + " successfully created."
         
         template_values1 = {'dialoguemessage': dialoguemessage}
         template = jinja2_env.get_template('dialoguebox.html')
@@ -167,7 +192,8 @@ class PostProcessStep(webapp.RequestHandler):
 class PostRequirement(webapp.RequestHandler):
     def post(self): 
         
-        authenticateUser = str(users.get_current_user())  
+        authenticateUser = str(users.get_current_user())
+        featureList = database.memcacheNavBuilder()  
         
         conn = get_connection()
         cursor = conn.cursor()
@@ -199,7 +225,8 @@ class PostRequirement(webapp.RequestHandler):
         conn.close()
         
         template_values = {'ddb_person': ddb_person, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 
-                           'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser }
+                           'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser,
+                           'featureList': featureList }
         template = jinja2_env.get_template('utilities.html')
         self.response.out.write(template.render(template_values))
      

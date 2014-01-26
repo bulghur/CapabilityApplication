@@ -10,40 +10,21 @@
 			<input type="text" value="Quick Search" onfocus="if(!this._haschanged){this.value=''};this._haschanged=true;">
 		</form>
 		<hr/>
-		<h3>Learn</h3>
-		<ul class="toggle">
-			<li class="icn_add_user"><a href="/DevelopCapability">Review Concepts</a></li>
-			<li class="icn_view_users"><a href="#">Attend Sessions</a></li>
-			<li class="icn_view_users"><a href="#">Work with a Coach</a></li>
-			<li class="icn_view_users"><a href="#">Purchase Materials</a></li>
-		<h3>Design</h3>
-		<ul class="toggle">
-			<li class="icn_edit_article"><a href="#">Determine Need</a></li>
-			<li class="icn_view_users"><a href="/ProcessModel">Design Process</a></li>
-			<li class="icn_security"><a href="/utilities">Build Process</a></li>
+		
+		{% for group in featureList|groupby(0)|sort(5) %}
+		<h3>{{ group.grouper }}</h3>
+		    {% for row in group.list %}
+		    <ul class="toggle">
+			<li class={{ row[1] }}><a href={{ row[2] }}>{{ row[3] }}</a></li>
+		    {% endfor %}
+		{% endfor %}
 		</ul>
-		<h3>Collaborate</h3>
-		<ul class="toggle">
-			<li class="icn_add_user"><a href="/YourProfile">Your Profile</a></li>
-			<li class="icn_view_users"><a href="#">Your Team</a></li>
-			<li class="icn_profile"><a href="#">Your Networks</a></li>
-			<li class="icn_video"><a href="#">Share Knowledge</a></li>
-		<h3>Operate & Manage</h3>
+		
+
+	</footer>
+		<h3>Administration</h3>
 			</select></li>
-			<li class="icn_categories"><a href="/OperateProcess">Operate</a></li>
-			<li class="icn_tags"><a href="/MeasurePerformance">Measure Performance</a></li>
-			<li class="icn_tags"><a href="/PoncCalulator">PONC/POC Calculator</a></li>
-			<li class="icn_edit_article"><a href="">Review Innovation</a></li>
+			<li class="icn_jump_back"><a href="/permissions">Go Home</a></li>
+			<li class="icn_security"><a href="/">Log-off</a></li>
 		</ul>
-
-		<h3>Development Sandbox(PDW)</h3>
-		<ul class="toggle">
-
-			<li class="icn_jump_back"><a href="/ajax">AjaxTest</a><br></li>
-			<li class="icn_jump_back"><a href="/jQueryJSON">jQuery</a><br></li>
-			<li class="icn_settings"><a href="/ajaxjson">AjaxJSON</a></li>
-			<li class="icn_settings"><a href="/playground">Playground</a></li>
-			<li class="icn_edit_article"><a href="/MainHandler">Home</a></li>
-		</ul>
-			<hr />
-		</footer>
+	</footer>

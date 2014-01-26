@@ -20,7 +20,12 @@ jinja2_env = jinja2.Environment(
 )
 
 def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8', use_unicode = True)
+    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, 
+                         database=config.DATABASE_NAME, 
+                         user=config.USER_NAME, 
+                         password=config.PASSWORD, 
+                         charset='utf8', 
+                         use_unicode = True)
 
 class PostProcessStep(webapp.RequestHandler):
     def post(self): # post to DB
@@ -56,18 +61,6 @@ class PostProcessRequirement(webapp.RequestHandler):
         conn.close()
         self.redirect("/")
    
-class DevelopCapability(webapp.RequestHandler):
-    def get(self):
-        sqlMeasureAll = "SELECT person.last_nm, process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_nm, SUM(proc_run.proc_output_conf)/COUNT(*) FROM proc_run inner join person ON (proc_run.emp_id = person.emp_id) inner join proc_req ON (proc_run.proc_req_id = proc_req.proc_req_id) inner join process_step ON (proc_req.proc_step_id = process_step.proc_step_id) inner join process ON (process_step.proc_id = process.proc_id) WHERE proc_run.proc_run_status='C' AND person.emp_id = 1 GROUP BY proc_run.emp_id, proc_run.proc_req_id"
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute(sqlMeasureAll)
-        rows = cursor.fetchall()
-        conn.close()
-    
-        
-        template_values = {'rows': rows, }
-        template = jinja2_env.get_template('developcapability.html')
-        self.response.out.write(template.render(template_values))    
+   
         
         

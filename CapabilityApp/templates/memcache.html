@@ -1,0 +1,41 @@
+    <h2>Memcache</h2>
+
+ 	 <br>
+			<table class=datatable align="center"> 
+				<th class=datatable>Process</th>
+				<th class=datatable>Process Step</th>
+				<th class=datatable>Conf Rate</th>
+				<th class=datatable>Success</th>
+				<th class=datatable>No of Operations</th><tr>
+					{% for row in memcacheData %}
+					<td width=5%>{{ row[0]|e }}
+					<td width=5%>{{ row[1]|e }}
+					<td align="center" width=10%>{{ row[2] }} <!--round(method='common'-->
+					<td align="center" width=10%>{{ row[3]|e }}
+					<td align="center" width=10%>{{ (row[4]|e) }}</tr>
+					{% endfor %}
+				</table>
+			</table>
+
+</div>
+
+    <h2>Generated</h2>
+
+ 	 <br>
+			<table class=datatable align="center"> 
+				<th class=datatable>Process</th>
+				<th class=datatable>Process Step</th>
+				<th class=datatable>Conf Rate</th>
+				<th class=datatable>Success</th>
+				<th class=datatable>No of Operations</th><tr>
+					{% for row in generatedData %}
+					<td width=5%>{{ row[0]|e }}
+					<td width=5%>{{ row[1]|e }}
+					<td align="center" width=10%>{{ row[2] }} <!--round(method='common'-->
+					<td align="center" width=10%>{{ row[3]|e }}
+					<td align="center" width=10%>{{ (row[4]|e) }}</tr>
+					{% endfor %}
+				</table>
+			</table>
+
+</div>

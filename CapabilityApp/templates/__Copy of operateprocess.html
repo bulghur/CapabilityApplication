@@ -25,7 +25,6 @@
 	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 	<script src="/static/jQueryWidgets.js"></script>
 
-
 	<style>.ui-menu { width: 150px; }</style>
 	<script type="text/javascript">
 	$(function() {
@@ -108,7 +107,7 @@
                 <label>1. Select a Case</label>
                          <select name="case_id" id="case_id"'>
                                  <option>Active Case</option>
-                                {% for row in ddb_active_case %}
+                                {% for row in activecase %}
                                 <option value={{ row[0]|e }}>{{ row[1]|e }}</option>
                                 {% endfor %}
                 </select><br><br>
@@ -195,78 +194,52 @@ innovations for each requirement.  Indicate a failure with risks and possible in
 </article>
 </div>
 <div id="tabs-5">
-		<script type="text/javascript">
-		var CheckboxHandler = new Object();
-		function testCheckbox(oCheckbox)
-		{
-		    var checkbox_val = oCheckbox.value;
-		    if (oCheckbox.checked == true)
-		    {
-		        alert("Checkbox with name = " + oCheckbox.name + " and value =" +
-		                checkbox_val + " is checked");
-		    }
-		    else
-		    {
-		        alert("Checkbox with name = " + oCheckbox.name + " and value =" +
-		              checkbox_val + " is not checked");
-		    }
-		}
-		</script>
-		<form action="/PostProcessAssessment" method="POST">
-	  	{% for row in assessinstance|batch(1)|first() %}
-		<header><h2>Assess Performance: </b>{{ row[4]|e }}/{{ row[5]|e }}: {{ case_key }}</h2></header><br>
-		<table><td width=50%>
-		<ul>
-		{% endfor %}
-	<h2>Process Step Summary</h2>
-	<br>
-		 	<table class=datatable align="center">
-			<th class=datatable colspan="7" align="left"> Capability of Instance</th><tr>
-			<th class=datatable>Seq</th>
-			<th class=datatable>Description</th>
-			<th class=datatable>Requirements</th>
-			<th class=datatable>Capability</th>
-			<th class=datatable>Notes</th>
-			<th class=datatable>Consequences</th>
-			<th class=datatable>Adjustments</th><tr>
+
+<fieldset class=fieldsets style="width:600px; margin-right: 0%;">
+	
+	<h2>Assess Performance</h2>
+	
+	Capability Summary for:
+	    <h2>DEV/DELETE: Pass Args to Class/SQL</h2>
+		 	<table class=datatable>
+			<th class=datatable colspan="14" align="left"> Data Validation from case </th>
+			<tr>
+			<th class=datatable>0</th>
+			<th class=datatable>1</th>
+			<th class=datatable>2</th>
+			<th class=datatable>3</th>
+			<th class=datatable>4</th>
+			<th class=datatable>5</th>
+			<th class=datatable>6</th>
+			<th class=datatable>7</th>
+			<th class=datatable>8</th>
+			<th class=datatable>9</th>
+			<th class=datatable>10</th>
+			<th class=datatable>11</th>
+			<th class=datatable>12</th>
+			<th class=datatable>13</th><tr>
 			
-				{% for row in assessinstance %}
-				<td align="center" width=2%>{{ row[7]|e }}
-				<td width=10%>{{ row[8]|e }}
-				<td width=20%>{{ row[9]|e }}
-				<td align="center" width=2%>{{ row[6]|e }}
-				<td width=10%>{{ row[10]|e }}
-				<td width=10%>{{ row[11]|e }}
-				<td width=10%>{{ row[12]|e }}<tr>
-				{% endfor %}
+						{% for row in case %}
+						<td>{{ row[0]|e }}<td>{{ row[1]|e }}<td>{{ row[2]|e }}<td>{{ row[3]|e }}<td>{{ row[4]|e }}<td>{{ row[5]|e }}<td>{{ row[6]|e }}
+						<td>{{ row[7]|e }}<td>{{ row[8]|e }}<td>{{ row[9]|e }}<td>{{ row[10]|e }}<td>{{ row[11]|e }}<td>{{ row[12]|e }}<td>{{ row[13]|e }}
+						<td>{{ row[14]|e }}<td>{{ row[15]|e }}<td>{{ row[16]|e }}<td>{{ row[17]|e }}<td>{{ row[18]|e }}<tr>
+						{% endfor %}
 			</table>
-			<br><br>
-     	
-		<table class=datatable align="center"> 
+	
+		<td width=500%>	
+		<table class=datatable align="left"> 
 		<th class=datatable>Control</th>
 		<th class=datatable>Requirements</th>
-		<th class=datatable>Req Met?</th>
-		<th class=datatable>Behaviors That Did Not Meet Standard</th><tr>
-		
-		<td width=10%>Zero Defects (Quality)
-		<td width=20%>Meet Requirements the first time
-		<td width=3%><input type="checkbox" name="perf_stnd_1"  id="perf_stnd_1" value="1">Yes
-		<td width=20%><textarea width="100% type=text rows="2" name="perf_stnd_notes_1" wrap="hard"></textarea><tr>
-		<td width=10%>Zero Workarounds(Cost)
-		<td width=20%>Follow the Procedures
-		<td width=3%><input type="checkbox" name="perf_stnd_2" id="perf_stnd_2" value="1">Yes
-		<td width=20%><textarea width="100% type=text rows="2" name="perf_stnd_notes_2" wrap="hard"></textarea><tr>
-		<td width=10%>Zero Delays (Schedule)
-		<td width=20%>Start work when conforming Inputs and Controls are available
-		<td width=3%><input type="checkbox" name="perf_stnd_3"  id="perf_stnd_3" value="1">Yes
-		<td width=20%><textarea width="100% type=text rows="2" name="perf_stnd_notes_3" wrap="hard"></textarea><tr>
+		<th class=datatable>Y/N</th>
+		<th class=datatable>Behaviors That Did Not Meet Standard</th>
+		<th class=datatable></th><tr>
+		<td>Zero Defects (Quality)<td>Meet Requirements the first time<td><input type="checkbox" default value=0><td><input type="textarea"><tr>
+		<td>Zero Workarounds(Cost)<td>Follow the Procedures<td><input type="checkbox" default value=0><td><input type="textarea"><tr>
+		<td>Zero Delays (Schedule)<td>Start work when conforming Inputs and Controls are available<td><input type="checkbox" default value=0><td><input type="textarea"><tr>
 		</table><br>
-		<br><br>
-        <div class="submit_link">
-        <input type="submit" value="Record Assessment">
-                
-        </form>
 		
+	</fieldset>
+
 </div>
 <div id="tabs-6">
 	<article class="module width_full">
@@ -275,8 +248,9 @@ innovations for each requirement.  Indicate a failure with risks and possible in
 	    <p>This tab lists all open processes for which all requirements have not been completed.  (this will allow a user to go back and complete any process they are unable
 	    to complete in a session. )</p>
 	    
-		 	<table class=datatable align="center">
-			<th class=datatable colspan="14" align="left"> Data Validation from case </th><tr>
+		 	<table class=datatable>
+			<th class=datatable colspan="14" align="left"> Data Validation from case </th>
+			<tr>
 			<th class=datatable>Process</th>
 			<th class=datatable>Process Step</th>
 			<th class=datatable>Case</th>
