@@ -5,12 +5,12 @@ import time
 from google.appengine.api import rdbms
 #from controllers import measure
 
-#Database Connections: LOCAL
+#Database Connections: LOCAL cold Daring
 CLOUDSQL_INSTANCE = 'MySQL56'
 HOST = 'localhost'
 DATABASE_NAME = 'capability'
 USER_NAME = 'root'
-PASSWORD = 'cdnfom1'
+PASSWORD = '' 
 '''
 #Database Connections: CLOUD
 CLOUDSQL_INSTANCE = 'noble-freehold-326:learndb'
