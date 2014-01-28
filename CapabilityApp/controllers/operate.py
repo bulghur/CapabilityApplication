@@ -6,7 +6,7 @@ import time
 import webapp2
 import jinja2
 import itertools
-import MySQLdb
+# import MySQLdb
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
 from google.appengine.ext import db
