@@ -15,7 +15,7 @@ CLOUDSQL_INSTANCE = 'MySQL56'
 HOST = 'localhost'
 DATABASE_NAME = 'capability'
 USER_NAME = 'root'
-PASSWORD = 'cDnfom100!' # this will be set to your local password: for Bulghur, coldDaring
+PASSWORD = '' # this will be set to your local password: for Bulghur, coldDaring
 '''
 #Database Connections: CLOUD
 CLOUDSQL_INSTANCE = 'noble-freehold-326:learndb' # 'noble-freehold-326:learndb' OR 'pca-dev-capability:capability'
