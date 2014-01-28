@@ -18,11 +18,6 @@ jinja2_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_path)
 ) 
 
-def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, database=config.DATABASE_NAME, user=config.USER_NAME, password=config.PASSWORD, charset='utf8', use_unicode = True)
-
-###################    COMMON    ##############################
-
 authenticateUser = users.get_current_user()
 
 class MainHandler(webapp.RequestHandler): 
@@ -30,7 +25,7 @@ class MainHandler(webapp.RequestHandler):
             authenticateUser = users.get_current_user()
             authenticateUser = str(authenticateUser)
             
-            conn = get_connection()
+            conn = config.get_connection()
             cursor = conn.cursor()
             cursor.execute("SELECT proc_id, proc_nm, SUM(proc_step_conf), COUNT(proc_id), SUM(proc_step_conf)/COUNT(proc_id) AS conformance_rate, "
             "SUM(proc_ponc), SUM(proc_poc), SUM(proc_efc) "

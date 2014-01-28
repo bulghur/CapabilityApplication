@@ -21,16 +21,9 @@ jinja2_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_path)
 )
 
-def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, 
-                         database=config.DATABASE_NAME, 
-                         user=config.USER_NAME, 
-                         password=config.PASSWORD, 
-                         charset='utf8')
-
 class DevelopCapability(webapp.RequestHandler):
     def get(self): 
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT person.last_nm, process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_nm, "
                        "SUM(proc_run.proc_output_conf)/COUNT(*) "
@@ -55,7 +48,7 @@ class UtilityHandler(webapp.RequestHandler):
         authenticateUser = str(users.get_current_user())
         featureList = database.memcacheNavBuilder()  
        
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()
         
         
@@ -91,7 +84,7 @@ class PostProcess(webapp.RequestHandler):
         authenticateUser = str(users.get_current_user()) 
         featureList = database.memcacheNavBuilder() 
         
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()
         cursor.execute('INSERT INTO process (proc_nm, proc_desc, proc_owner, proc_start_dt) '
                        'VALUES (%s, %s, %s, %s)',
@@ -140,7 +133,7 @@ class PostProcessStep(webapp.RequestHandler):
         authenticateUser = str(users.get_current_user())  
         featureList = database.memcacheNavBuilder() 
         
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()
         cursor.execute("INSERT INTO process_step (proc_step_nm, proc_seq, proc_step_desc, proc_id, proc_step_sop, proc_model_link, process_step.proc_step_owner, "
                        "proc_poc, proc_ponc, proc_efc ) "
@@ -195,7 +188,7 @@ class PostRequirement(webapp.RequestHandler):
         authenticateUser = str(users.get_current_user())
         featureList = database.memcacheNavBuilder()  
         
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()
         cursor.execute('INSERT INTO proc_req (proc_req_nm, proc_req_desc, proc_req_seq, proc_step_id)'
                        'VALUES (%s, %s, %s, %s)',
@@ -241,7 +234,7 @@ class PostPerson(webapp.RequestHandler):
         
         authenticateUser = str(users.get_current_user())  
         
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()
         cursor.execute('INSERT INTO person (first_nm, last_nm, email)'
                        'VALUES (%s, %s, %s)',

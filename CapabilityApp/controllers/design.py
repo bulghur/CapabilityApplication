@@ -19,17 +19,9 @@ jinja2_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_path)
 )
 
-def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, 
-                         database=config.DATABASE_NAME, 
-                         user=config.USER_NAME, 
-                         password=config.PASSWORD, 
-                         charset='utf8', 
-                         use_unicode = True)
-
 class PostProcessStep(webapp.RequestHandler):
     def post(self): # post to DB
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()
         cursor.execute('INSERT INTO process_step (proc_step_nm, proc_seq, proc_step_desc, proc_id, proc_step_sop)'
                        'VALUES (%s, %s, %s, %s, %s)',
@@ -47,7 +39,7 @@ class PostProcessStep(webapp.RequestHandler):
         
 class PostProcessRequirement(webapp.RequestHandler):
     def post(self): # post to DB
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()
         cursor.execute('INSERT INTO proc_req (proc_req_nm, proc_req_desc, proc_step_id)'
                        'VALUES (%s, %s, %s)',

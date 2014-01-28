@@ -21,22 +21,13 @@ jinja2_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_path)
     )
 
-def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE,
-                         database=config.DATABASE_NAME, 
-                         user=config.USER_NAME, 
-                         password=config.PASSWORD, 
-                         charset='utf8', 
-                         use_unicode = True,
-                         )
-
 class YourProfile(webapp.RequestHandler):
     '''
     Queries on people 
     '''
     def get(self):
 
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()
         
         authenticateUser = str(users.get_current_user()) 

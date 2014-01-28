@@ -2,25 +2,12 @@ import config
 
 from google.appengine.api import rdbms
 from google.appengine.api import users
-from google.appengine.api import memcache
-
-
-
-
-
-def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE, 
-                         database=config.DATABASE_NAME, 
-                         user=config.USER_NAME, 
-                         password=config.PASSWORD, 
-                         charset='utf8', 
-                         use_unicode = True)
-    
+from google.appengine.api import memcache  
     
 def queryNavBuilder(): 
     #This generates the leftnav features dependent on user rights on the application.
     authenticateUser = str(users.get_current_user())
-    conn = get_connection()
+    conn = config.get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT app_feat_cat_0, app_feat_0, app_feat_1, app_feat_2, app_feat_type, app_feat_display_index "
                            "FROM map_person_to_feature "
@@ -45,7 +32,7 @@ def memcacheNavBuilder(): #if the Memcache is empty, load it with the query data
     
 def queryProcessMenu():     
     authenticateUser = str(users.get_current_user())
-    conn = get_connection()
+    conn = config.get_connection()
     cursor = conn.cursor() 
 
     cursor.execute("SELECT DISTINCT proc_id, proc_nm, proc_step_id, proc_step_seq, proc_step_nm "
@@ -71,7 +58,7 @@ def memcacheProcessMenu(): #if the Memcache is empty, load it with the query dat
 
 def queryActiveCase():
     authenticateUser = str(users.get_current_user())
-    conn = get_connection()
+    conn = config.get_connection()
     cursor = conn.cursor() 
     
     cursor.execute("SELECT case_id, case_nm "
@@ -97,7 +84,7 @@ def memcacheActiveCase(): #if the Memcache is empty, load it with the query data
 def query(query, condition1):  #this is the sample pattern
     #this is a test form of centralising a query
        
-    conn = get_connection()
+    conn = config.get_connection()
     cursor = conn.cursor()      
 
     cursor.execute(query + "'" + condition1 + "'" )

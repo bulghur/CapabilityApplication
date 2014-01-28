@@ -21,56 +21,7 @@ template_path = os.path.join(os.path.dirname(__file__), '../templates')
 jinja2_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_path)
     )
-
-def get_connection():
-    return rdbms.connect(instance=config.CLOUDSQL_INSTANCE,
-                         database=config.DATABASE_NAME, 
-                         user=config.USER_NAME, 
-                         password=config.PASSWORD, 
-                         charset='utf8', 
-                         use_unicode = True,
-                         )
-     
-class CreateCase(webapp.RequestHandler):
-    '''
-    This object creates a user case against which process run can be associated.  Cases are associated with specific users. 
-    Renders to operateprocess.html.  
-    '''
-    def post(self):
-        authenticateUser = str(users.get_current_user()) 
-        featureList = database.memcacheNavBuilder()
-        processmenu = database.memcacheProcessMenu()
-
-        conn = get_connection()
-        cursor = conn.cursor()  
-        
-        cursor.execute('INSERT INTO proc_case (case_nm, emp_id, status) ' # status = 1 = ACTIVE
-                       'VALUES (%s, %s, 1)',
-                       (
-                       self.request.get('case_nm'),
-                       (authenticateUser),
-                       ))   
-        
-        conn.commit() 
-        
-        cursor.execute("SELECT case_id, case_nm FROM proc_case WHERE status = 1 AND emp_id =%s", (authenticateUser))
-        ddb_active_case = cursor.fetchall()
-        
-        client = memcache.Client() 
-        client.set('ddb_active_case', ddb_active_case, 120) 
-      
-        cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
-        openoperations = cursor.fetchall()        
-        
-        conn.close()
-        
-        tabindex = 2
-
-        template_values = {'ddb_active_case': ddb_active_case, 'processmenu': processmenu, 'openoperations': openoperations, 
-                           'authenticateUser': authenticateUser, 'tabindex': tabindex, 'featureList': featureList }
-        template = jinja2_env.get_template('operateprocess.html')
-        self.response.out.write(template.render(template_values))
-             
+           
 class OperateProcess(webapp.RequestHandler):
     '''
     Initially displays the O&M page for Process Step Selection
@@ -83,7 +34,7 @@ class OperateProcess(webapp.RequestHandler):
         processmenu = database.memcacheProcessMenu()
         ddb_active_case = database.memcacheActiveCase()
         
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()    
         '''
         cursor.execute("SELECT case_id, case_nm FROM proc_case WHERE status = 1 AND emp_id =%s", (authenticateUser))
@@ -125,7 +76,7 @@ TODO: Instances should load with status value set to initialised, then it should
         client.set('case_key', case_key, 6000) 
         now = config.UTCTime()
         
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()
 
         #create an unique instance key
@@ -198,7 +149,7 @@ class PostProcessRun(webapp.RequestHandler):
         proc_run_id = self.request.get('proc_run_id')
         proc_run_status = self.request.get('proc_run_status')
         
-        conn = get_connection()
+        conn = conn = config.get_connection()
         cursor = conn.cursor()
         
         cursor.execute("UPDATE proc_run SET "
@@ -258,7 +209,7 @@ class AssessPerformance(webapp.RequestHandler):
         client = memcache.Client()
         case_key = client.get('case_key')
         tabindex = 4
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()    
         
         cursor.execute("SELECT proc_run.proc_run_id, proc_run.emp_id, proc_run.instance_key, proc_case.case_nm, process.proc_nm, process_step.proc_step_nm, "
@@ -320,7 +271,7 @@ class PostProcessAssessment(webapp.RequestHandler):
         else:
             pass 
         
-        conn = get_connection()
+        conn = config.get_connection()
         cursor = conn.cursor()
         
         #perf_stnd_1 =%s, perf_stnd_2 = %s, perf_stnd_3 = %s, // perf_stnd_1, perf_stnd_2, perf_stnd_3, //perf_stnd_notes_ts
@@ -336,5 +287,45 @@ class PostProcessAssessment(webapp.RequestHandler):
         
         template_values = {'processmenu': processmenu, 'authenticateUser': authenticateUser, 'ddb_active_case': ddb_active_case, 'featureList': featureList,
                            'tabindex': tabindex, 'case_key': case_key}
+        template = jinja2_env.get_template('operateprocess.html')
+        self.response.out.write(template.render(template_values))
+        
+class CreateCase(webapp.RequestHandler):
+    '''
+    This object creates a user case against which process run can be associated.  Cases are associated with specific users. 
+    Renders to operateprocess.html.  
+    '''
+    def post(self):
+        authenticateUser = str(users.get_current_user()) 
+        featureList = database.memcacheNavBuilder()
+        processmenu = database.memcacheProcessMenu()
+
+        conn = config.get_connection()
+        cursor = conn.cursor()  
+        
+        cursor.execute('INSERT INTO proc_case (case_nm, emp_id, status) ' # status = 1 = ACTIVE
+                       'VALUES (%s, %s, 1)',
+                       (
+                       self.request.get('case_nm'),
+                       (authenticateUser),
+                       ))   
+        
+        conn.commit() 
+        
+        cursor.execute("SELECT case_id, case_nm FROM proc_case WHERE status = 1 AND emp_id =%s", (authenticateUser))
+        ddb_active_case = cursor.fetchall()
+        
+        client = memcache.Client() 
+        client.set('ddb_active_case', ddb_active_case, 120) 
+      
+        cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
+        openoperations = cursor.fetchall()        
+        
+        conn.close()
+        
+        tabindex = 2
+
+        template_values = {'ddb_active_case': ddb_active_case, 'processmenu': processmenu, 'openoperations': openoperations, 
+                           'authenticateUser': authenticateUser, 'tabindex': tabindex, 'featureList': featureList }
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))

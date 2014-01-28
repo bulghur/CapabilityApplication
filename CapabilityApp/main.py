@@ -99,7 +99,7 @@ class jQueryJSON(webapp2.RequestHandler):
         
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT proc_id, proc_nm, emp_id FROM process")
+        cursor.execute("SELECT proc_id, proc_nm FROM process")
         rows = cursor.fetchall()
         conn.close()
 
