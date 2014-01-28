@@ -10,7 +10,7 @@ CLOUDSQL_INSTANCE = 'MySQL56'
 HOST = 'localhost'
 DATABASE_NAME = 'capability'
 USER_NAME = 'root'
-PASSWORD = '' 
+PASSWORD = 'cDnfom100!' 
 '''
 #Database Connections: CLOUD
 CLOUDSQL_INSTANCE = 'noble-freehold-326:learndb'
