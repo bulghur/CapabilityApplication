@@ -30,9 +30,9 @@ class OperateProcess(webapp.RequestHandler):
     def get(self):
         
         authenticateUser = str(users.get_current_user()) 
-        featureList = database.memcacheNavBuilder()
-        processmenu = database.memcacheProcessMenu()
-        ddb_active_case = database.memcacheActiveCase()
+        featureList = database.gaeSessionNavBuilder()
+        processmenu = database.gaeSessionProcessMenu()
+        ddb_active_case = database.gaeSessionActiveCase()
         
         conn = config.get_connection()
         cursor = conn.cursor()    
@@ -66,9 +66,9 @@ TODO: Instances should load with status value set to initialised, then it should
         idGenerator = config.IDGenerator() # generates a unique key
         case_key = str(idGenerator) + authenticateUser
         now = config.UTCTime()
-        featureList = database.memcacheNavBuilder()
-        processmenu = database.memcacheProcessMenu()
-        ddb_active_case = database.memcacheActiveCase()
+        featureList = database.gaeSessionNavBuilder()
+        processmenu = database.gaeSessionProcessMenu()
+        ddb_active_case = database.gaeSessionActiveCase()
         
         idGenerator = config.IDGenerator() # generates a unique key
         case_key = str(idGenerator) + authenticateUser
@@ -139,7 +139,7 @@ class PostProcessRun(webapp.RequestHandler):
     def post(self): 
         now = config.UTCTime()
         authenticateUser = str(users.get_current_user())
-        featureList = database.memcacheNavBuilder()
+        featureList = database.gaeSessionNavBuilder()
         client = memcache.Client()
         case_key = client.get('case_key')
         proc_output_conf = self.request.get('proc_output_conf')
@@ -205,7 +205,7 @@ class AssessPerformance(webapp.RequestHandler):
     def get(self):
         
         authenticateUser = str(users.get_current_user()) 
-        featureList = database.memcacheNavBuilder()
+        featureList = database.gaeSessionNavBuilder()
         client = memcache.Client()
         case_key = client.get('case_key')
         tabindex = 4
@@ -240,9 +240,9 @@ class PostProcessAssessment(webapp.RequestHandler):
     def post(self): 
         now = config.UTCTime()
         authenticateUser = str(users.get_current_user())
-        featureList = database.memcacheNavBuilder()
-        processmenu = database.memcacheProcessMenu()
-        ddb_active_case = database.memcacheActiveCase()
+        featureList = database.gaeSessionNavBuilder()
+        processmenu = database.gaeSessionProcessMenu()
+        ddb_active_case = database.gaeSessionActiveCase()
         
         perf_stnd_1 = self.request.get('perf_stnd_1')
         perf_stnd_2 = self.request.get('perf_stnd_2')
@@ -297,8 +297,8 @@ class CreateCase(webapp.RequestHandler):
     '''
     def post(self):
         authenticateUser = str(users.get_current_user()) 
-        featureList = database.memcacheNavBuilder()
-        processmenu = database.memcacheProcessMenu()
+        featureList = database.gaeSessionNavBuilder()
+        processmenu = database.gaeSessionProcessMenu()
 
         conn = config.get_connection()
         cursor = conn.cursor()  

@@ -31,7 +31,7 @@ class MeasurePerformance(webapp.RequestHandler):
         cursor = conn.cursor()
         
         authenticateUser = str(users.get_current_user()) 
-        featureList = database.memcacheNavBuilder()
+        featureList = database.gaeSessionNavBuilder()
         
         cursor.execute("SELECT proc_id, proc_nm, proc_step_id, proc_step_nm, proc_seq, case_id, case_nm, instance_key, emp_id, "
                        "ROUND(SUM(proc_step_conf)/COUNT(proc_step_id)*100) AS conf_summary, SUM(proc_step_conf) AS proc_success, COUNT(proc_step_id) AS proc_step_total "
@@ -103,7 +103,7 @@ class PoncCalulator(webapp.RequestHandler):
         cursor = conn.cursor()
         
         authenticateUser = str(users.get_current_user())
-        featureList = database.memcacheNavBuilder()
+        featureList = database.gaeSessionNavBuilder()
         
         cursor.execute("SELECT DISTINCT proc_nm, proc_step_seq, proc_step_nm, proc_step_desc, proc_step_owner, proc_step_status, proc_step_ponc, "
                        "proc_step_poc, proc_step_efc "

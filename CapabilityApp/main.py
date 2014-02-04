@@ -5,7 +5,7 @@ import logging
 import string
 import json
 import time
-
+from gaesessions import get_current_session
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
 from google.appengine.ext import db
@@ -266,6 +266,11 @@ Fix authentication issues/bug by watching this: https://www.youtube.com/watch?v=
 
             
             if person == authenticateUser:
+                # Clear the session cache
+                session = get_current_session()
+                session.set_quick('navList', '')
+                session.set_quick('processmenu', '')
+                session.set_quick('ddb_active_case', '')
     
                 greeting = ('Welcome authenticateUser: %s! person: %s <li class="icn_edit_article">(<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/permissions">Go to Main Page</a></li>' %
                 (authenticateUser, person, users.create_logout_url("/")))
@@ -284,7 +289,9 @@ class Permissions(webapp.RequestHandler): #This is messy coding -- clean it up
         def get(self):
             authenticateUser = users.get_current_user()
             authenticateUser = str(authenticateUser)
-            featureList = database.memcacheNavBuilder()
+            featureList = database.gaeSessionNavBuilder()
+
+
                         
             conn = get_connection()
             cursor = conn.cursor()
@@ -299,7 +306,7 @@ class Permissions(webapp.RequestHandler): #This is messy coding -- clean it up
             template_values = {"authenticateUser": authenticateUser, 'activitySummary': activitySummary, 'featureList': featureList}
             template = jinja2_env.get_template('index.html')
             self.response.out.write(template.render(template_values))
-            
+          
 class MemcacheTest(webapp2.RequestHandler):
 
     def queryNavBuilder(self): # this is the query
@@ -336,7 +343,7 @@ class MemcacheTest(webapp2.RequestHandler):
         template_values = {'generatedData': generatedData, 'memcacheData': memcacheData}
         template = jinja2_env.get_template('memcache.html')
         self.response.out.write(template.render(template_values))
-            
+         
 application = webapp.WSGIApplication(
     [
         ('/', Authenticate),

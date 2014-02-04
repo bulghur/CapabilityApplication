@@ -15,14 +15,14 @@ CLOUDSQL_INSTANCE = 'MySQL56'
 HOST = 'localhost'
 DATABASE_NAME = 'capability'
 USER_NAME = 'root'
-PASSWORD = '' 
+PASSWORD = '' #cold Dare
 '''
 #Database Connections: CLOUD
-CLOUDSQL_INSTANCE = 'noble-freehold-326:learndb' # 'noble-freehold-326:learndb' OR 'pca-dev-capability:capability'
+CLOUDSQL_INSTANCE = 'pca-dev-capability:capability' # 'noble-freehold-326:learndb' OR 'pca-dev-capability:capability'
 DATABASE_NAME = 'capability'
 HOST = 'localhost'
 USER_NAME = 'root'
-PASSWORD = ''
+PASSWORD = '' #5A
 '''
 def get_connection():
     return rdbms.connect(instance=CLOUDSQL_INSTANCE, 

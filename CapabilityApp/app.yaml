@@ -1,4 +1,4 @@
-application: noble-freehold-326 # pca-dev-capability
+application: pca-dev-capability # noble-freehold-326
 version: 1
 api_version: 1
 runtime: python27

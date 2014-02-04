@@ -1,5 +1,5 @@
 import config
-
+from gaesessions import get_current_session
 from google.appengine.api import rdbms
 from google.appengine.api import users
 from google.appengine.api import memcache  
@@ -19,14 +19,15 @@ def queryNavBuilder():
     conn.close()
     return navList
 
-def memcacheNavBuilder(): #if the Memcache is empty, load it with the query data
-    client = memcache.Client()
-    navList = client.get('navList')
-    if navList is not None:
-        pass
-    else:
+def gaeSessionNavBuilder(): #if the Memcache is empty, load it with the query data
+    session = get_current_session()
+    navList = session.get('navList')
+  
+    if navList is '':
         navList = queryNavBuilder()
-        client.add('navList', navList, 3600)
+        session.set_quick('navList', navList)
+    else:
+        navList
 
     return navList 
     
@@ -44,16 +45,16 @@ def queryProcessMenu():
     conn.close()
     return processmenu  
 
-def memcacheProcessMenu(): #if the Memcache is empty, load it with the query data
-    client = memcache.Client() 
-       
-    processmenu = client.get('processmenu')
-    if processmenu is not None:
-        pass
-    else:
+def gaeSessionProcessMenu(): #if the Memcache is empty, load it with the query data
+    session = get_current_session()
+    processmenu = session.get('processmenu')        
+
+    if processmenu is '':
         processmenu = queryProcessMenu()
-        client.add('processmenu', processmenu, 120) 
-               
+        session.set_quick('processmenu', processmenu)
+    else:
+        processmenu
+        
     return processmenu
 
 def queryActiveCase():
@@ -69,15 +70,15 @@ def queryActiveCase():
     return ddb_active_case
     
     
-def memcacheActiveCase(): #if the Memcache is empty, load it with the query data
-    client = memcache.Client() 
-       
-    ddb_active_case = client.get('ddb_active_case')
-    if ddb_active_case is not None:
-        pass
-    else:
+def gaeSessionActiveCase(): #if the Memcache is empty, load it with the query data
+    session = get_current_session()
+    ddb_active_case = session.get('ddb_active_case')   
+    
+    if ddb_active_case is '':
         ddb_active_case = queryActiveCase()
-        client.add('ddb_active_case', ddb_active_case, 120) 
+        session.set_quick('ddb_active_case', ddb_active_case)
+    else:
+        ddb_active_case
                
     return ddb_active_case
 
