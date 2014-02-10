@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8"/>
+	<title>Philip Crosby Associates - Review Processes</title>
+	
+	<link rel="stylesheet" href="/stylesheets/layout.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="/stylesheets/widgets.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" type="text/css" media="screen" />
+
+	
+	<!--[if lt IE 9]>
+	<link rel="images" href="/images/" type="" media="screen" />
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	
+	<script type="text/javascript" src="js/jquery.equalHeight.js"></script>
+	<script src="js/jquery-1.5.2.min.js" type="text/javascript"></script>
+	<script src="js/hideshow.js" type="text/javascript"></script>
+	<script src="js/jquery.tablesorter.min.js" type="text/javascript"></script>
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<script src="/static/jQueryWidgets.js"></script>
+
+
+	<style>.ui-menu { width: 150px; }</style>
+	<script type="text/javascript">
+	$(function() {
+	$( "#tabs" ).tabs({active: {{ tabindex }} });
+	});
+	</script>
+	<script>
+	 $(function() {
+	$( "#datepicker1" ).datepicker({ dateFormat: "yy-mm-dd" });
+	$( "#datepicker2" ).datepicker({ dateFormat: "yy-mm-dd" });
+	});
+	</script>
+</head>
+<body>
+
+	<header id="header">
+		<hgroup>
+			<h1 class="site_title"><a href="/">Integrated Capability</a></h1>
+			<h2 class="section_title">Operate</h2><div class="btn_view_site"><a href="http://http://www.theonion.com/">View Site</a></div>
+		</hgroup>
+	</header> <!-- end of header bar -->
+	
+		<section id="secondary_bar">
+			{% include 'userbar.html' %}
+		</section><!-- end of secondary bar -->
+			
+		<aside id="sidebar" class="column">
+			{% include 'leftnav.html' %}
+		</aside><!-- end of sidebar -->
+			
+		<section id="main" class="column">
+
+		
+<div class="clear"></div>
+<div id="tabs">
+<ul>
+	<li><a href="#tabs-1">Select Process Group for Review</a></li>
+	<li><a href="#tabs-2">Review Process Group</a></li>
+	<li><a href="#tabs-3">Review Open Processes</a></li>
+</ul>
+
+<div id="tabs-1">
+	<article class="module width_full">
+	    <h2>Review/Edit Process Operations</h2>
+	    
+			<li class="icn_jump_back"><a href="/ReviewCase">Refresh</a></li>
+
+	    
+	    <p>Select the processes you wish to review by selecting either a case or a date range.</p>
+	    
+	    
+	    <form action="/SelectReviewCase" method="POST">        
+                <label>Select a Case</label>
+                    <select name='case_id' id='case_id'>
+                               <option>Any Case</option>
+                              {% for row in ddb_active_case %}
+                              <option value={{ row[0]|e }}>{{ row[1]|e }}</option>
+                              {% endfor %}
+              		</select><br>
+              		<b>OR</b><br>
+             	<label>Between Start Date</label><input type="text" id="datepicker1" name="proc_start_dt" style="width:10%;">
+             	<label>and End Date</label><input type="text" id="datepicker2" name="proc_end_dt" style="width:10%;">
+                <div class="submit_link">
+                
+                        <input type="submit" value="Find Processes"><br><br>
+        </form>
+	</article>
+	<article class="module width_full">
+	<form action="/CaseReview" method="POST">
+		 	<table class=datatable align="center">
+			<th class=datatable colspan="14" align="left"> Data Validation from case </th><tr>
+			<th class=datatable>Process</th>
+			<th class=datatable>Process Step</th>
+			<th class=datatable>Date</th>
+			<th class=datatable>Case Name</th>
+			<th class=datatable>Instance ID</th>
+			<th class=datatable>Conformance</th><tr>
+						{% for row in reviewOperations %}
+						<td>{{ row[0]|e }}
+						<td>{{ row[1]|e }}
+						<td>{{ row[2]|e }}
+						<td>{{ row[3]|e }}
+						<td><a href="/CaseReview" input type="text" instance_key={{ row[5] }}>{{ row[5] }}</a>
+						<td align="center" width=10%>{{ row[7]|e }}<tr>
+						{% endfor %}
+						
+	<input type="submit" value="Take it"><br><br>
+			</table></form>
+	</article>
+</div>
+<div id="tabs-2">
+	<article class="module width_full">
+	HERE: {{ case_id }} AND {{ instance_key }}
+		 	<table class=datatable align="center">
+			<th class=datatable colspan="14" align="left"> Data Validation from case </th><tr>
+			<th class=datatable>Process</th>
+			<th class=datatable>Process Step</th>
+			<th class=datatable>Case</th>
+			<th class=datatable>Case ID</th>
+			<th class=datatable>Instance ID</th><tr>
+			
+						{% for row in reviewOperations %}
+						<td>{{ row[0]|e }}
+						<td>{{ row[1]|e }}
+						<td>{{ row[2]|e }}
+						<td>{{ row[3]|e }}
+						<td>{{ row[4]|e }}
+						<td>{{ row[5]|e }}
+						<td>{{ row[6]|e }}
+						<td>{{ row[7]|e }}
+						<td>{{ row[8]|e }}
+						<td>{{ row[9]|e }}<tr>
+						{% endfor %}
+			</table>
+</article>
+</div>
+<div id="tabs-3">
+	<article class="module width_full">
+
+		 	<table class=datatable align="center">
+			<th class=datatable colspan="14" align="left"> Data Validation from case </th><tr>
+			<th class=datatable>Process</th>
+			<th class=datatable>Process Step</th>
+			<th class=datatable>Case</th>
+			<th class=datatable>Case ID</th>
+			<th class=datatable>Instance ID</th><tr>
+			
+						{% for row in openoperations %}
+						<td>{{ row[0]|e }}
+						<td>{{ row[1]|e }}
+						<td>{{ row[2]|e }}
+						<td>{{ row[3]|e }}
+						<td>{{ row[4]|e }}
+						<td>{{ row[5]|e }}
+						<td>{{ row[6]|e }}
+						<td>{{ row[7]|e }}
+						<td>{{ row[8]|e }}
+						<td>{{ row[9]|e }}<tr>
+						{% endfor %}
+			</table>
+</article>
+</div>
+</div>
+</body>
+</html>

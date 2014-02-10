@@ -32,6 +32,28 @@
 	$( "#tabs" ).tabs({active: {{ tabindex }} });
 	});
 	</script>
+	<script>
+	 $(function() {
+	$( "#datepicker" ).datepicker({ dateFormat: "yy-mm-dd" });
+	});
+	</script>
+	<script type="text/javascript">
+	var CheckboxHandler = new Object();
+	function testCheckbox(oCheckbox)
+	{
+	    var checkbox_val = oCheckbox.value;
+	    if (oCheckbox.checked == true)
+	    {
+	        alert("Checkbox with name = " + oCheckbox.name + " and value =" +
+	                checkbox_val + " is checked");
+	    }
+	    else
+	    {
+	        alert("Checkbox with name = " + oCheckbox.name + " and value =" +
+	              checkbox_val + " is not checked");
+	    }
+	}
+	</script>
 </head>
 <body>
 
@@ -57,12 +79,11 @@
 <div id="tabs">
 <ul>
 	<li><a href="#tabs-1">Operating a Process: Instructions</a></li>
-	<li><a href="#tabs-2">Create a Case</a></li>
+	<li><a href="#tabs-2">Manage Cases</a></li>
 	<li><a href="#tabs-3">Select Case and Process</a></li>
-	<li><a href="#tabs-4">Operate Process</a></li>
-	<li><a href="#tabs-5">Assess Performance</a></li>
-	<li><a href="#tabs-6">View Open Processes</a></li>
-	<li><a href="#tabs-7">test</a></li>
+	<li><a href="#tabs-4">Determine Capability</a></li>
+	<li><a href="#tabs-5">Conduct Behaviors</a></li>
+	<li><a href="#tabs-6">Define Adjustments</a></li>
 </ul>
 
 <div id="tabs-1">
@@ -85,6 +106,9 @@
 		<input type="submit" value="Cancel">
 	</form>
 </article>	
+<article class="module width_half">
+	    <h2>Manage Cases</h2>
+</article>	
 </div>
 <div id="tabs-3">
 
@@ -103,10 +127,10 @@
         <li>Click on Create Instance. You will be directed to the Operate Process tab.</li>
         </ol>
         <p>Good luck and may the conformances of processes be forever in your favour.</p>
-        <form action="/CreateInstance" method="POST">        
+        <form id="CreateInstance" action="/CreateInstance" method="POST">        
                 <label>1. Select a Case</label>
-                         <select name="case_id" id="case_id"'>
-                                 <option>Active Case</option>
+                         <select name="case_id" id="case_id" onchange="caseConfirmMessage()">
+                                 <option>Select a Case</option>
                                 {% for row in ddb_active_case %}
                                 <option value={{ row[0]|e }}>{{ row[1]|e }}</option>
                                 {% endfor %}
@@ -124,200 +148,180 @@
                         <br><br>
                 <ol id="proc_step_id_value"></ol>
                 <br>
-        
-                <div class="submit_link">
-                        <input type="submit" value="Create Instance">
-                        <input type="submit" value="Cancel">
                 
         </form>
         </fieldset>
 </div>
-
 <div id="tabs-4">
-<article class="module width_full">
-<h2>Operate the Process</h2>
-<p>The moment of reckoning has come.  You have designed the process, tested the output and proofed it as a demonstration of your profound commitment.  
-You are now certified to operate it.  Provided below is the SOP, PMW, the Performance Standard, etc.; an environment with everything you need to operate the process
-successfully</p>
-<p>To operate the process, view the SOP and other documentation.  As you meet each requirement, submit it.  Feel free to provide notes on the operation, risks and potential
-innovations for each requirement.  Indicate a failure with risks and possible innovations.  </p>
-<p>When you have completed all requirements, the process step is complete.</p>
-	<fieldset class=fieldsets style="width:900px; margin-right: 0%;"> 	
-	  		{% for row in case|batch(1)|first() %}
-		<header><h2>2. Process Name/Process Step: </b>{{ row[8]|e }}/{{ row[9]|e }}</h2></header><br>
-		<table><td width=50%>
-		<ul>
-			<li><b>Process Case: </b>{{ row[1]|e }} - {{ row[7]|e }}</li>
-			<li><b>Process Instance: </b>{{ row[3]|e }}</li>
-			<li><b>Link to SOP: </b><a href={{ row[10]|e }} target="_blank">Click here for SOP</a></li>
-			<li><b>Link to Local SOP (under construction): </b><a href={{ row[10]|e }} target="_blank">Click here for Personal SOP</a></li>
-			<li><b>Link to Process Model Worksheet: </b><a href={{ row[15]|e }} target="_blank">Click here for PMW</a></li>
+	<article class="module width_full">
+	<h2>Determine Capability</h2>
+	<p>The moment of reckoning has come.  You have designed the process, tested the output and proofed it as a demonstration of your profound commitment.  
+	You are now certified to operate it.  Provided below is the SOP, PMW, the Performance Standard, etc.; an environment with everything you need to operate the process
+	successfully</p>
+	<p>To operate the process, view the SOP and other documentation.  As you meet each requirement, submit it.  Feel free to provide notes on the operation, risks and potential
+	innovations for each requirement.  Indicate a failure with risks and possible innovations.  </p>
+	<p>When you have completed all requirements, the process step is complete.</p>
+		<fieldset class=fieldsets style="width:900px; margin-right: 0%;"> 	
+		  		{% for row in instance|batch(1)|first() %}
+			<header><h2>2. Process Name/Process Step: </b>{{ row[8]|e }}/{{ row[9]|e }}</h2></header><br>
+			<table><td width=50%>
+			<ul>
+				<li><b>Process Case: </b>{{ row[1]|e }} - {{ row[7]|e }}</li>
+				<li><b>Process Instance: </b>{{ row[3]|e }}</li>
+				<li><b>Link to SOP: </b><a href={{ row[10]|e }} target="_blank">Click here for SOP</a></li>
+				<li><b>Link to Local SOP (under construction): </b><a href={{ row[10]|e }} target="_blank">Click here for Personal SOP</a></li>
+				<li><b>Link to Process Model Worksheet: </b><a href={{ row[15]|e }} target="_blank">Click here for PMW</a></li>
+	
+			{% endfor %}
+			</ul>
+			
+			<tr>
+			    <table class=datatable align="left"> 
+				<form action="/PostInstance" method="POST" screen.showTab("Tab2");> 
+				<th colspan="5" align="left" font size=72> Operate the Process </th><tr>
+				<th>Seq</th>
+				<th>Requirement</th>
 
-		{% endfor %}
-		</ul>
-		
-		<tr>
-		    <table class=datatable align="left"> 
-			<form action="/postProcessRun" method="POST" screen.showTab("Tab2");> 
-			<th colspan="8" align="left" font size=72> Operate the Process </th><tr>
-			<th>Seq</th>
-			<th>Requirement</th>
-			<th>Requirement Details</th>
-			<th>Notes</th>
-			<th>Consequences</th>
-			<th>Process Adjustments</th>
-			<th>Conformance</th>
-			<th>Action</th><tr>
-				{% for row in case %}
+				<th>Notes</th>
+				<th>Meets Req?</th>
+				<th>Action</th><tr>
+					{% for row in instance %}
+						<td align="center" width=1%>{{ row[12]|e }}
+						<td width=10%>{{ row[14]|e }}
+						<td width=30%><textarea width="100%" type=text rows="2" name="proc_notes" wrap="hard"></textarea>
+						<td width=1%><select font-size="10px" name="proc_output_conf">
+			                <optgroup>
+			                <option font-size="10px" value="1">Yes</option>
+			                <option font-size="10px" value="0">No</option>
+			                </optgroup>
+		                </select>
+		                <td width=5%><input type="submit" name = "proc_run_status" font-size:10px; value="Submit">
+		              	<input type="hidden" name="proc_req_id" value={{ row[4]|e }}>
+		              	<input type="hidden" name="proc_step_id" value={{ row[5]|e }}>
+						<input type="hidden" name="case_id" value={{ row[3]|e }}>
+						<input type="hidden" name="proc_run_id" value={{ row[0]|e }}><tr>
+					{% endfor %}
+				</form>	
+				</table>
+				<br>	
+		</fieldset>
+	</article>
+</div>
+
+<div id="tabs-5">
+<article class="module width_full">
+	<h2>Conduct Behaviors</h2>
+	<p>The moment of reckoning has come.  You have designed the process, tested the output and proofed it as a demonstration of your profound commitment.</p>
+	<h2>Process Step Summary</h2>
+			<br>
+				 	<table class=datatable align="center">
+					<th class=datatable colspan="4" align="left"> Capability of Instance</th><tr>
+					<th class=datatable>Seq</th>
+					<th class=datatable>Requirements</th>
+					<th class=datatable>Capability</th>
+					<th class=datatable>Notes</th><tr>
+					
+						{% for row in instance %}
+						<td align="center" width=2%>{{ row[7]|e }}
+						<td width=20%>{{ row[9]|e }}
+						<td align="center" width=2%>{{ row[6]|e }}
+						<td width=10%>{{ row[10]|e }}<tr>
+						{% endfor %}
+					</table>
+					<br><br>
+							<form action="/PostProcessAssessment" method="POST">     	
+				<table class=datatable align="center"> 
+				<th class=datatable>Performance Standards</th>
+				<th class=datatable>Requirements</th>
+				<th class=datatable>Req Met?</th>
+				<th class=datatable>Behaviors That Did Not Meet Standard</th><tr>
+				
+				<td width=10%>Zero Defects (Quality)
+				<td width=20%>Meet Requirements the first time
+				<td width=3%><input type="checkbox" name="perf_stnd_1"  id="perf_stnd_1" value="1">Yes
+				<td width=20%><textarea width="100% type=text rows="2" name="perf_stnd_notes_1" wrap="hard"></textarea><tr>
+				<td width=10%>Zero Workarounds(Cost)
+				<td width=20%>Follow the Procedures
+				<td width=3%><input type="checkbox" name="perf_stnd_2" id="perf_stnd_2" value="1">Yes
+				<td width=20%><textarea width="100% type=text rows="2" name="perf_stnd_notes_2" wrap="hard"></textarea><tr>
+				<td width=10%>Zero Delays (Schedule)
+				<td width=20%>Start work when conforming Inputs and Controls are available
+				<td width=3%><input type="checkbox" name="perf_stnd_3"  id="perf_stnd_3" value="1">Yes
+				<td width=20%><textarea width="100% type=text rows="2" name="perf_stnd_notes_3" wrap="hard"></textarea><tr>
+				</table><br>
+				<br><br>
+		        <div class="submit_link"><input type="submit" value="Record Assessment"></div>        
+		</form>
+</article>
+</div>
+
+<div id="tabs-6">
+<article class="module width_full">
+	<h2>Define Adjustments</h2>
+
+			<fieldset class=fieldsets style="width:900px; margin-right: 0%;"> 	
+		  	{% for row in instance|batch(1)|first() %}
+				<header><h2>Process Name/Process Step: </b>{{ row[8]|e }}/{{ row[9]|e }}</h2></header><br>
+				<table><td width=50%>
+				<ul>
+				<li><b>Process Case: </b>{{ row[1]|e }} - {{ row[7]|e }}</li>
+				<li><b>Process Instance: </b>{{ row[3]|e }}</li>	
+			{% endfor %}
+			</ul>
+			
+			<tr> 	
+				<table class=datatable align="center"> 
+				<th class=datatable>Control</th>
+				<th class=datatable>Requirements</th>
+				<th class=datatable>Req Met?</th>
+				<th class=datatable>Behaviors That Did Not Meet Standard</th><tr>
+				{% for row in instanceperformance|batch(1)|first() %}
+					<td width=10%>Zero Defects (Quality)
+					<td width=20%>Meet Requirements the first time
+					<td width=3%>{{ row[0]|e }}
+					<td width=20%>{{ row[3]|e }}<tr>
+					<td width=10%>Zero Workarounds(Cost)
+					<td width=20%>Follow the Procedures
+					<td width=3%>{{ row[1]|e }}
+					<td width=20%>{{ row[4]|e }}<tr>
+					<td width=10%>Zero Delays (Schedule)
+					<td width=20%>Start work when conforming Inputs and Controls are available
+					<td width=3%>{{ row[2]|e }}
+					<td width=20%>{{ row[5]|e }}</textarea><tr>
+					</table><br>
+				{% endfor %}
+				<br><br>
+			    <table class=datatable align="left"> 
+				<form action="/PostConsequences" method="POST" screen.showTab("Tab2");> 
+				<th colspan="7" align="left" font size=72> Operate the Process </th><tr>
+				<th>Seq</th>
+				<th>Requirement</th>
+				<th>Conformance</th>
+				<th>Notes</th>
+				<th>Consequences</th>
+				<th>Process Adjustments</th>
+				<th>Action</th><tr>
+				{% for row in instance %}
 					<td align="center" width=1%>{{ row[12]|e }}
-					<td width=12%>{{ row[13]|e }}
-					<td width=18%>{{ row[14]|e }}
-					<td width=25%><textarea width="100%" type=text rows="2" name="proc_notes" wrap="hard"></textarea>
+					<td width=15%>{{ row[14]|e }}
+					<td width=1%>{{ row[11]|e }}
+					<td width=25%>{{ row[16]|e }}
 					<td width=25%><textarea width="100%" type=text rows="2" name="proc_conseq" wrap="hard"></textarea>
 					<td width=25%><textarea width=100% type=text rows="2" name="proc_innovation" wrap="hard"></textarea>
-					<td width=10%><select font-size="10px" name="proc_output_conf">
-		                <optgroup>
-		                <option font-size="10px" value="1">Capable</option>
-		                <option font-size="10px" value="0">Not Capable</option>
-		                </optgroup>
-	                </select>
 	                <td width=10%><input type="submit" name = "proc_run_status" font-size:10px; value="Submit">
 	              	<input type="hidden" name="proc_req_id" value={{ row[4]|e }}>
 	              	<input type="hidden" name="proc_step_id" value={{ row[5]|e }}>
-					<input type="hidden" name="case_key" value={{ row[3]|e }}>
+					<input type="hidden" name="case_id" value={{ row[3]|e }}>
 					<input type="hidden" name="proc_run_id" value={{ row[0]|e }}><tr>
 				{% endfor %}
-			</form>	
-			</table>
-			<br>	
-	</fieldset>
+				</form>	
+				</table>
+				<br>	
+		</fieldset>
 </article>
 </div>
-<div id="tabs-5">
-		<script type="text/javascript">
-		var CheckboxHandler = new Object();
-		function testCheckbox(oCheckbox)
-		{
-		    var checkbox_val = oCheckbox.value;
-		    if (oCheckbox.checked == true)
-		    {
-		        alert("Checkbox with name = " + oCheckbox.name + " and value =" +
-		                checkbox_val + " is checked");
-		    }
-		    else
-		    {
-		        alert("Checkbox with name = " + oCheckbox.name + " and value =" +
-		              checkbox_val + " is not checked");
-		    }
-		}
-		</script>
-		<form action="/PostProcessAssessment" method="POST">
-	  	{% for row in assessinstance|batch(1)|first() %}
-		<header><h2>Assess Performance: </b>{{ row[4]|e }}/{{ row[5]|e }}: {{ case_key }}</h2></header><br>
-		<table><td width=50%>
-		<ul>
-		{% endfor %}
-	<h2>Process Step Summary</h2>
-	<br>
-		 	<table class=datatable align="center">
-			<th class=datatable colspan="7" align="left"> Capability of Instance</th><tr>
-			<th class=datatable>Seq</th>
-			<th class=datatable>Description</th>
-			<th class=datatable>Requirements</th>
-			<th class=datatable>Capability</th>
-			<th class=datatable>Notes</th>
-			<th class=datatable>Consequences</th>
-			<th class=datatable>Adjustments</th><tr>
-			
-				{% for row in assessinstance %}
-				<td align="center" width=2%>{{ row[7]|e }}
-				<td width=10%>{{ row[8]|e }}
-				<td width=20%>{{ row[9]|e }}
-				<td align="center" width=2%>{{ row[6]|e }}
-				<td width=10%>{{ row[10]|e }}
-				<td width=10%>{{ row[11]|e }}
-				<td width=10%>{{ row[12]|e }}<tr>
-				{% endfor %}
-			</table>
-			<br><br>
-     	
-		<table class=datatable align="center"> 
-		<th class=datatable>Control</th>
-		<th class=datatable>Requirements</th>
-		<th class=datatable>Req Met?</th>
-		<th class=datatable>Behaviors That Did Not Meet Standard</th><tr>
-		
-		<td width=10%>Zero Defects (Quality)
-		<td width=20%>Meet Requirements the first time
-		<td width=3%><input type="checkbox" name="perf_stnd_1"  id="perf_stnd_1" value="1">Yes
-		<td width=20%><textarea width="100% type=text rows="2" name="perf_stnd_notes_1" wrap="hard"></textarea><tr>
-		<td width=10%>Zero Workarounds(Cost)
-		<td width=20%>Follow the Procedures
-		<td width=3%><input type="checkbox" name="perf_stnd_2" id="perf_stnd_2" value="1">Yes
-		<td width=20%><textarea width="100% type=text rows="2" name="perf_stnd_notes_2" wrap="hard"></textarea><tr>
-		<td width=10%>Zero Delays (Schedule)
-		<td width=20%>Start work when conforming Inputs and Controls are available
-		<td width=3%><input type="checkbox" name="perf_stnd_3"  id="perf_stnd_3" value="1">Yes
-		<td width=20%><textarea width="100% type=text rows="2" name="perf_stnd_notes_3" wrap="hard"></textarea><tr>
-		</table><br>
-		<br><br>
-        <div class="submit_link">
-        <input type="submit" value="Record Assessment">
-                
-        </form>
-		
-</div>
-<div id="tabs-6">
-	<article class="module width_full">
-	    <h2>View Open Processes</h2>
-	    
-	    <p>This tab lists all open processes for which all requirements have not been completed.  (this will allow a user to go back and complete any process they are unable
-	    to complete in a session. )</p>
-	    
-		 	<table class=datatable align="center">
-			<th class=datatable colspan="14" align="left"> Data Validation from case </th><tr>
-			<th class=datatable>Process</th>
-			<th class=datatable>Process Step</th>
-			<th class=datatable>Case</th>
-			<th class=datatable>Case ID</th>
-			<th class=datatable>Instance ID</th><tr>
-			
-						{% for row in openoperations %}
-						<td>{{ row[1]|e }}
-						<td>{{ row[4]|e }}
-						<td>{{ row[5]|e }}
-						<td>{{ row[6]|e }}
-						<td>{{ row[7]|e }}<tr>
-						{% endfor %}
-			</table>
-</article>
-</div>
-<div id="tabs-7">
-	<article class="module width_full">
-	    <h2>View Open Processes</h2>
-	    
-	    <p>This tab lists all open processes for which all requirements have not been completed.  (this will allow a user to go back and complete any process they are unable
-	    to complete in a session. )</p>
-	    
-		 	<table class=datatable>
-			<th class=datale colspan="14" align="left"> Data Validation from case </th>
-			<tr>
-			<th class=datatable>Process</th>
-			<th class=datatable>Process Step</th>
-			<th class=datatable>Case</th>
-			<th class=datatable>Case ID</th>
-			<th class=datatable>Instance ID</th><tr>
-			
-						{% for row in results0 %}
-						<td>{{ row[1]|e }}
-						<td>{{ row[4]|e }}
-						<td>{{ row[5]|e }}
-						<td>{{ row[6]|e }}
-						<td>{{ row[7]|e }}<tr>
-						{% endfor %}
-			</table>
-</article>
-</div>
+
+
 </div>
 </body>
 </html>

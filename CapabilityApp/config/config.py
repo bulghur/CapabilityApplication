@@ -9,21 +9,21 @@ Configure
 2. Change the password
 3. Update the Yaml File: 
 '''
-
+'''
 #Database Connections: LOCAL
 CLOUDSQL_INSTANCE = 'MySQL56'
 HOST = 'localhost'
 DATABASE_NAME = 'capability'
 USER_NAME = 'root'
-PASSWORD = '' #cold Dare
+PASSWORD = 'cDnfom100!' #cold Dare
 '''
 #Database Connections: CLOUD
 CLOUDSQL_INSTANCE = 'pca-dev-capability:capability' # 'noble-freehold-326:learndb' OR 'pca-dev-capability:capability'
 DATABASE_NAME = 'capability'
 HOST = 'localhost'
 USER_NAME = 'root'
-PASSWORD = '' #5A
-'''
+PASSWORD = '5Ab$olutes' #or ?
+
 def get_connection():
     return rdbms.connect(instance=CLOUDSQL_INSTANCE, 
                          database=DATABASE_NAME, 

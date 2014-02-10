@@ -70,7 +70,7 @@ def queryActiveCase():
     return ddb_active_case
     
     
-def gaeSessionActiveCase(): #if the Memcache is empty, load it with the query data
+def gaeSessionActiveCase():
     session = get_current_session()
     ddb_active_case = session.get('ddb_active_case')   
     
@@ -81,6 +81,35 @@ def gaeSessionActiveCase(): #if the Memcache is empty, load it with the query da
         ddb_active_case
                
     return ddb_active_case
+
+def queryOpenOperations():
+    authenticateUser = str(users.get_current_user())
+    conn = config.get_connection()
+    cursor = conn.cursor() 
+    
+    cursor.execute("SELECT case_id, case_nm "
+                   "FROM proc_case "
+                   "WHERE status = 1 AND emp_id =%s", (authenticateUser))
+    openoperations = cursor.fetchall()
+    conn.close()
+    return openoperations
+    
+def gaeSessionOpenOperations():
+    authenticateUser = str(users.get_current_user())
+    session = get_current_session()
+    openoperations = session.get('openoperations')
+    
+    if openoperations is None:
+        conn = config.get_connection()
+        cursor = conn.cursor() 
+        cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null")
+        openoperations = cursor.fetchall()
+        conn.close()
+        openoperations
+    else:
+        openoperations
+               
+    return openoperations
 
 def query(query, condition1):  #this is the sample pattern
     #this is a test form of centralising a query
