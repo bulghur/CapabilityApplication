@@ -45,7 +45,7 @@ class OperateProcess(webapp.RequestHandler):
         openoperations = cursor.fetchall()
         
         conn.close()
-        tabindex = 2
+        tabindex = 1
 
         template_values = {'ddb_active_case': ddb_active_case, 'processmenu': processmenu, 'authenticateUser': authenticateUser, 
                            'openoperations': openoperations, 'featureList': featureList, 'tabindex': tabindex}
@@ -65,7 +65,7 @@ TODO: Instances should load with status value set to initialised, then it should
     def post(self): # post to DB
         authenticateUser = str(users.get_current_user())
         idGenerator = config.IDGenerator() # generates a unique key
-        instance_id = str(idGenerator) + authenticateUser
+        instance_key = str(idGenerator) + authenticateUser
         now = config.UTCTime()
         featureList = database.gaeSessionNavBuilder()
         processmenu = database.gaeSessionProcessMenu()
@@ -74,7 +74,7 @@ TODO: Instances should load with status value set to initialised, then it should
         proc_step_id = self.request.get('proc_step_id')
         
         session = get_current_session()
-        session.set_quick('instance_id', instance_id)
+        session.set_quick('instance_key', instance_key)
         session.set_quick('case_id', case_id)
         
         conn = config.get_connection()
@@ -86,7 +86,7 @@ TODO: Instances should load with status value set to initialised, then it should
                        (
                         (case_id),
                         (proc_step_id),
-                        (instance_id)
+                        (instance_key)
                        ))
         
         conn.commit()
@@ -97,7 +97,7 @@ TODO: Instances should load with status value set to initialised, then it should
                        "INNER JOIN process_step on (instance.proc_step_id = process_step.proc_step_id) "
                        "INNER JOIN proc_req on (process_step.proc_step_id = proc_req.proc_step_id) "
                        "INNER JOIN process on (process_step.proc_id = process.proc_id)"
-                       "WHERE instance.instance_key = %s", (instance_id))
+                       "WHERE instance.instance_key = %s", (instance_key))
         caseMake = cursor.fetchall()
 
 
@@ -115,9 +115,9 @@ TODO: Instances should load with status value set to initialised, then it should
                        "INNER JOIN process_step on (proc_run.proc_step_id = process_step.proc_step_id) "
                        "INNER JOIN proc_req on (proc_run.proc_req_id = proc_req.proc_req_id) "
                        "INNER JOIN instance on (proc_run.instance_key = instance.instance_key) "
-                       "WHERE instance.instance_key = %s", (instance_id))
+                       "WHERE instance.instance_key = %s", (instance_key))
                         
-        tabindex = 3                
+        tabindex = 2                
         instance = cursor.fetchall()
         
         cursor.execute("SELECT * FROM capability.vw_proc_run_sum WHERE proc_step_conf is null AND emp_id = %s", (authenticateUser))
@@ -148,19 +148,19 @@ class PostInstance(webapp.RequestHandler):
         proc_conseq = self.request.get('proc_conseq')
         proc_innovation = self.request.get('proc_innovation')
         proc_run_id = self.request.get('proc_run_id')
-        proc_run_status = "pending"
+        proc_run_status = 2
         
         session = get_current_session()
-        instance_id = session.get('instance_id')
+        instance_key = session.get('instance_key')
         case_id = session.get('case_id')
         
         conn = config.get_connection()
         cursor = conn.cursor()
         
         cursor.execute("UPDATE proc_run SET "
-                       "proc_run_start_tm =%s, proc_output_conf = %s, proc_notes = %s, proc_conseq = %s, proc_innovation = %s, proc_run_status = %s "
+                       "proc_run_start_tm =%s, proc_output_conf = %s, proc_run_status = %s, proc_notes = %s, proc_conseq = %s, proc_innovation = %s, proc_run_status = %s "
                        "WHERE proc_run_id = %s",
-                       (now, proc_output_conf, proc_notes, proc_conseq, proc_innovation, proc_run_status, proc_run_id ))
+                       (now, proc_output_conf, proc_run_status, proc_notes, proc_conseq, proc_innovation, proc_run_status, proc_run_id ))
 
         conn.commit()
         
@@ -172,7 +172,7 @@ class PostInstance(webapp.RequestHandler):
                        "INNER JOIN process on (proc_run.proc_id = process.proc_id) "
                        "INNER JOIN process_step on (proc_run.proc_step_id = process_step.proc_step_id) "
                        "INNER JOIN proc_req on (proc_run.proc_req_id = proc_req.proc_req_id)"
-                       "WHERE proc_run.proc_output_conf IS NULL AND proc_run.instance_key = %s", (instance_id))
+                       "WHERE proc_run.proc_run_status < 2 AND proc_run.instance_key = %s", (instance_key))
         
         instanceCount = cursor.rowcount
         instance = cursor.fetchall()  
@@ -183,12 +183,13 @@ class PostInstance(webapp.RequestHandler):
         conn.close()
         
         if instanceCount > 0:
-            tabindex = 3
+            tabindex = 2
             template_values = {'processmenu': processmenu, 'authenticateUser': authenticateUser, 'instance': instance, 'case_id': case_id, 
                            'openoperations': openoperations, 'ddb_active_case': ddb_active_case, 'featureList': featureList,
                            'tabindex': tabindex}
             template = jinja2_env.get_template('operateprocess.html')
             self.response.out.write(template.render(template_values))
+            # self.redirect("go somewhere else?")
         else:
             self.redirect("/AssessPerformance")
             
@@ -205,9 +206,9 @@ class AssessPerformance(webapp.RequestHandler):
         processmenu = database.gaeSessionProcessMenu()
         ddb_active_case = database.gaeSessionActiveCase()
         session = get_current_session()
-        instance_id = session.get('instance_id')
+        instance_key = session.get('instance_key')
         
-        tabindex = 4
+        tabindex = 3
         conn = config.get_connection()
         cursor = conn.cursor()    
         
@@ -219,14 +220,14 @@ class AssessPerformance(webapp.RequestHandler):
                        "INNER JOIN process on (proc_run.proc_id = process.proc_id) "
                        "INNER JOIN process_step on (proc_run.proc_step_id = process_step.proc_step_id) "
                        "INNER JOIN proc_req on (proc_run.proc_req_id = proc_req.proc_req_id) "
-                       "WHERE proc_run.instance_key = %s", (instance_id)) 
+                       "WHERE proc_run.instance_key = %s ", (instance_key)) 
         
         instance = cursor.fetchall()  
         
         conn.close()
 
         template_values = {'authenticateUser': authenticateUser, 'featureList': featureList, 'tabindex': tabindex,
-                           'instance': instance, 'instance_id': instance_id }
+                           'instance': instance, 'instance_key': instance_key }
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
         
@@ -250,7 +251,7 @@ class PostProcessAssessment(webapp.RequestHandler):
         perf_stnd_notes_2 = self.request.get('perf_stnd_notes_2')
         perf_stnd_notes_3 = self.request.get('perf_stnd_notes_3')
         session = get_current_session()
-        instance_id = session.get('instance_id')
+        instance_key = session.get('instance_key')
         
         if perf_stnd_1 is '':
             perf_stnd_1 = 0
@@ -265,7 +266,7 @@ class PostProcessAssessment(webapp.RequestHandler):
         else:
             perf_stnd_3 = 1
             
-        if instance_id is None:
+        if instance_key is None:
             pass # query for last entry for expired GAE Sessions
         else:
             pass 
@@ -277,7 +278,7 @@ class PostProcessAssessment(webapp.RequestHandler):
         cursor.execute("UPDATE instance SET "
                        "perf_stnd_1 = %s, perf_stnd_2 = %s,perf_stnd_3 = %s, perf_stnd_notes_1 = %s, perf_stnd_notes_2 = %s, perf_stnd_notes_3 = %s, perf_stnd_notes_ts = %s "
                        "WHERE instance_key = %s ",
-                       (perf_stnd_1, perf_stnd_2, perf_stnd_3, perf_stnd_notes_1, perf_stnd_notes_2, perf_stnd_notes_3, now, instance_id ))
+                       (perf_stnd_1, perf_stnd_2, perf_stnd_3, perf_stnd_notes_1, perf_stnd_notes_2, perf_stnd_notes_3, now, instance_key ))
         conn.commit()
         
         cursor.execute("SELECT proc_run.proc_run_id, proc_run.case_id, proc_run.emp_id, proc_run.instance_key, proc_run.proc_req_id, proc_run.proc_step_id, "
@@ -289,20 +290,20 @@ class PostProcessAssessment(webapp.RequestHandler):
                        "INNER JOIN process_step on (proc_run.proc_step_id = process_step.proc_step_id) "
                        "INNER JOIN proc_req on (proc_run.proc_req_id = proc_req.proc_req_id) "
                        "INNER JOIN instance on (proc_run.instance_key = instance.instance_key) "
-                       "WHERE instance.instance_key = %s ", (instance_id))
+                       "WHERE instance.instance_key = %s ", (instance_key))
         instance = cursor.fetchall()
         
         cursor.execute("SELECT perf_stnd_1, perf_stnd_2, perf_stnd_3, perf_stnd_notes_1, perf_stnd_notes_2, perf_stnd_notes_3 "
                        "FROM instance "
-                       "WHERE instance_key = %s", (instance_id))
+                       "WHERE instance_key = %s", (instance_key))
         instanceperformance = cursor.fetchall()
 
         conn.close()       
 
-        tabindex = 5
+        tabindex = 4
         
         template_values = {'processmenu': processmenu, 'authenticateUser': authenticateUser, 'ddb_active_case': ddb_active_case, 'featureList': featureList,
-                           'tabindex': tabindex, 'instance': instance, 'instance_id': instance_id, 'instanceperformance': instanceperformance}
+                           'tabindex': tabindex, 'instance': instance, 'instance_key': instance_key, 'instanceperformance': instanceperformance}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
         
@@ -321,9 +322,9 @@ class PostConsequences(webapp.RequestHandler): #rename
         proc_conseq = self.request.get('proc_conseq')
         proc_innovation = self.request.get('proc_innovation')
         proc_run_id = self.request.get('proc_run_id')
-        proc_run_status = 'complete'
+        proc_run_status = 3
         session = get_current_session()
-        instance_id = session.get('instance_id')
+        instance_key = session.get('instance_key')
                 
         conn = config.get_connection()
         cursor = conn.cursor()
@@ -342,22 +343,22 @@ class PostConsequences(webapp.RequestHandler): #rename
                "INNER JOIN process_step on (proc_run.proc_step_id = process_step.proc_step_id) "
                "INNER JOIN proc_req on (proc_run.proc_req_id = proc_req.proc_req_id) "
                "INNER JOIN instance on (proc_run.instance_key = instance.instance_key) "
-               "WHERE proc_run.proc_run_status = 'pending' AND proc_run.instance_key = %s", (instance_id))
+               "WHERE proc_run.proc_run_status < 3 AND proc_run.instance_key = %s", (instance_key))
         instance = cursor.fetchall()
         instanceCount = cursor.rowcount
         
         cursor.execute("SELECT perf_stnd_1, perf_stnd_2, perf_stnd_3, perf_stnd_notes_1, perf_stnd_notes_2, perf_stnd_notes_3 "
                        "FROM instance "
-                       "WHERE instance_key = %s", (instance_id))
+                       "WHERE instance_key = %s", (instance_key))
         instanceperformance = cursor.fetchall()
         
         conn.commit()
         conn.close()      
         
         if instanceCount > 0:
-            tabindex = 5
+            tabindex = 4
         else:
-            tabindex = 2 
+            tabindex = 1 
 
         
         template_values = {'processmenu': processmenu, 'authenticateUser': authenticateUser, 'ddb_active_case': ddb_active_case, 'featureList': featureList,
@@ -399,7 +400,7 @@ class CreateCase(webapp.RequestHandler):
         
         conn.close()
         
-        tabindex = 2
+        tabindex = 1
 
         template_values = {'ddb_active_case': ddb_active_case, 'processmenu': processmenu, 'openoperations': openoperations, 
                            'authenticateUser': authenticateUser, 'tabindex': tabindex, 'featureList': featureList }

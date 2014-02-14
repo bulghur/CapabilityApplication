@@ -82,7 +82,7 @@ class PostProcess(webapp.RequestHandler):
     def post(self): # post to DB
         
         authenticateUser = str(users.get_current_user()) 
-        featureList = database.memcacheNavBuilder() 
+        featureList = database.gaeSessionNavBuilder()
         
         conn = config.get_connection()
         cursor = conn.cursor()
@@ -131,7 +131,7 @@ class PostProcessStep(webapp.RequestHandler):
     def post(self): # post to DB
         
         authenticateUser = str(users.get_current_user())  
-        featureList = database.memcacheNavBuilder() 
+        featureList = database.gaeSessionNavBuilder() 
         
         conn = config.get_connection()
         cursor = conn.cursor()
@@ -186,7 +186,7 @@ class PostRequirement(webapp.RequestHandler):
     def post(self): 
         
         authenticateUser = str(users.get_current_user())
-        featureList = database.memcacheNavBuilder()  
+        featureList = database.gaeSessionNavBuilder()  
         
         conn = config.get_connection()
         cursor = conn.cursor()

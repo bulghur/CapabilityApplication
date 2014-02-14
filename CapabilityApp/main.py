@@ -57,7 +57,7 @@ class Authenticate(webapp2.RequestHandler):
                 session.set_quick('processmenu', '')
                 session.set_quick('ddb_active_case', '')
     
-                greeting = ('Welcome authenticateUser: %s! person: %s <li class="icn_edit_article">(<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/permissions">Go to Main Page</a></li>' %
+                greeting = ('Welcome : %s! person: %s <li class="icn_edit_article">(<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/permissions">Go to Main Page</a></li>' %
                 (authenticateUser, person, users.create_logout_url("/")))
              
             else:
@@ -108,7 +108,7 @@ application = webapp.WSGIApplication(
         ("/CreateCase", operate.CreateCase),
         ("/ReviewCase", reviewprocess.ReviewCase),
         ("/SelectReviewCase", reviewprocess.SelectReviewCase),
-        ("/CaseReview", reviewprocess.CaseReview),
+        ("/EditInstance", reviewprocess.EditInstance),
         ("/MeasurePerformance", measure.MeasurePerformance),
         ("/PoncCalulator", measure.PoncCalulator),
         ("/postProcessSteps", design.PostProcessStep),
