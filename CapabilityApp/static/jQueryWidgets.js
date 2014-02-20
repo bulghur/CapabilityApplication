@@ -16,8 +16,10 @@ $( "#datepicker" ).datepicker({ dateFormat: "yy-mm-dd" });
 function getInstanceKey(lnk){
 	var instance_key = lnk.getAttribute('value');
 	console.log ("Instance Key is: " + instance_key);
-	document.getElementById("inputTextHackThatNeedsToBeCodedMoreBeautifully").innerHTML = "<input type='text' name='instance_key' id='instance_key' value=" + instance_key +">";
-	document.getElementById("EditInstance").submit();
+	//$("#inputTextHackThatNeedsToBeCodedMoreBeautifully").html("<input type='text' name='instance_key' id='instance_key' value=" + instance_key +">");
+//	document.getElementById("inputTextHackThatNeedsToBeCodedMoreBeautifully").innerHTML = "<input type='text' name='instance_key' id='instance_key' value=" + instance_key +">";
+//	document.getElementById("EditInstance").submit();
+//	window.location.href = "/whatever/?instance_key=" + instance_key;
 	}
 
 //Populate selectedCase for CreateInstance Submission.
@@ -38,8 +40,6 @@ $(document).ready(function(){
 	    	  var proc_step_nm = (ui.item.children().attr('proc_step_nm'));
 	          var proc_step_id = ui.item.children().attr('proc_step_id');
 	          
-	          $('#proc_step_id_value').append('<input type="hidden" name="proc_step_id" id="proc_step_id" value=' + proc_step_id + '>');
-	          document.getElementById("proc_step_id").innerHTML="proc_step_id";
 	          var holdhere = proc_step_id;
 	          console.log ("holdhere = " + holdhere);
 	          console.log ("proc_step_nm = " + proc_step_nm);
@@ -48,6 +48,8 @@ $(document).ready(function(){
 	        	  alert("You failed to select a Case and/or a Process Step.  Please try again.");
 	          }
 	          else{
+		          $('#proc_step_id_value').append('<input type="hidden" name="proc_step_id" id="proc_step_id" value=' + proc_step_id + '>');
+		          document.getElementById("proc_step_id").innerHTML="proc_step_id";
 	        	  if (confirm("You have selected Process Step: " + proc_step_nm  + "... and Case: " 
 	        		  + selectedCase + ".")) {
 	        		  proc_step_id = holdhere;

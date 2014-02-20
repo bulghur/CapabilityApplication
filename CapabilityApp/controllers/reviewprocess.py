@@ -108,7 +108,7 @@ class EditInstance(webapp.RequestHandler):
 This object allows the user to edit the selected instance. This redirects the user back to the operate.py controller.  Perhaps this should be put there?
 '''
     
-    def post(self): # post to DB
+    def get(self): # post to DB
         authenticateUser = str(users.get_current_user())
         idGenerator = config.IDGenerator() # generates a unique key
         instance_key = str(idGenerator) + authenticateUser
@@ -131,6 +131,7 @@ This object allows the user to edit the selected instance. This redirects the us
                        "WHERE instance_key = %s ", instance_key)
         conn.commit()
         
+                
         cursor.execute("SELECT proc_run.proc_run_id, proc_run.case_id, proc_run.emp_id, proc_run.instance_key, proc_run.proc_req_id, proc_run.proc_step_id, "
                        "process.proc_id, proc_case.case_nm, process.proc_nm, process_step.proc_step_nm, process_step.proc_step_sop, proc_run.proc_output_conf, "
                        "proc_req.proc_req_seq, proc_req.proc_req_nm, proc_req.proc_req_desc, process_step.proc_model_link "

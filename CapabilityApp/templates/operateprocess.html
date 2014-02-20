@@ -186,7 +186,7 @@
 						<td align="center" width=1%>{{ row[12]|e }}
 						<td width=10%>{{ row[14]|e }}
 						<td width=30%><textarea width="100%" type=text rows="2" name="proc_notes" wrap="hard"></textarea>
-						<td width=1%><select font-size="10px" name="proc_output_conf">
+						<td width=5%><select font-size="10px" name="proc_output_conf">
 			                <optgroup>
 			                <option font-size="10px" value="1">Yes</option>
 			                <option font-size="10px" value="0">No</option>
@@ -221,7 +221,7 @@
 						{% for row in instance %}
 						<td align="center" width=2%>{{ row[7]|e }}
 						<td width=20%>{{ row[9]|e }}
-						<td align="center" width=2%>{{ row[6]|e }}
+						<td align="center" width=5%>{{ row[6]|e }}
 						<td width=10%>{{ row[10]|e }}<tr>
 						{% endfor %}
 					</table>

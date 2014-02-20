@@ -80,7 +80,7 @@ class MeasurePerformance(webapp.RequestHandler):
                        "INNER JOIN proc_case ON (proc_run.case_id = proc_case.case_id) "      
                        "INNER JOIN process_step ON (proc_run.proc_step_id = process_step.proc_step_id) "
                        "INNER JOIN process ON (proc_run.proc_id = process.proc_id) "
-                       "WHERE proc_run.emp_id = %s AND (proc_notes != ' ' OR not null) "
+                       "WHERE proc_run.emp_id = %s AND (proc_notes != '' OR not null) "
                        "ORDER BY process.proc_id, process_step.proc_step_id", (authenticateUser))                     
         notes = cursor.fetchall()
              
