@@ -58,20 +58,43 @@ $(document).ready(function(){
 	    	          console.log ("proc_step_nm = " + proc_step_nm);
 	    	          console.log ("case_id = " + selectedCase);
 	        		  }
-        		  else{
-        			  
-        			  
+        		  else{  
         		  };
-        		  
-	        	  
-	        	  }
+	          }          
 	          
-	          
-          } 
-            	
+          }    	
       }); 
 });
 
+// This menu function is used for providing menu items for subscribing to processes
+$(document).ready(function(){
+	
+      $( "#menuSubscription" ).menu({
+    	  
+          select: function( event, ui ) { 
+	    	  var proc_step_nm = (ui.item.children().attr('proc_step_nm'));
+	          var proc_step_id = ui.item.children().attr('proc_step_id');
+	          
+	          var holdhere = proc_step_id;
+	          console.log ("holdhere = " + holdhere);
+	          console.log ("proc_step_nm = " + proc_step_nm);
+	          if (proc_step_id == null ){
+	        	  alert("You failed to select a Process Step.  Please try again.");
+	          }
+	          else{
+		          $('#proc_step_id_value').append('<input type="hidden" name="proc_step_id" id="proc_step_id" value=' + proc_step_id + '>');
+		          document.getElementById("proc_step_id").innerHTML="proc_step_id";
+	        	  if (confirm("You have selected Process Step: " + proc_step_nm  + ".")) {
+	        		  proc_step_id = holdhere;
+	        		  document.getElementById("RequestSubscription").submit();
+	        		  }
+        		  else{  
+        		  };
+	          }          
+	          
+          }    	
+      }); 
+});
 
 //Checkbox functionality
 	var CheckboxHandler = new Object();

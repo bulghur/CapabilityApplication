@@ -229,22 +229,7 @@ class PostRequirement(webapp.RequestHandler):
         template = jinja2_env.get_template('dialoguebox.html')
         self.response.out.write(template.render(template_values1))
         
-class PostPerson(webapp.RequestHandler):
-    def post(self): # post to DB
-        
-        authenticateUser = str(users.get_current_user())  
-        
-        conn = config.get_connection()
-        cursor = conn.cursor()
-        cursor.execute('INSERT INTO person (first_nm, last_nm, email)'
-                       'VALUES (%s, %s, %s)',
-                       (
-                       self.request.get('first_nm'),
-                       self.request.get('last_nm'),
-                       self.request.get('email'),
-                                                                                            
-                       ))
-        conn.commit()
-        conn.close()
 
-        self.response.out.write(jinja2_env.get_template('utilities.html').render({}))
+        
+        
+

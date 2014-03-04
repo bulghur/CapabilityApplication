@@ -6,10 +6,10 @@
 	
 	<link rel="stylesheet" href="/stylesheets/layout.css" type="text/css" media="screen" />
 
-		<form class="quick_search">
+		<!--  <form class="quick_search">
 			<input type="text" value="Quick Search" onfocus="if(!this._haschanged){this.value=''};this._haschanged=true;">
 		</form>
-		<hr/>
+		<hr/> -->
 		
 		{% for group in featureList|groupby(0)|sort(5) %}
 		<h3>{{ group.grouper }}</h3>
@@ -24,7 +24,7 @@
 	</footer>
 		<h3>Administration</h3>
 			</select></li>
-			<li class="icn_jump_back"><a href="/permissions">Go Home</a></li>
+			<li class="icn_jump_back"><a href="/MainPageHandler">Go Home</a></li>
 			<li class="icn_security"><a href="/">Log-off</a></li>
 		</ul>
 	</footer>

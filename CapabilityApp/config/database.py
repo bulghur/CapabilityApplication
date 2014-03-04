@@ -1,9 +1,42 @@
 import config
+import os
+import webapp2
+import jinja2
 from gaesessions import get_current_session
 from google.appengine.api import rdbms
 from google.appengine.api import users
-from google.appengine.api import memcache  
+from google.appengine.api import memcache 
+
+# Paths and Jinja2
+template_path = os.path.join(os.path.dirname(__file__), '../templates')
+
+jinja2_env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(template_path)
+    ) 
     
+
+def queryUser(): 
+    #This generates the leftnav features dependent on user rights on the application.
+    authenticateUser = str(users.get_current_user())
+    conn = config.get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM person WHERE google_user_id = %s ", (authenticateUser)) 
+    user = list(cursor.fetchall())
+    conn.close()
+    return user
+
+def gaeSessionUser(): #if the Memcache is empty, load it with the query data
+    session = get_current_session()
+    user = session.get('user')
+  
+    if user is '':
+        user = queryUser()
+        session.set_quick('user', user)
+    else:
+        user
+
+    return user
+
 def queryNavBuilder(): 
     #This generates the leftnav features dependent on user rights on the application.
     authenticateUser = str(users.get_current_user())
@@ -32,14 +65,16 @@ def gaeSessionNavBuilder(): #if the Memcache is empty, load it with the query da
     return navList 
     
 def queryProcessMenu():     
-    authenticateUser = str(users.get_current_user())
+    emp_id = gaeSessionUser()[0][0]
     conn = config.get_connection()
     cursor = conn.cursor() 
 
-    cursor.execute("SELECT DISTINCT proc_id, proc_nm, proc_step_id, proc_step_seq, proc_step_nm "
-           "FROM vw_processes "
-           "WHERE proc_step_status = 'active' OR proc_step_owner = %s "
-           "ORDER BY proc_id, proc_step_seq", (authenticateUser))
+    cursor.execute("SELECT DISTINCT vw_processes.proc_id, vw_processes.proc_nm, vw_processes.proc_step_id, vw_processes.proc_step_seq, vw_processes.proc_step_nm "
+           "FROM map_person_proc_step "
+           "INNER JOIN vw_processes on (map_person_proc_step.proc_step_id = vw_processes.proc_step_id) "
+           "INNER JOIN person on (map_person_proc_step.emp_id = person.emp_id) "
+           "WHERE map_person_proc_step.emp_id = %s AND map_person_proc_step.status = 1 "
+           "ORDER BY proc_id, proc_step_seq", (emp_id))
     processmenu = cursor.fetchall()
     
     conn.close()
@@ -123,6 +158,46 @@ def query(query, condition1):  #this is the sample pattern
     conn.close()
     
     return dbResults
+
+class MemcacheTest(webapp2.RequestHandler):
+
+    def queryBuilder(self): # this is the query
+        authenticateUser = str(users.get_current_user())
+        conn = config.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT proc_nm, proc_desc, proc_owner, proc_status, proc_step_id, proc_step_seq, proc_step_nm, proc_step_desc, "
+                       "proc_step_owner, proc_step_status, proc_req_id, proc_req_nm, proc_req_desc, "
+                       "proc_req_seq, proc_req_status "
+                       " FROM vw_processes "
+                       "WHERE proc_id = 15") 
+        memQuery = cursor.fetchall()
+        conn.close()
+        return memQuery
+
+    def memcacheBuilder(self): #if the Memcache is empty, load it with the query data
+        client = memcache.Client()
+        memQuery = client.get('memQuery')
+        
+        if memQuery is not None:
+            pass
+        else:
+            memQuery = self.queryBuilder()
+            client.add('memQuery', memQuery, 120)
+        
+        return memQuery
+
+    
+    def get(self):
+        memQuery = self.queryBuilder()
+        generatedData = self.queryBuilder()
+        memcacheData = self.memcacheBuilder()
+        
+        generatedList = list(generatedData)
+        generatedList1 = memQuery[2][1]
+        
+        template_values = {'generatedData': generatedData, 'memcacheData': memcacheData, 'generatedList1': generatedList1}
+        template = jinja2_env.get_template('memcache.html')
+        self.response.out.write(template.render(template_values))
 '''
 def sumProblemString(x, y):
     sum = x + y

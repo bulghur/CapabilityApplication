@@ -20,21 +20,23 @@ jinja2_env = jinja2.Environment(
 
 authenticateUser = users.get_current_user()
 
-class MainHandler(webapp.RequestHandler): 
+class MainPageHandler(webapp.RequestHandler): #This is messy coding -- clean it up
         def get(self):
-            authenticateUser = users.get_current_user()
-            authenticateUser = str(authenticateUser)
-            
+            authenticateUser = str(users.get_current_user()) 
+            featureList = database.gaeSessionNavBuilder()
+            user = database.gaeSessionUser()
+            emp_id = user[0][0]
+                        
             conn = config.get_connection()
             cursor = conn.cursor()
             cursor.execute("SELECT proc_id, proc_nm, SUM(proc_step_conf), COUNT(proc_id), SUM(proc_step_conf)/COUNT(proc_id) AS conformance_rate, "
-            "SUM(proc_ponc), SUM(proc_poc), SUM(proc_efc) "
-            "FROM `capability`.`vw_proc_run_sum` "
-            "WHERE proc_run_start_tm BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE() "
-            "GROUP BY proc_id") 
+                           "SUM(proc_ponc), SUM(proc_poc), SUM(proc_efc) "
+                           "FROM `capability`.`vw_proc_run_sum` "
+                           "WHERE proc_run_start_tm > (NOW() - INTERVAL 7 DAY)"
+                           "GROUP BY proc_id") 
             activitySummary = cursor.fetchall()
             conn.close()
             
-            template_values = {"authenticateUser": authenticateUser, 'activitySummary': activitySummary }
+            template_values = {"authenticateUser": authenticateUser, 'user': user, 'emp_id': emp_id, 'activitySummary': activitySummary, 'featureList': featureList}
             template = jinja2_env.get_template('index.html')
             self.response.out.write(template.render(template_values))

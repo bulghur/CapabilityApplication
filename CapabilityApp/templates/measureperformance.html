@@ -100,16 +100,14 @@
 	<li><a href="#tabs-1">Organisational Performance</a></li>
 	<li><a href="#tabs-2">By Process</a></li>
 	<li><a href="#tabs-3">By Case</a></li>
-	<li><a href="#tabs-4">Consequences/Adjustments</a></li>
-	<li><a href="#tabs-5">Behaviours</a></li>
-	<li><a href="#tabs-6">Tab6</a></li>
-	<li><a href="#tabs-7">DEV/DELETE</a></li>
+	<li><a href="#tabs-4">Consequences and Adjustments</a></li>
+	<li><a href="#tabs-5">Behaviors</a></li>
 </ul>
 <div id="tabs-1">
   	
     <h2>Organisational Performance</h2>
     <br>
-    <p>This table is an performance overview of all processes operated for the entire organisation.</p>
+    <p>This table is a performance overview of all ZD Capable processes operated across all operators.  Individual processes are <b>not</b> included in this summary.</p>
  	 <br>
 			<table class=datatable align="center"> 
 				<th class=datatable>Process</th>
@@ -132,7 +130,7 @@
     
     <h2>Performance by Process</h2>
     <br>
-    <p>This table displays your performance by Process.</p>
+    <p>This table displays your personal performance as an Operator by process step.</p>
     <br>
 
 			<table class=datatable align="center"> 
@@ -158,7 +156,7 @@
     
     <h2>Performance by Case</h2>
     <br>
-    <p>This table displays your performance by Case.</p>
+    <p>This table displays your Operator performance by Case.</p>
     <br>
 
 			<table class=datatable align="center"> 
@@ -181,25 +179,21 @@
 
 </div>
 <div id="tabs-4">
-    <h2>Adjustments/Innovations Summary</h2>
+    <h2>Consequences and Adjustments</h2>
 
-    <p>This table displays all the comments recorded for processes operated by all Operators.</p>
+    <p>This table displays all Consequences and Adjustments recorded for ZD Capable processes operated by all Operators.  This is an example of a page that might be used by the Process Owner to organise a workgroup to Document Processes.</p>
     <br>
  
 			<table class=datatable align="center"> 
-			<th class=datatable colspan="14" align="left" font=16px> Summary of Adjustments and Suggested Innovations </th><tr>
+			<th class=datatable colspan="5" align="left" font=16px> Summary of Adjustments and Suggested Innovations </th><tr>
 			<th class=datatable>Process</th>
 			<th class=datatable>Process Step</th>
-			<th class=datatable>Case</th>
-			<th class=datatable>Reported by</th>
 			<th class=datatable>Date</th>
-			<th class=datatable>Risks</th>
+			<th class=datatable>Consequences</th>
 			<th class=datatable>Adjustments</th><tr>
 						{% for row in innovations %}
 						<td width=10%>	{{ row[0]|e }}
 						<td width=10%>	{{ row[1]|e }}
-						<td width=10%>	{{ row[2]|e }}
-						<td width=5%>	{{ row[6]|e }}
 						<td width=5%>	{{ row[3]|e }}
 						<td width=25%>	{{ row[4]|e }}
 						<td width=25%>	{{ row[5]|e }}	<tr>
@@ -208,57 +202,27 @@
 		
 </div>
 <div id="tabs-5">
-    <h2>Review Operation Notes</h2>
+    <h2>Review of Operational Notes</h2>
+    
+   <br><br>
+   <p> This is a summary of the Operator's Personal Notes recorded for processes.</p>
 			<table class=datatable align="center"> 
-			<th class=datatable colspan="15" align="left" font=16px> Summary of Adjustments and Suggested Innovations </th><tr>
+			<th class=datatable colspan="5" align="left" font=16px> Summary of Adjustments and Suggested Innovations </th><tr>
 			<th class=datatable>Process</th>
 			<th class=datatable>Process Step</th>
 			<th class=datatable>Case</th>
-			<th class=datatable>Reported by</th>
 			<th class=datatable>Date</th>
-			<th class=datatable>Notes</th>
-			<th class=datatable>Risks</th>
-			<th class=datatable>Adjustments</th><tr>
+			<th class=datatable>Notes</th><tr>
 						{% for row in notes %}
 						<td width=10%>{{ row[0]|e }}
 						<td width=10%>{{ row[1]|e }}
 						<td width=10%>{{ row[2]|e }}
-						<td width=5%>{{ row[7]|e }}
 						<td width=5%>{{ row[3]|e }}
-						<td width=20%>{{ row[4]|e }}
-						<td width=20%>{{ row[5]|e }}
-						<td width=20%>{{ row[6]|e }}<tr>
+						<td width=20%>{{ row[4]|e }}<tr>
 						{% endfor %}
 			</table>
 </div>
-<div id="tabs-6">
-    <h2>OPEN</h2>
-</div>
-<div id="tabs-7">
-    <h2>DEV/DELETE: Pass Args to Class/SQL</h2>
-		 	<table class=datatable>
-			<th class=datatable colspan="14" align="left"> Data Validation from case </th>
-			<tr>
-			<th class=datatable>0</th>
-			<th class=datatable>1</th>
-			<th class=datatable>2</th>
-			<th class=datatable>3</th>
-			<th class=datatable>4</th>
-			<th class=datatable>5</th>
-			<th class=datatable>6</th>
-			<th class=datatable>7</th>
-			<th class=datatable>8</th>
-			<th class=datatable>9</th>
-			<th class=datatable>10</th>
-			<th class=datatable>11</th>
-			<th class=datatable>12</th>
-			<th class=datatable>13</th><tr>
-			
-						{% for row in summary8 %}
-						<td>{{ row[0]|e }}<td>{{ row[1]|e }}<td>{{ row[2]|e }}<td>{{ row[3]|e }}<td>{{ row[4]|e }}<td>{{ row[5]|e }}<td>{{ row[6]|e }}<tr>
-						{% endfor %}
-			</table>
-</div>
+
 </div>
 
 </body>

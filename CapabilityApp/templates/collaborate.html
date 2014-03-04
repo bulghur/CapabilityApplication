@@ -3,18 +3,27 @@
 
 <head>
 	<meta charset="utf-8"/>
-	<title>Philip Crosby Associates</title>
+	<title>Philip Crosby Associates - Collaborate</title>
 	
 	<link rel="stylesheet" href="/stylesheets/layout.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="/stylesheets/widgets.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" type="text/css" media="screen" />
+	  
 	<!--[if lt IE 9]>
-	<link rel="stylesheet" href="css/ie.css" type="text/css" media="screen" />
+	<link rel="images" href="/images/" type="" media="screen" />
 	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
+	
 	<script src="js/jquery-1.5.2.min.js" type="text/javascript"></script>
 	<script src="js/hideshow.js" type="text/javascript"></script>
 	<script src="js/jquery.tablesorter.min.js" type="text/javascript"></script>
-	<script type="text/javascript" src="js/jquery.equalHeight.js"></script>
-	<script type="text/javascript"> 
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<script src="/static/jQueryWidgets.js"></script>
+	
+	<script>
 	$(document).ready(function() 
     	{ 
 		      	  $(".tablesorter").tablesorter(); 
@@ -57,12 +66,7 @@
 		return s;
 	}
 	</script>
-<script>
-    <script type="text/javascript">
-    $(function(){
-        $('.column').equalHeight();
-    });
-</script>
+
 	 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
 	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
@@ -90,46 +94,166 @@
 		</aside><!-- end of sidebar -->
 			
 		<section id="main" class="column">
-		
-		<h4 class="alert_info">Step up the bean counter...</h4>
 
 <div class="clear"></div>
 <div id="tabs">
 		
 <ul>
-	<li><a href="#tabs-1">You</a></li>
-	<li><a href="#tabs-2">Your Team</a></li>
-	<li><a href="#tabs-3">Your Network</a></li>
-	<li><a href="#tabs-4">tab4</a></li>
-	<li><a href="#tabs-5">tab5</a></li>
-	<li><a href="#tabs-6">tab6</a></li>
-	<li><a href="#tabs-7">tab6</a></li>
+	<li><a href="#tabs-1">Processes You Own</a></li>
+	<li><a href="#tabs-2">Processes You Operate</a></li>
+	<li><a href="#tabs-3">Process Subscriptions</a></li>
+	<li><a href="#tabs-4">Grant Subscriptions</a></li>
+	<li><a href="#tabs-5">You</a></li>
+	<li><a href="#tabs-6">Your Team</a></li>
+	<li><a href="#tabs-7">Your Network</a></li>
 </ul>
 <div id="tabs-1">
-    <h2>Your Profile</h2>
+    <h2>Here are processes you own.</h2> 
+    UserName: {{ userName }} <br>
+    emp_id: {{ emp_id }} <br>
+    Google ID: {{ googleID }} <br>
+  
+    Using Jinja2: {% for row in user|batch(1)|first() %} {{ row [1] }} {{ row [2] }} {% endfor %}
+    <p>Deployment Status can be one of the following:</p>
+    <li>Local: This is your own process, perhaps on that you are prototyping to start a project.</li>
+    <li>Hold: A process in purgatory.</li>
+    <li>Retired: A post red-giant.</li>
+    <li>Zero Defect Capabable: A process that has completed all stages of Prevention and is operational within the O&M model.</li>
     
-    <p>This is you...</p>
+    
     <br>
-		 	<table class=datatable>
-			<th class=datatable colspan="14" align="left"> </th>
-			<tr>
-			<th class=datatable align="center" width=1%>Emp ID</th>	
-			<th class=datatable width=20%>Name</th>
-			<th class=datatablewidth=10%>Email</th>
-			<th class=datatablewidth=10%>Google User ID</th><tr>
-			
-						{% for row in yourprofile %}
-						<td>{{ row[0]|e }}
-						<td>{{ row[1]|e }} {{ row[2]|e }}
-						<td>{{ row[3]|e }}
-						<td>{{ row[4]|e }}<tr>
-						{% endfor %}
+			<table class=datatable align="center"> 
+				{% for group in ownerProcesses|groupby(1) %}
+				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="13" align="left">{{ group.grouper }}</th><tr>
+					<th class=datatable>Seq</th>
+					<th class=datatable>Process Step</th>
+					<th class=datatable>Description</th>
+					<th class=datatable>Deploymemt Status</th>
+					<th class=datatable>POC</th>
+					<th class=datatable>PONC</th>
+					<th class=datatable>EFC</th><tr>
+				    {% for row in group.list %}
+				   	 	<td width=1% align="center" >{{ row[6]|e }}
+				        <td width=10%>{{ row[7]|e }}
+				        <td width=15%>{{ row[8]|e }}
+				        <td align="center" width=5%>{{ row[10]|e }}
+				        <td align="center" width=5%>${{ row[11]|e }}
+				        <td align="center" width=5%>${{ row[12]|e }}
+				        <td align="center" width=5%>${{ row[13]|e }}<tr>
+				    {% endfor %}
+				{% endfor %}
 			</table>
 
 </div>
 <div id="tabs-2">
 
-			    <h2>People in your Organization</h2>
+    <h2>Here are your subscribed processes.</h2>
+    <p>This means that you have been granted access to operate the process by the Process Owner. <br><br>
+    
+     However, this does not mean that you are qualified to operate the process in a ZD capable manner.  You must meet the requirements to operated these processes as defined in the PMW.  In the future, the environment will help the owner and operator track and meet these requirements. Future Enhancement
+    </p>
+    <br><br>
+
+			<table class=datatable align="center"> 
+				{% for group in subscribedProcesses|groupby(0) %}
+				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="13" align="left">{{ group.grouper }}</th><tr>
+					<th class=datatable>Seq</th>
+					<th class=datatable>Process Step</th>
+					<th class=datatable>Owner</th><tr>
+				    {% for row in group.list %}
+				        <td width=1%>{{ row[2]|e }}
+				        <td width=15%>{{ row[1]|e }}
+				        <td align="center" width=10%>{{ row[3]|e }} {{ row[4]|e }}<tr>
+				    {% endfor %}
+				{% endfor %}
+			</table>
+
+</div>
+<div id="tabs-3">
+<h2>Process Subscriptions</h2>
+    <h2>Here are your Requested processes.</h2>
+    <p>The ball is in the owner's court.  They must grant you these processes. <br><br>
+   
+    </p>
+    <br><br>
+
+			<table class=datatable align="center"> 
+				{% for group in requestedProcesses|groupby(0) %}
+				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="13" align="left">{{ group.grouper }}</th><tr>
+					<th class=datatable>Seq</th>
+					<th class=datatable>Process Step</th>
+					<th class=datatable>Owner</th><tr>
+				    {% for row in group.list %}
+				        <td width=1%>{{ row[2]|e }}
+				        <td width=15%>{{ row[1]|e }}
+				        <td align="center" width=10%>{{ row[3]|e }} {{ row[4]|e }}<tr>
+				    {% endfor %}
+				{% endfor %}
+			</table>
+			        <fieldset class=fieldsets style="width:600px; margin-right: 0%;">
+        
+        <p>Query: All processes that have not been requested AND that are either ZD Capable OR published.  All other processes are local.</p>
+        
+        <h2>Request Subscription to Processs</h2>
+        <br><br>
+        
+        <form id="GrantSubscription" action="/GrantSubscription" method="POST"> 
+			<table class=datatable align="center"> 
+				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="13" align="left"></th><tr>
+					<th class=datatable>Process</th>
+					<th class=datatable>Process Step</th>
+					<th class=datatable>Requestor</th>
+					<th class=datatable>Grant</th><tr>
+					
+				    {% for row in grantRequest %}
+				    	<input type="hidden" name="map_person_proc_step_id" value={{ row[0]|e }}>
+				        <td width=10%>{{ row[1]|e }}
+				        <td width=15%>{{ row[2]|e }}
+				        <td width=15%>{{ row[3]|e }} {{ row[4]|e }}
+				        <td width=20%><select font-size="10px" name="status">
+			                <optgroup>
+			                <option font-size="10px" value="1">Grant</option>
+			                <option font-size="10px" value="2">Deny</option>
+			                </optgroup>
+		                
+		                </select><tr>
+				    {% endfor %}
+			</table>
+				<div class="submit_link">
+				<input type="submit" value="Update">
+				</div>
+		</form>
+</div>
+<div id="tabs-4">
+
+        <h2>Grant Subscriptions to Processes</h2>
+        <br><br>
+        
+        <form id="RequestSubscription" action="/RequestSubscription" method="POST"> 
+                        <ul id="menuSubscription">
+                        		<input type="hidden" name="emp_id" id="emp_id" value= {{ emp_id }}></input>
+                                {% for group in availableProcesses|groupby(1) %}
+                                 <li><a href="#">{{ group.grouper }}</a><ul>
+                                 {% for row in group.list %}
+                                 <li><a href="#" proc_step_id={{ row[2] }} proc_step_nm={{ row[4]|string() }}>{{ row[4] }}</a></li>
+                                 {% endfor %}</ul></li>
+                                {% endfor %}
+                        </li></ul>
+                        <br><br>
+                <ol id="proc_step_id_value"></ol>
+                <br>
+
+
+</div>
+<div id="tabs-5">
+
+</div>
+<div id="tabs-6">
+
+</div>
+<div id="tabs-7">
+	<article class="module width_full">
+		<h2>Your Network</h2>
 		 	<table class=datatable>
 			<th class=datatable colspan="14" align="left"> </th>
 			<tr>
@@ -145,79 +269,11 @@
 						<td>{{ row[4]|e }}<tr>
 						{% endfor %}
 			</table>
-
-
+	</article>
 </div>
-<div id="tabs-3">
-<h2>Your Networks</h2>
-			<table class=datatable align="center"> 
-				{% for group in capability|groupby(1) %}
-				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="13" align="left">{{ group.grouper }}</th><tr>
-				    <th class=datatable>Process</th>
-					<th class=datatable>Seq</th>
-					<th class=datatable>Process Step</th>
-					<th class=datatable>Operator</th>
-					<th class=datatable>Tot Ops</th>
-					<th class=datatable>Conf Ops</th>
-					<th class=datatable>Failed</th>
-					<th class=datatable>POC</th>
-					<th class=datatable>PONC</th>
-					<th class=datatable>EFC</th>
-					<th class=datatable>Tot Cost</th><tr>
-				    {% for row in group.list %}
-				   	 	<td width=10% align="center" >{{ row[1]|e }}
-				        <td width=2%>{{ row[2]|e }}
-				        <td width=10%>{{ row[3]|e }}
-				        <td width=10%>{{ row[6]|e }}
-				        <td align="center" width=5%>{{ row[7]|e }}
-				        <td align="center" width=5%>{{ row[8]|e }}
-				        <td align="center" width=5%>{{ row[9]|e }}
-				        <td align="center" width=5%>${{ row[11]|round|int|e }}
-				        <td align="center" width=5%>${{ row[10]|round|int|e }}
-				        <td align="center" width=5%>${{ row[12]|round|int|e }}
-				        <td align="center" width=5%>${{ row[13]|round|int|e }}<tr>
-				    {% endfor %}
-				{% endfor %}
-			</table>
-</div>
-<div id="tabs-4">
-
-			<h2>Process Cost Reference</h2>
-			<p>Listed below are processes you operate or processes you own (local) with current POC, PONC and EFC.</p>
-			<br>
-			<table class=datatable align="center"> 
-				{% for group in processcost|groupby(0) %}
-				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="7" align="left">{{ group.grouper }}</th><tr>
-				    <th class=datatable>Seq</th>
-					<th class=datatable>Process Step</th>
-					<th class=datatable>Step Owner</th>
-					<th class=datatable>Status</th>
-					<th class=datatable>POC</th>
-					<th class=datatable>PONC</th>
-					<th class=datatable>EFC</th><tr>
-				    {% for row in group.list %}
-				        <td width=1% align="center" >{{ row[1]|e }}
-				        <td width=10%>{{ row[2]|e }}
-				        <td width=10%>{{ row[4]|e }}
-				        <td width=2% align="center" >{{ row[5]|e }}
-				        <td align="center" width=5%>${{ row[7]|round|int|e }}
-				        <td align="center" width=5%>${{ row[6]|round|int|e }}
-				        <td align="center" width=5%>${{ row[8]|round|int|e }}<tr>
-				    {% endfor %}
-				{% endfor %}
-			</table>
 
 </div>
-<div id="tabs-5">
 
-</div>
-<div id="tabs-6">
-
-</div>
-<div id="tabs-7">
-
-</div>
-</div>
 
 </body>
 

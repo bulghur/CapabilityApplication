@@ -28,8 +28,8 @@ class Authenticate(webapp2.RequestHandler):
     Fix authentication issues/bug by watching this: https://www.youtube.com/watch?v=yCS6cwYjl8o
 '''
     def get(self):
-        authenticateUser = users.get_current_user()
-        authenticateUser = str(authenticateUser)
+        authenticateUser = str(users.get_current_user())
+        featureList = database.gaeSessionNavBuilder()
         
         if authenticateUser:
             
@@ -53,11 +53,12 @@ class Authenticate(webapp2.RequestHandler):
             if person == authenticateUser:
                 # Clear the session cache
                 session = get_current_session()
+                session.set_quick('user', '')
                 session.set_quick('navList', '')
                 session.set_quick('processmenu', '')
                 session.set_quick('ddb_active_case', '')
     
-                greeting = ('Welcome : %s! person: %s <li class="icn_edit_article">(<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/permissions">Go to Main Page</a></li>' %
+                greeting = ('Welcome : %s! person: %s <li class="icn_edit_article">(<a href="%s">sign out</a>) <li class="icn_edit_article"><a href="/MainPageHandler">Go to Main Page</a></li>' %
                 (authenticateUser, person, users.create_logout_url("/")))
              
             else:
@@ -70,35 +71,18 @@ class Authenticate(webapp2.RequestHandler):
 
         self.response.out.write('<html><body>%s</body></html>' % greeting)
         
-class Permissions(webapp.RequestHandler): #This is messy coding -- clean it up
-        def get(self):
-            authenticateUser = users.get_current_user()
-            authenticateUser = str(authenticateUser)
-            featureList = database.gaeSessionNavBuilder()
-
-
-                        
-            conn = config.get_connection()
-            cursor = conn.cursor()
-            cursor.execute("SELECT proc_id, proc_nm, SUM(proc_step_conf), COUNT(proc_id), SUM(proc_step_conf)/COUNT(proc_id) AS conformance_rate, "
-                           "SUM(proc_ponc), SUM(proc_poc), SUM(proc_efc) "
-                           "FROM `capability`.`vw_proc_run_sum` "
-                           "WHERE proc_run_start_tm > (NOW() - INTERVAL 7 DAY)"
-                           "GROUP BY proc_id") 
-            activitySummary = cursor.fetchall()
-            conn.close()
-            
-            template_values = {"authenticateUser": authenticateUser, 'activitySummary': activitySummary, 'featureList': featureList}
-            template = jinja2_env.get_template('index.html')
-            self.response.out.write(template.render(template_values))
           
-
-         
 application = webapp.WSGIApplication(
     [
         ('/', Authenticate),
-        ("/permissions", Permissions),
+        ('/CollaborationHandler', collaborate.CollaborationHandler),
         ("/YourProfile", collaborate.YourProfile),
+        ("/GrantSubscription", collaborate.GrantSubscription),
+        ("/postperson", collaborate.PostPerson),
+        ("/RequestSubscription", collaborate.RequestSubscription),
+        ("/GrantSubscription", collaborate.GrantSubscription),
+        ('/Memcache', database.MemcacheTest),
+        ("/MainPageHandler", home.MainPageHandler),
         ("/OperateProcess", operate.OperateProcess), 
         ("/CreateInstance", operate.CreateInstance),
         ("/PostInstance", operate.PostInstance),
@@ -117,8 +101,6 @@ application = webapp.WSGIApplication(
         ("/postprocess", utilities.PostProcess),
         ("/postprocessstep", utilities.PostProcessStep),
         ("/postrequirement", utilities.PostRequirement),
-        ("/postperson", utilities.PostPerson),
-        ('/Memcache', playground.MemcacheTest),
         ("/playground", playground.PlayGroundHandler),
         ("/ProcessModel", playground.ProcessModelHandler),
         ("/leftnav", playground.LeftNavHandler),

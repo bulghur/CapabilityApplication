@@ -23,7 +23,7 @@ jinja2_env = jinja2.Environment(
 
 class MeasurePerformance(webapp.RequestHandler):
     '''
-    Queries on measurment 
+    Queries on measurement 
     '''
     def get(self):
 
@@ -47,9 +47,9 @@ class MeasurePerformance(webapp.RequestHandler):
         cursor.execute("SELECT proc_id, proc_nm, proc_step_id, proc_step_nm, proc_seq, case_id, case_nm, instance_key, emp_id, "
                        "ROUND(SUM(proc_step_conf)/COUNT(proc_step_id)*100) AS conf_summary, SUM(proc_step_conf) AS proc_success, COUNT(proc_step_id) AS proc_step_total "
                        "FROM vw_proc_run_sum "
-                       "WHERE emp_id = %s "
+                       "WHERE proc_id = 14 OR proc_id = 15 "
                        "GROUP BY proc_step_id "
-                       "ORDER BY proc_nm, proc_seq, case_nm", (authenticateUser))     
+                       "ORDER BY proc_nm, proc_seq, case_nm")    
                       
         sqlMeasurebyPerson = cursor.fetchall()
         
@@ -59,9 +59,9 @@ class MeasurePerformance(webapp.RequestHandler):
                        "INNER JOIN proc_case ON (proc_run.case_id = proc_case.case_id) "      
                        "INNER JOIN process_step ON (proc_run.proc_step_id = process_step.proc_step_id) "
                        "INNER JOIN process ON (proc_run.proc_id = process.proc_id) "
-                       "WHERE (proc_conseq != ' ' OR not null OR proc_innovation != ' ' OR not null) AND proc_run.emp_id = %s "
-                       "ORDER BY process.proc_id, process_step.proc_step_id", (authenticateUser))                     
-        innovations = cursor.fetchall()
+                       "WHERE (proc_conseq != ' ' OR not null OR proc_innovation != ' '  OR not null) AND (process.proc_id = 14 or process.proc_id = 15) "
+                       "ORDER BY process.proc_id, process_step.proc_step_id")                     
+        innovations = list(cursor.fetchall())
         
 
         cursor = conn.cursor()
@@ -85,14 +85,16 @@ class MeasurePerformance(webapp.RequestHandler):
         notes = cursor.fetchall()
              
         conn.close()
+        '''
+        This a way of sending arguments to another area
         #query = ("SELECT * from person WHERE google_user_id ='" + str(authenticateUser) + "'")
         query = "SELECT * from person WHERE google_user_id = "
         condition1 = authenticateUser
         summary8 = database.query(query, condition1)
+        '''
                
         template_values = {'summary': summary, 'sqlMeasurebyPerson' : sqlMeasurebyPerson, 'summary1': summary1, 'innovations': innovations, 
-                           'authenticateUser': authenticateUser, 'processSummary': processSummary, 'notes': notes, 
-                           'summary8': summary8, 'featureList': featureList}
+                           'authenticateUser': authenticateUser, 'processSummary': processSummary, 'notes': notes, 'featureList': featureList}
         template = jinja2_env.get_template('measureperformance.html')
         self.response.out.write(template.render(template_values))
         
