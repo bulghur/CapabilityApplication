@@ -7,11 +7,11 @@ import time
 import jinja2
 import itertools
 
-from google.appengine.api import rdbms
+from google.appengine.api import memcache 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import users
-from config import *
+from config import config, database
 template_path = os.path.join(os.path.dirname(__file__), '../templates')
 
 #from ProcessRun import *
@@ -21,58 +21,43 @@ jinja2_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_path)
 )
 
-class DevelopCapability(webapp.RequestHandler):
-    def get(self): 
-        conn = config.get_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT person.last_nm, process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_nm, "
-                       "SUM(proc_run.proc_output_conf)/COUNT(*) "
-                       "FROM proc_run "
-                       "inner join person ON (proc_run.emp_id = person.emp_id) "
-                       "inner join proc_req ON (proc_run.proc_req_id = proc_req.proc_req_id) "
-                       "inner join process_step ON (proc_req.proc_step_id = process_step.proc_step_id) "
-                       "inner join process ON (process_step.proc_id = process.proc_id) "
-                       "WHERE proc_run.proc_run_status='C' AND person.emp_id = 1 "
-                       "GROUP BY proc_run.emp_id, proc_run.proc_req_id")
-        rows = cursor.fetchall()
-        conn.close()
-    
-        
-        template_values = {'rows': rows, }
-        template = jinja2_env.get_template('developcapability.html')
-        self.response.out.write(template.render(template_values)) 
 
 class UtilityHandler(webapp.RequestHandler):
     def get(self):
         
         authenticateUser = str(users.get_current_user())
-        featureList = database.gaeSessionNavBuilder()  
+        featureList = database.gaeSessionNavBuilder()
+        processmenu = database.gaeSessionProcessMenu()
+        user = database.gaeSessionUser()
+        allUsers = database.gaeAllUsers()
+        allProcesses = database.memcacheProcesses(self)
+
        
         conn = config.get_connection()
         cursor = conn.cursor()
         
-        
-        cursor.execute("SELECT * FROM person ORDER by first_nm")
-        ddb_person = cursor.fetchall()
-        
-
         cursor.execute("SELECT * FROM process ORDER by proc_nm")
         ddb_process = cursor.fetchall()
 
-
         cursor.execute("SELECT * FROM process_step ORDER by proc_step_nm")
         ddb_processsteps = cursor.fetchall()
-
-        cursor.execute("SELECT * FROM capability.vw_processes WHERE proc_step_status = 'active'")
-        processlist = cursor.fetchall()
+        
+        zdProcesses = {}             
+        i = 0                   
+        rowCount = len(allProcesses)    
+        while i < rowCount:
+            for allProcesses[i]['proc_step_owner'] in authenticateUser :
+                zdProcesses[i] = allProcesses[i] 
+            i += 1
+        zdProcesses = zdProcesses.viewvalues() 
         
         cursor.execute("SELECT * FROM capability.vw_processes WHERE proc_step_status = 'local' AND proc_step_owner = %s", (authenticateUser))
         localprocesslist = cursor.fetchall()
                 
         conn.close()
         
-        template_values = {'ddb_person': ddb_person, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 
-                           'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser, 'featureList': featureList }
+        template_values = {'allUsers': allUsers, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 
+                           'zdProcesses': zdProcesses, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser, 'featureList': featureList }
         template = jinja2_env.get_template('utilities.html')
         self.response.out.write(template.render(template_values))
         
@@ -83,6 +68,7 @@ class PostProcess(webapp.RequestHandler):
         
         authenticateUser = str(users.get_current_user()) 
         featureList = database.gaeSessionNavBuilder()
+        allUsers = database.gaeAllUsers()
         
         conn = config.get_connection()
         cursor = conn.cursor()
@@ -95,10 +81,10 @@ class PostProcess(webapp.RequestHandler):
                        self.request.get('proc_start_dt')
                        ))
         conn.commit()
-        
+        '''
         cursor.execute("SELECT * FROM person ORDER by first_nm")
         ddb_person = cursor.fetchall()
-        
+        '''
         
         cursor.execute("SELECT * FROM process ORDER by proc_nm")
         ddb_process = cursor.fetchall()
@@ -114,7 +100,7 @@ class PostProcess(webapp.RequestHandler):
                 
         conn.close()
         
-        template_values = {'ddb_person': ddb_person, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 
+        template_values = {'allUsers': allUsers, 'ddb_process': ddb_process, 'ddb_processsteps': ddb_processsteps, 
                            'processlist': processlist, 'localprocesslist': localprocesslist, 'authenticateUser': authenticateUser,
                            'featureList': featureList }
         template = jinja2_env.get_template('utilities.html')
@@ -229,7 +215,31 @@ class PostRequirement(webapp.RequestHandler):
         template = jinja2_env.get_template('dialoguebox.html')
         self.response.out.write(template.render(template_values1))
         
+class ViewAssignments(webapp.RequestHandler):
+    def get(self): 
+        
+        conn = config.get_connection()
+        cursor = conn.cursor() 
+        
+        cursor.execute("SELECT DISTINCT first_nm, last_nm, proc_nm, proc_step_nm, proc_step_owner, proc_status "
+                       "FROM capability.map_person_proc_step "
+                       "INNER JOIN person ON(map_person_proc_step.emp_id = person.emp_id) "
+                       "INNER JOIN vw_processes ON (map_person_proc_step.proc_step_id = vw_processes.proc_step_id) "
+                       "ORDER BY proc_nm, proc_step_nm, first_nm" )
+        operatorSubscriptions = cursor.fetchall()  
+        
+        cursor.execute("SELECT app_feat_cat_0, app_feat_2, first_nm, last_nm, map_person_to_feature.emp_id "
+                       "FROM capability.map_person_to_feature "
+                       "INNER JOIN person ON (map_person_to_feature.emp_id = person.emp_id) "
+                       "INNER JOIN app_feature ON (map_person_to_feature.app_feat_cat_id = app_feature.app_feat_cat_id) "
+                       "WHERE App_Feat_active = 1 "
+                       "ORDER BY app_feat_cat_0")
+        operatorFeatures = cursor.fetchall()
 
+        template_values = {'operatorFeatures': operatorFeatures, 'operatorSubscriptions': operatorSubscriptions}
         
+        template = jinja2_env.get_template('administration.html')
+        self.response.out.write(template.render(template_values))
         
+
 

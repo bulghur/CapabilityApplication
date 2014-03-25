@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8"/>
+	<title>Philip Crosby Associates</title>
+	
+	<link rel="stylesheet" href="/stylesheets/layout.css" type="text/css" media="screen" />
+	<!--[if lt IE 9]>
+	<link rel="stylesheet" href="css/ie.css" type="text/css" media="screen" />
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<script src="js/jquery-1.5.2.min.js" type="text/javascript"></script>
+	<script src="js/hideshow.js" type="text/javascript"></script>
+	<script src="js/jquery.tablesorter.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="js/jquery.equalHeight.js"></script>
+	<script type="text/javascript"> 
+	$(document).ready(function() 
+    	{ 
+		      	  $(".tablesorter").tablesorter(); 
+		   	 } 
+			);
+			$(document).ready(function() {
+		
+			//When page loads...
+			$(".tab_content").hide(); //Hide all content
+			$("ul.tabs li:first").addClass("active").show(); //Activate first tab
+			$(".tab_content:first").show(); //Show first tab content
+		
+			//On Click Event
+			$("ul.tabs li").click(function() {
+		
+				$("ul.tabs li").removeClass("active"); //Remove any "active" class
+				$(this).addClass("active"); //Add "active" class to selected tab
+				$(".tab_content").hide(); //Hide all tab content
+		
+				var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
+				$(activeTab).fadeIn(); //Fade in the active ID content
+				return false;
+			});
+		
+		});
+    </script>
+	<script>
+	function CurrencyFormatted(amount) {
+		var i = parseFloat(amount);
+		if(isNaN(i)) { i = 0.00; }
+		var minus = '';
+		if(i < 0) { minus = '-'; }
+		i = Math.abs(i);
+		i = parseInt((i + .005) * 100);
+		i = i / 100;
+		s = new String(i);
+		if(s.indexOf('.') < 0) { s += '.00'; }
+		if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+		s = minus + s;
+		return s;
+	}
+	</script>
+<script>
+    <script type="text/javascript">
+    $(function(){
+        $('.column').equalHeight();
+    });
+</script>
+	 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<script>
+		$(function() {
+		$( "#tabs" ).tabs({active: 0});
+		});
+	</script>
+</head>
+<body>
+	<header id="header">
+		<hgroup>
+			<h1 class="site_title"><a href="/">Integrated Capability</a></h1>
+			<h2 class="section_title">Measure Operator Performance</h2>
+		</hgroup>
+	</header> <!-- end of header bar -->
+	
+		<section id="secondary_bar">
+			{% include 'userbar.html' %}
+		</section><!-- end of secondary bar -->
+			
+		<aside id="sidebar" class="column">
+			{% include 'leftnav.html' %}
+		</aside><!-- end of sidebar -->
+			
+		<section id="main" class="column">
+
+<div class="clear"></div>
+<div id="tabs">
+<ul>
+	<li><a href="#tabs-1">Organizational Performance</a></li>
+	<li><a href="#tabs-2">By Process</a></li>
+	<li><a href="#tabs-3">By Case</a></li>
+	<li><a href="#tabs-4">Consequences and Adjustments</a></li>
+	<li><a href="#tabs-5">Notes</a></li>
+	<li><a href="#tabs-6">Costs by Process</a></li>
+	<li><a href="#tabs-7">Costs by Case</a></li>
+	<li><a href="#tabs-8">Process Cost Reference</a></li>
+</ul>
+<div id="tabs-1">
+  	
+    <h2>Organizational Performance by ZD Capable Processes</h2>
+    <br>
+    <p>Individual "local" processes are <b>not</b> included in this summary.</p>
+ 	 <br>
+			<table class=datatable align="center"> 
+			{% for group in orgProcesses|groupby('proc_nm') %}
+			<th class=datatable id="group1_header" style="color: #FFFFFF" colspan="4" align="left">{{ group.grouper }}</th><tr>
+				<th class=datatable>Process Step</th>
+				<th class=datatable>Conf Rate</th>
+				<th class=datatable>Conforming</th>
+				<th class=datatable>No of Operations</th><tr>
+					{% for row in group.list %}
+					<td width=30%>{{ row.proc_step_nm|e }}
+					<td align="center" width=10%>{{ row.conf_summary }}% <!--round(method='common'-->
+					<td align="center" width=10%>{{ row.proc_success|e }}
+					<td align="center" width=10%>{{ (row.proc_step_total|e) }}</tr>
+					{% endfor %}
+				{% endfor %}
+				</table>
+			</table>
+</div>
+<div id="tabs-2">
+    
+    <h2>Personal Performance by Processes</h2>
+    <p>This table displays your personal performance as an Operator.</p>
+    <br>
+			<table class=datatable align="center"> 
+				{% for group in summaryByProcess|groupby('proc_nm') %}
+				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="4" align="left">{{ group.grouper }}</th><tr>
+				    <th class=datatable>Process Step</th>
+				    <th class=datatable>Conf Rate</th>
+					<th class=datatable>Conforming</th>
+					<th class=datatable>No of Operations</th><tr>
+				    {% for row in group.list %}
+				        <td width=30%>{{ row.proc_step_nm|e }}
+				        <td align="center" width=10%>{{ row.conf_summary|e }}%
+				        <td align="center" width=10%>{{ row.proc_success|e }}
+				        <td align="center" width=10%>{{ row.proc_step_total|e }}<tr>
+				    {% endfor %}
+				{% endfor %}
+			</table>
+</div>
+<div id="tabs-3">
+    
+    <h2>Personal Performance by Case</h2>
+    <br>
+    <p>This table displays your Operator performance by Case.</p>
+    <br>
+
+			<table class=datatable align="center"> 
+			
+				{% for group in summaryByCase|groupby('case_nm')|sort(0)|sort(3) %}
+				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="5" align="left">{{ group.grouper }}</th1><tr>
+				    <th class=datatable>Process</th>
+					<th class=datatable>Process Step</th>
+					<th class=datatable>Conf Rate%</th>
+					<th class=datatable>Conforming</th>
+					<th class=datatable>No of Operations</th><tr>
+				    {% for row in group.list %}
+				        <td width=30%>{{ row.proc_nm|e }}
+				        <td width=40%>{{ row.proc_step_nm|e }}
+				        <td align="center" width=10%>{{ row.conf_summary|e }}%
+				        <td align="center" width=10%>{{ row.proc_success|e }}
+				        <td align="center" width=10%>{{ row.proc_step_total|e }}<tr>
+				    {% endfor %}
+				{% endfor %}
+			</table>
+
+</div>
+<div id="tabs-4">
+    <h2>Personal Consequences and Adjustments</h2>
+
+    <p>This table displays all Consequences and Adjustments recorded for ZD Capable processes operated by all Operators.  This is an example of a page that might be used by the Process Owner to organise a workgroup to Document Processes.</p>
+    <br>
+ 
+			<table class=datatable align="center"> 
+			{% for proc_nm, proc_nm_group in consequencesAndAdjustments|groupby('proc_nm') %}
+			<th class=datatable id="group1_header" style="color: #FFFFFF" colspan="9" align="left">{{ proc_nm }}</th1><tr>
+				{% for proc_step_nm, list in proc_nm_group|groupby('proc_step_nm') %}
+				<th class=datatable id="group2_header" style="color: #FFFFFF" colspan="9" align="left">{{ proc_step_nm|e }}: {{ proc_step_owner|e }}</th><tr>	
+				<th class=datatable>Date</th>
+				<th class=datatable>Instance</th>
+				<th class=datatable>Consequences</th>
+				<th class=datatable>Adjustments</th>
+				<th class=datatable>Quality</th>
+				<th class=datatable>Cost</th>
+				<th class=datatable>Schedule</th><tr>
+					{% for row in list %}
+					<td width=4%>{{ row.proc_run_start_tm|e }}
+					<td width=2%>{{ row.instance_key|e|wordwrap(20, break_long_words=True) }}
+					<td width=10%>{{ row.proc_conseq|e }}
+					<td width=10%>{{ row.proc_innovation|e }}
+					<td width=10%>{{ row.perf_stnd_notes_1|e }}	
+					<td width=10%>{{ row.perf_stnd_notes_2|e }}	
+					<td width=10%>{{ row.perf_stnd_notes_3|e }}<tr>
+					{% endfor %}
+				{% endfor %}
+			{% endfor %}
+			</table>	
+		
+</div>
+<div id="tabs-5">
+    <h2>Personal Notes</h2>
+   <p> This is a summary of the Operator's Personal Notes recorded for processes.</p>
+   
+   <table class=datatable align="center"> 
+   			{% for group in notes|groupby('proc_nm') %}
+			<th class=datatable id="group1_header" style="color: #FFFFFF" colspan="5" align="left">{{ group.grouper }}</th1><tr>
+			<th class=datatable>Process</th>
+			<th class=datatable>Process Step</th>
+			<th class=datatable>Instance</th>
+			<th class=datatable>Date</th>
+			<th class=datatable>Notes</th><tr>
+						{% for row in group.list %}
+						<td width=10%>{{ row.proc_nm|e }}
+						<td width=10%>{{ row.proc_step_nm|e }}
+						<td width=10%>{{ row.instance_key|e }}
+						<td width=5%>{{ row.proc_run_start_tm|e }}
+						<td width=20%>{{ row.proc_notes|default('new value')|e }}<tr>
+						{% endfor %}
+					{% endfor %}
+			</table>
+</div>
+<div id="tabs-6">
+    <h2>Operator Cost by Process</h2> 
+    <p>This is your Cost Performance based on POC, EFC and PONC.  Currently, these numbers change in the report according to the changes in the numbers.  In the future, cost data will be recorded with the prevailing cost data available at the time the operation is completed.   /p>
+		 	<table class=datatable>
+		 	{% for group in operatorCosts|groupby('proc_nm') %}
+			<th class=datatable id="group1_header" style="color: #FFFFFF" colspan="10" align="left"> {{ group.grouper }} </th><tr>
+			<th class=datatable>Seq</th>
+			<th class=datatable>Process Step</th>
+			<th class=datatable>Case</th>
+			<th class=datatable>No of Ops</th>
+			<th class=datatable>No of Failures</th>
+			<th class=datatable>POC</th>
+			<th class=datatable>PONC</th>
+			<th class=datatable>EFC</th>
+			<th class=datatable>Total Cost</th><tr>
+						{% for row in group.list %}
+						<td width=1% align="center" >{{ row.proc_seq|e }}
+						<td width=5%>{{ row.proc_step_nm|e }}
+						<td width=5%>{{ row.case_nm|e }}
+						<td width=1% align="center" > {{ row.tot_ops|e }}
+						<td width=1% align="center" >{{ row.failure|e  }}
+						<td width=1% align="center" >$ {{ row.sum_poc|round|int|e }}
+						<td width=1% align="center" >$ {{ row.sum_ponc|round|int|e }}
+						<td width=1% align="center" >$ {{ row.sum_efc|round|int|e }}
+						<td width=1% align="center" >$ {{ row.tot_cost|round|int|e  }}<tr>
+						{% endfor %}
+					{% endfor %}
+			</table>
+</div>
+<div id="tabs-7">
+<h2>Operator Cost by Case</h2>
+			<table class=datatable align="center"> 
+				{% for group in operatorCosts|groupby('case_nm') %}
+				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="11" align="left">{{ group.grouper }}</th><tr>
+				    <th class=datatable>Process</th>
+					<th class=datatable>Seq</th>
+					<th class=datatable>Process Step</th>
+					<th class=datatable>Tot Ops</th>
+					<th class=datatable>Conf Ops</th>
+					<th class=datatable>Failed</th>
+					<th class=datatable>POC</th>
+					<th class=datatable>PONC</th>
+					<th class=datatable>EFC</th>
+					<th class=datatable>Tot Cost</th><tr>
+				    {% for row in group.list %}
+				   	 	<td width=10% align="center" >{{ row.proc_nm|e }}
+				        <td width=2%>{{ row.proc_nm|e }}
+				        <td width=10%>{{ row.proc_step_nm|e }}
+				        <td align="center" width=5%>{{ row.tot_ops|e }}
+				        <td align="center" width=5%>{{ row.tot_success|e }}
+				        <td align="center" width=5%>{{ row.failure|e }}
+				        <td align="center" width=5%>${{ row.sum_poc|round|int|e }}
+				        <td align="center" width=5%>${{ row.sum_ponc|round|int|e }}
+				        <td align="center" width=5%>${{ row.sum_efc|round|int|e }}
+				        <td align="center" width=5%>${{ row.tot_cost|round|int|e }}<tr>
+				    {% endfor %}
+				{% endfor %}
+			</table>
+</div>
+<div id="tabs-8">
+<h2>Process Cost Reference</h2>
+			<p>Listed below are the current cost of all processes to which you are subscribed.</p>
+			<li><b>ZD Capable:</b> Process has completed all Stages of Prevention.</li>
+			<li><b>local:</b> A process under constuction.</li>
+			
+			<br>
+			<table class=datatable align="center"> 
+				{% for group in processcost|groupby('proc_nm') %}
+				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="7" align="left">{{ group.grouper }}</th><tr>
+				    <th class=datatable>Seq</th>
+					<th class=datatable>Process Step</th>
+					<th class=datatable>Owner</th>
+					<th class=datatable>Status</th>
+					<th class=datatable>POC</th>
+					<th class=datatable>PONC</th>
+					<th class=datatable>EFC</th><tr>
+				    {% for row in group.list %}
+				        <td width=1% align="center" >{{ row.proc_step_seq|e }}
+				        <td width=10%>{{ row.proc_step_nm|e }}
+				        <td width=10% align="center" >{{ row.proc_step_owner|e }}
+				        <td width=10% align="center" >{{ row.proc_step_status|e }}
+				        <td align="center" width=5%>${{ row.proc_step_poc|round|int|e }}
+				        <td align="center" width=5%>${{ row.proc_step_ponc|round|int|e }}
+				        <td align="center" width=5%>${{ row.proc_step_efc|round|int|e }}<tr>
+				    {% endfor %}
+				{% endfor %}
+			</table>
+</div>
+</div>
+
+</body>
+
+</html>

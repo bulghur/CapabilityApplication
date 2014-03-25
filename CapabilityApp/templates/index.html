@@ -63,7 +63,7 @@
 </section><!-- end of secondary bar -->
 	
 <aside id="sidebar" class="column">
-	{% include 'leftnav.html' %}
+	{% include 'leftnav.html' %} 
 </aside><!-- end of sidebar -->
 	
 	<section id="main" class="column">
@@ -96,12 +96,12 @@
 				<th class=datatable>Total PONC</th>
 				<th class=datatable>Total POC</th><tr>
 					{% for row in activitySummary %}
-					<td width=30%>{{ row[1]|e }}
-					<td width=10%>{{ row[2]|e }}
-					<td align="center" width=10%>{{ row[3]|round|int|e }} 
-					<td align="center" width=10%>{{ (row[4]*100)|round|int|e }}% <!--round(method='common'-->
-					<td align="center" width=10%>${{ (row[5]|round|int|e) }}
-					<td align="center" width=10%>${{ (row[6]|round|int|e) }}</tr>
+					<td width=30%>{{ row.proc_nm|e }}
+					<td width=10%>{{ row.sum_conf|e }}
+					<td align="center" width=10%>{{ row.count|round|int|e }} 
+					<td align="center" width=10%>{{ (row.conformance_rate*100)|round|int|e }}% <!--round(method='common'-->
+					<td align="center" width=10%>${{ (row.ponc|round|int|e) }}
+					<td align="center" width=10%>${{ (row.poc|round|int|e) }}</tr>
 					{% endfor %}
 				</table>
 			</table>

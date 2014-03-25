@@ -34,12 +34,12 @@ class ReviewCase(webapp.RequestHandler):
         authenticateUser = str(users.get_current_user()) 
         featureList = database.gaeSessionNavBuilder()
         processmenu = database.gaeSessionProcessMenu()
-        ddb_active_case = database.gaeSessionActiveCase()
+        activeCase = database.gaeSessionActiveCase()
         openoperations = database.gaeSessionOpenOperations()
         
         tabindex = 0
 
-        template_values = {'ddb_active_case': ddb_active_case, 'processmenu': processmenu, 'authenticateUser': authenticateUser, 
+        template_values = {'activeCase': activeCase, 'processmenu': processmenu, 'authenticateUser': authenticateUser, 
                            'featureList': featureList, 'tabindex': tabindex, 'openoperations': openoperations}
         template = jinja2_env.get_template('reviewprocess.html')
         self.response.out.write(template.render(template_values))
@@ -51,7 +51,7 @@ class SelectReviewCase(webapp.RequestHandler):
         authenticateUser = str(users.get_current_user())
         featureList = database.gaeSessionNavBuilder()
         processmenu = database.gaeSessionProcessMenu()
-        ddb_active_case = database.gaeSessionActiveCase()
+        activeCase = database.gaeSessionActiveCase()
 
         case_id = self.request.get('case_id')
         proc_start_dt = self.request.get('proc_start_dt')
@@ -64,24 +64,24 @@ class SelectReviewCase(webapp.RequestHandler):
         
         
         if not "Any Case" in case_id:
-            caseQueryString = "AND case_id = '" + case_id + "' "
+            caseQueryString = "case_id = '" + case_id + "' AND "
         else:
             caseQueryString = ""
         
         if proc_start_dt is not '' and proc_end_dt is not '':
-            dateQueryString = "AND (proc_run_start_tm BETWEEN '" + proc_start_dt + "' AND '" + proc_end_dt + "') "
+            dateQueryString = "(proc_run_start_tm BETWEEN '" + proc_start_dt + "' AND '" + proc_end_dt + "') "
         else:
             dateQueryString = ""
             
         if proc_start_dt is not '' and '' in proc_end_dt:
-            dateQueryString = "AND (proc_run_start_tm > '" + proc_start_dt + "') "
+            dateQueryString = "(proc_run_start_tm > '" + proc_start_dt + "') "
         else:
             pass
 
         if openProcesses is '':
             pass
         else:
-            openProcessesQueryString = "AND proc_run_start_tm is NULL "
+            openProcessesQueryString = "proc_run_start_tm is NULL "
             dateQueryString = ""
         
         conn = config.get_connection()
@@ -89,7 +89,7 @@ class SelectReviewCase(webapp.RequestHandler):
         cursor.execute("SELECT proc_nm, proc_step_nm, proc_run_start_tm, case_nm, case_id, instance_key, "
                        "emp_id, proc_step_conf "
                        "FROM vw_proc_run_sum "
-                       "WHERE emp_id = %s "
+                       "WHERE emp_id = %s AND "
                        + caseQueryString + dateQueryString + openProcessesQueryString +
                        "ORDER BY case_nm, proc_run_start_tm", (authenticateUser))
         reviewOperations = cursor.fetchall()
@@ -97,7 +97,7 @@ class SelectReviewCase(webapp.RequestHandler):
         conn.close()
         tabindex = 0
 
-        template_values = {'ddb_active_case': ddb_active_case, 'processmenu': processmenu, 'authenticateUser': authenticateUser, 
+        template_values = {'activeCase': activeCase, 'processmenu': processmenu, 'authenticateUser': authenticateUser, 
                            'reviewOperations': reviewOperations, 'featureList': featureList, 'tabindex': tabindex, 'case_id': case_id}
         template = jinja2_env.get_template('reviewprocess.html')
         self.response.out.write(template.render(template_values))
@@ -111,15 +111,13 @@ This object allows the user to edit the selected instance. This redirects the us
     def get(self): # post to DB
         authenticateUser = str(users.get_current_user())
         idGenerator = config.IDGenerator() # generates a unique key
-        instance_key = str(idGenerator) + authenticateUser
-        now = config.UTCTime()
         featureList = database.gaeSessionNavBuilder()
         processmenu = database.gaeSessionProcessMenu()
-        ddb_active_case = database.gaeSessionActiveCase()
+        activeCase = database.gaeSessionActiveCase()
         case_id = self.request.get('case_id')
         proc_step_id = self.request.get('proc_step_id')
         
-        instance_key = self.request.get('instance_key') # ALL THESE INSTANCE idS NEED TO BE CHANGED TO key
+        instance_key = self.request.get('instance_key') 
         session = get_current_session()
         session.set_quick('instance_key', instance_key)
         session.set_quick('case_id', case_id)
@@ -134,7 +132,7 @@ This object allows the user to edit the selected instance. This redirects the us
                 
         cursor.execute("SELECT proc_run.proc_run_id, proc_run.case_id, proc_run.emp_id, proc_run.instance_key, proc_run.proc_req_id, proc_run.proc_step_id, "
                        "process.proc_id, proc_case.case_nm, process.proc_nm, process_step.proc_step_nm, process_step.proc_step_sop, proc_run.proc_output_conf, "
-                       "proc_req.proc_req_seq, proc_req.proc_req_nm, proc_req.proc_req_desc, process_step.proc_model_link "
+                       "proc_req.proc_req_seq, proc_req.proc_req_desc, process_step.proc_model_link, proc_run.proc_notes "
                        "FROM proc_run "
                        "INNER JOIN proc_case on (proc_run.case_id = proc_case.case_id) "
                        "INNER JOIN process on (proc_run.proc_id = process.proc_id) "
@@ -146,10 +144,15 @@ This object allows the user to edit the selected instance. This redirects the us
         tabindex = 2                
         instance = cursor.fetchall()
         
+        cursor.execute("SELECT perf_stnd_1, perf_stnd_2, perf_stnd_3, perf_stnd_notes_1, perf_stnd_notes_2, perf_stnd_notes_3 "
+                       "FROM instance "
+                       "WHERE instance_key = %s", (instance_key))
+        instancePerformance = cursor.fetchall()
+        
         conn.close()
 
-        template_values = {'authenticateUser': authenticateUser, 'instance': instance, 'case_id': case_id, 'processmenu': processmenu, 'featureList': featureList,
-                           'ddb_active_case': ddb_active_case, 'ddb_active_case': ddb_active_case, 'tabindex': tabindex }
+        template_values = {'authenticateUser': authenticateUser, 'instance': instance, 'instancePerformance': instancePerformance, 'case_id': case_id, 'processmenu': processmenu, 'featureList': featureList,
+                           'activeCase': activeCase, 'tabindex': tabindex }
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(template_values))
         self.response.out.write(case_id)

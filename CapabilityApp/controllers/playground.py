@@ -5,6 +5,7 @@ import logging
 import string
 import json
 import time
+
 from gaesessions import get_current_session
 from google.appengine.api import rdbms
 from google.appengine.ext import webapp
@@ -13,6 +14,15 @@ from google.appengine.api import users
 from google.appengine.api import memcache
 from controllers import collaborate, design, home, measure, operate, utilities
 from config import *
+from google.appengine.ext import ndb
+
+class Processes(ndb.Model): #please see: https://developers.google.com/appengine/docs/python/ndb/properties
+    proc_nm = ndb.StringProperty()
+    proc_desc = ndb.IntegerProperty()
+    proc_owner = ndb.StringProperty()
+    
+row = Processes(proc_nm = 'hello', proc_desc = 12, proc_owner = 'Tom') 
+row.put
 
 # Paths and Jinja2
 template_path = os.path.join(os.path.dirname(__file__), '../templates')
@@ -22,8 +32,87 @@ jinja2_env = jinja2.Environment(
     )
 
 
-###################################################################Ajax########################################################################
+class TestJinja2(webapp2.RequestHandler):
+    def get(self):
+        
+        user = database.gaeSessionUser()
+        userName = user[0]['first_nm'] + user[0]['last_nm']
+        emp_id = user[0]['emp_id']
+        google_id = user [0]['google_user_id']
+        vw_processes = database.memcacheProcesses(self) 
+        
+        
+        resultSet = database.cacheFilter(vw_processes, google_id, 'proc_step_owner')
+        #resultSet = database.cacheFilter(resultSet, 14, 'proc_id')
+ 
+        ''' 
+        dataSource = vw_processes
+        constraint = 14
+        searchColumn = 'proc_id'
+        outerRow = {}
+        innerRow = {}
+        resultSet = {}
+        columns = {}
+        row = 0
+        while row < len(dataSource):
+            if dataSource[row][searchColumn] == constraint:
+                columns = dataSource[0].keys() #get column names
+                c = 0
+                while c < len(columns):
+                    innerRow[columns[c]] = dataSource[row][columns[c]] 
+                    outerRow[row] = dict(innerRow)
+                    c += 1
+                resultSet = outerRow.values()
+            row += 1
 
+
+        holdRow = {}
+        innerRow = {}
+        justValues = {}
+        columns = {}
+        row = 0
+        while row < len(person):
+            if 'paul.weber@philipcrosby.com' in person[row]['google_user_id']:
+                innerRow['emp_id'] = person[row]['emp_id'] 
+                innerRow['first_nm'] = person[row]['first_nm'] 
+                innerRow['last_nm'] = person[row]['last_nm']
+                innerRow['email'] = person[row]['email']  
+                holdRow[row] = dict(innerRow)
+                columns = person[0].keys()
+                columnLen = len(columns)
+                #get rid of the row/key references to yield a dictionary of values in the form of  [{'emp_id': 17L, 'last_nm': u'Weber', 'first_nm': u'Paul '}, {'emp_id': 34L, 'last_nm': u'The Toast', 'first_nm': u'Honey'}]
+                justValues = holdRow.values()
+            row += 1
+        ''' 
+        self.templateValues = {'userName': userName, 'emp_id': emp_id, 'google_id': google_id, 'resultSet': resultSet } 
+        self.templateValues["title"] = 'This is from a second set of template values.'
+        template = jinja2_env.get_template("TestJinja2.html")
+        self.response.out.write(template.render(self.templateValues))
+        
+class DevelopCapability(webapp.RequestHandler):
+    '''
+    TODO: Move this to learn and use it to source videos and materials
+    '''
+    def get(self): 
+        conn = config.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT person.last_nm, process.proc_nm, process_step.proc_step_nm, proc_req.proc_req_nm, "
+                       "SUM(proc_run.proc_output_conf)/COUNT(*) "
+                       "FROM proc_run "
+                       "inner join person ON (proc_run.emp_id = person.emp_id) "
+                       "inner join proc_req ON (proc_run.proc_req_id = proc_req.proc_req_id) "
+                       "inner join process_step ON (proc_req.proc_step_id = process_step.proc_step_id) "
+                       "inner join process ON (process_step.proc_id = process.proc_id) "
+                       "WHERE proc_run.proc_run_status='C' AND person.emp_id = 1 "
+                       "GROUP BY proc_run.emp_id, proc_run.proc_req_id")
+        rows = cursor.fetchall()
+        conn.close()
+    
+        
+        template_values = {'rows': rows, }
+        template = jinja2_env.get_template('developcapability.html')
+        self.response.out.write(template.render(template_values)) 
+        
 class AjaxHandler(webapp2.RequestHandler):
     def get(self): # /ajax 
 
@@ -49,7 +138,7 @@ class AjaxHandler(webapp2.RequestHandler):
         
         conn.close()
         
-        title = 'jQuery Ajax: AjaxHandler() with Process Steps'
+        title = 'AjaxHandler(webapp2.RequestHandler):'
         template_values = {'ddb_process': ddb_process, 'ddb_proc_step': ddb_proc_step, 'title': title, }
         template = jinja2_env.get_template('base.html')
         self.response.out.write(template.render(template_values))
@@ -95,7 +184,7 @@ class jQueryJSON(webapp2.RequestHandler):
             self.response.out.write(json.dumps(data))
             return
 
-        title = "jQuery JSON Tutorial-edited: jQueryJSON from SQL using ajaxjson.html"
+        title = "jQueryJSON(webapp2.RequestHandler)"
         self.template_values = {'title': title, "t": t, 'rows': rows}
         template = jinja2_env.get_template('jQuery.html')
         self.response.out.write(template.render(self.template_values))
@@ -130,7 +219,7 @@ class ProcessDataJSON(webapp2.RequestHandler):
             self.response.out.write(processJSON)
             return
 
-        title = "jQuery JSON Tutorial: ProcessDataJSON()"
+        title = "class ProcessDataJSON(webapp2.RequestHandler)"
         self.template_values = {'title': title}
         template = jinja2_env.get_template('operateprocess.html')
         self.response.out.write(template.render(self.template_values))
@@ -167,7 +256,7 @@ class AjaxJSON(webapp2.RequestHandler):
 
         conn.close()
         
-        title = 'jQuery Ajax/JSON: From AjaxJSON() in main.py, def get'
+        title = 'class AjaxJSON(webapp2.RequestHandler):'
         template_values = {'ddb_process': ddb_process, 'ddb_proc_step': ddb_proc_step, 'title': title, }
         template = jinja2_env.get_template('ajaxjson.html')
         self.response.out.write(template.render(template_values))
@@ -190,29 +279,6 @@ class ProcessModelHandler(webapp.RequestHandler):
     # sourced from http://code-tricks.com/create-a-simple-html5-tabs-using-jquery/
     def get(self):
         self.response.out.write(jinja2_env.get_template('processmodel.html').render({}))        
-
-class PlayGroundHandler(webapp.RequestHandler):
-    def get(self):
-        
-        authenticateUser = users.get_current_user()
-        authenticateUser = str(authenticateUser)
-        
-        conn = config.get_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT DISTINCT proc_id, proc_nm, proc_step_id, proc_step_seq, proc_step_nm "
-                       "FROM vw_processes "
-                       "WHERE proc_step_status = 'active' OR proc_step_owner = %s "
-                       "ORDER BY proc_id, proc_step_seq", (authenticateUser))
-        processmenu = cursor.fetchall()
-        conn.close()
-        
-        template_values = {"processmenu": processmenu, }
-        template = jinja2_env.get_template('playground.html')
-        self.response.out.write(template.render(template_values))
-        
-class LeftNavHandler(webapp.RequestHandler):
-    def get(self):
-        self.response.out.write("jinja2_env.get_template('leftnav.html').render({})")
         
 class MemcacheTest(webapp2.RequestHandler):
 

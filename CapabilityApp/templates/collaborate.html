@@ -101,29 +101,24 @@
 <ul>
 	<li><a href="#tabs-1">Processes You Own</a></li>
 	<li><a href="#tabs-2">Processes You Operate</a></li>
-	<li><a href="#tabs-3">Process Subscriptions</a></li>
+	<li><a href="#tabs-3">Request Subscriptions</a></li>
 	<li><a href="#tabs-4">Grant Subscriptions</a></li>
-	<li><a href="#tabs-5">You</a></li>
-	<li><a href="#tabs-6">Your Team</a></li>
-	<li><a href="#tabs-7">Your Network</a></li>
+	<li><a href="#tabs-5">Your Team</a></li>
 </ul>
 <div id="tabs-1">
     <h2>Here are processes you own.</h2> 
-    UserName: {{ userName }} <br>
-    emp_id: {{ emp_id }} <br>
-    Google ID: {{ googleID }} <br>
   
-    Using Jinja2: {% for row in user|batch(1)|first() %} {{ row [1] }} {{ row [2] }} {% endfor %}
     <p>Deployment Status can be one of the following:</p>
-    <li>Local: This is your own process, perhaps on that you are prototyping to start a project.</li>
-    <li>Hold: A process in purgatory.</li>
-    <li>Retired: A post red-giant.</li>
-    <li>Zero Defect Capabable: A process that has completed all stages of Prevention and is operational within the O&M model.</li>
+    <li><b>Local:</b> This is your own process, perhaps on that you are prototyping to start a project.</li>
+    <li><b>Published:</b> A non-ZD Capable process that has been offered to be shared.</li>
+    <li><b>Hold:</b> A process in purgatory.</li>
+    <li><b>Retired:</b> A post red-giant.</li>
+    <li><b>ZD Capabable:</b> A process that has completed all stages of Prevention and is operational within the O&M model.</li>
     
     
     <br>
 			<table class=datatable align="center"> 
-				{% for group in ownerProcesses|groupby(1) %}
+				{% for group in ownerProcesses|groupby('proc_nm') %}
 				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="13" align="left">{{ group.grouper }}</th><tr>
 					<th class=datatable>Seq</th>
 					<th class=datatable>Process Step</th>
@@ -133,13 +128,13 @@
 					<th class=datatable>PONC</th>
 					<th class=datatable>EFC</th><tr>
 				    {% for row in group.list %}
-				   	 	<td width=1% align="center" >{{ row[6]|e }}
-				        <td width=10%>{{ row[7]|e }}
-				        <td width=15%>{{ row[8]|e }}
-				        <td align="center" width=5%>{{ row[10]|e }}
-				        <td align="center" width=5%>${{ row[11]|e }}
-				        <td align="center" width=5%>${{ row[12]|e }}
-				        <td align="center" width=5%>${{ row[13]|e }}<tr>
+				   	 	<td width=1% align="center" >{{ row.proc_step_seq|e }}
+				        <td width=10%>{{ row.proc_step_nm|e }}
+				        <td width=15%>{{ row.proc_step_desc|e }}
+				        <td align="center" width=5%>{{ row.proc_step_status|e }}
+				        <td align="center" width=5%>${{ row.proc_step_poc|e }}
+				        <td align="center" width=5%>${{ row.proc_step_ponc|e }}
+				        <td align="center" width=5%>${{ row.proc_step_efc|e }}<tr>
 				    {% endfor %}
 				{% endfor %}
 			</table>
@@ -147,55 +142,69 @@
 </div>
 <div id="tabs-2">
 
-    <h2>Here are your subscribed processes.</h2>
+    <h2>Here are Processes to which you are Subscribed.</h2>
     <p>This means that you have been granted access to operate the process by the Process Owner. <br><br>
     
      However, this does not mean that you are qualified to operate the process in a ZD capable manner.  You must meet the requirements to operated these processes as defined in the PMW.  In the future, the environment will help the owner and operator track and meet these requirements. Future Enhancement
     </p>
-    <br><br>
 
 			<table class=datatable align="center"> 
-				{% for group in subscribedProcesses|groupby(0) %}
+				{% for group in subscribedProcesses|groupby('proc_nm') %}
 				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="13" align="left">{{ group.grouper }}</th><tr>
 					<th class=datatable>Seq</th>
 					<th class=datatable>Process Step</th>
 					<th class=datatable>Owner</th><tr>
 				    {% for row in group.list %}
-				        <td width=1%>{{ row[2]|e }}
-				        <td width=15%>{{ row[1]|e }}
-				        <td align="center" width=10%>{{ row[3]|e }} {{ row[4]|e }}<tr>
+				        <td width=1%>{{ row.proc_step_seq|e }}
+				        <td width=15%>{{ row.proc_step_nm|e }}
+				        <td align="center" width=10%>{{ row.proc_owner }}<tr>
 				    {% endfor %}
 				{% endfor %}
 			</table>
 
 </div>
-<div id="tabs-3">
-<h2>Process Subscriptions</h2>
-    <h2>Here are your Requested processes.</h2>
-    <p>The ball is in the owner's court.  They must grant you these processes. <br><br>
-   
-    </p>
-    <br><br>
 
-			<table class=datatable align="center"> 
-				{% for group in requestedProcesses|groupby(0) %}
-				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="13" align="left">{{ group.grouper }}</th><tr>
-					<th class=datatable>Seq</th>
-					<th class=datatable>Process Step</th>
-					<th class=datatable>Owner</th><tr>
-				    {% for row in group.list %}
-				        <td width=1%>{{ row[2]|e }}
-				        <td width=15%>{{ row[1]|e }}
-				        <td align="center" width=10%>{{ row[3]|e }} {{ row[4]|e }}<tr>
-				    {% endfor %}
-				{% endfor %}
-			</table>
-			        <fieldset class=fieldsets style="width:600px; margin-right: 0%;">
+<div id="tabs-3">
+
+        <h2>Request Subscriptions</h2>
+        
+        <br><br>
+        <article class="module width_half">
+        <p>The following are required for an operator to see a process:</p>
+        <li>ZD capable or a Published Local Process</li>
+        <li>Not already in the queue for subscription approval by the Operator</li>
+        <li>Not deferred as a subscription</li>
+        <form id="RequestSubscription" action="/RequestSubscription" method="POST"> 
+                        <ul id="menuSubscription">
+                        		<input type="hidden" name="emp_id" id="emp_id" value= {{ emp_id }}></input>
+                                {% for group in availableProcesses|groupby('proc_nm') %}
+                                 <li><a href="#">{{ group.grouper }}</a><ul>
+                                 {% for row in group.list %}
+                                 <li><a href="#" proc_step_id={{ row.proc_step_id }} proc_step_nm={{ row.proc_step_nm|string() }} width="50%">{{ row.proc_step_nm }}</a></li>
+                                 {% endfor %}</ul></li>
+                                {% endfor %}
+                        </li></ul>
+                        <br><br>
+
+                <ol id="proc_step_id_value"></ol>
+                <br>
+                
+        </form>
+        </article>
+
+
+</div>
+
+<div id="tabs-4">
+
+    <h2>Here are your Requested processes.</h2>
+    <p>The ball is in the owner's court.  They must grant you these processes. </p>
+
+<fieldset class=fieldsets style="width:600px; margin-right: 0%;">
         
         <p>Query: All processes that have not been requested AND that are either ZD Capable OR published.  All other processes are local.</p>
         
-        <h2>Request Subscription to Processs</h2>
-        <br><br>
+        <h2>Grant Subscriptions</h2>
         
         <form id="GrantSubscription" action="/GrantSubscription" method="POST"> 
 			<table class=datatable align="center"> 
@@ -203,13 +212,13 @@
 					<th class=datatable>Process</th>
 					<th class=datatable>Process Step</th>
 					<th class=datatable>Requestor</th>
-					<th class=datatable>Grant</th><tr>
+					<th class=datatable>Action</th><tr>
 					
 				    {% for row in grantRequest %}
-				    	<input type="hidden" name="map_person_proc_step_id" value={{ row[0]|e }}>
-				        <td width=10%>{{ row[1]|e }}
-				        <td width=15%>{{ row[2]|e }}
-				        <td width=15%>{{ row[3]|e }} {{ row[4]|e }}
+				    	<input type="hidden" name="map_person_proc_step_id" value={{ row.map_person_proc_step_id|e }}>
+				        <td width=10%>{{ row.proc_nm|e }}
+				        <td width=15%>{{ row.proc_step_nm|e }}
+				        <td width=15%>{{ rowfirst_nm|e }}{{ row.last_nm|e }}
 				        <td width=20%><select font-size="10px" name="status">
 			                <optgroup>
 			                <option font-size="10px" value="1">Grant</option>
@@ -224,34 +233,8 @@
 				</div>
 		</form>
 </div>
-<div id="tabs-4">
 
-        <h2>Grant Subscriptions to Processes</h2>
-        <br><br>
-        
-        <form id="RequestSubscription" action="/RequestSubscription" method="POST"> 
-                        <ul id="menuSubscription">
-                        		<input type="hidden" name="emp_id" id="emp_id" value= {{ emp_id }}></input>
-                                {% for group in availableProcesses|groupby(1) %}
-                                 <li><a href="#">{{ group.grouper }}</a><ul>
-                                 {% for row in group.list %}
-                                 <li><a href="#" proc_step_id={{ row[2] }} proc_step_nm={{ row[4]|string() }}>{{ row[4] }}</a></li>
-                                 {% endfor %}</ul></li>
-                                {% endfor %}
-                        </li></ul>
-                        <br><br>
-                <ol id="proc_step_id_value"></ol>
-                <br>
-
-
-</div>
 <div id="tabs-5">
-
-</div>
-<div id="tabs-6">
-
-</div>
-<div id="tabs-7">
 	<article class="module width_full">
 		<h2>Your Network</h2>
 		 	<table class=datatable>
@@ -261,15 +244,16 @@
 			<th class=datatable width=20%>Name</th>
 			<th class=datatablewidth=10%>Email</th>
 			<th class=datatablewidth=10%>Google User ID</th><tr>
-			
 						{% for row in yourteam %}
-						<td>{{ row[0]|e }}
-						<td>{{ row[1]|e }} {{ row[2]|e }}
-						<td>{{ row[3]|e }}
-						<td>{{ row[4]|e }}<tr>
+						<td>{{ row.emp_id|e }}
+						<td>{{ row.first_nm|e }} {{ row.last_nm|e }}
+						<td>{{ row.email|e }}
+						<td>{{ row.google_user_id|e }}<tr>
 						{% endfor %}
 			</table>
+		
 	</article>
+
 </div>
 
 </div>

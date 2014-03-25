@@ -6,20 +6,15 @@
 	
 	<link rel="stylesheet" href="/stylesheets/layout.css" type="text/css" media="screen" />
 
-		<!--  <form class="quick_search">
-			<input type="text" value="Quick Search" onfocus="if(!this._haschanged){this.value=''};this._haschanged=true;">
-		</form>
-		<hr/> -->
-		
-		{% for group in featureList|groupby(0)|sort(5) %}
+
+	{% for group in featureList|groupby('app_feat_cat_0')|sort(5) %}
 		<h3>{{ group.grouper }}</h3>
 		    {% for row in group.list %}
 		    <ul class="toggle">
-			<li class={{ row[1] }}><a href={{ row[2] }}>{{ row[3] }}</a></li>
+			<li class={{ row.app_feat_0 }}><a href={{ row.app_feat_1 }}>{{ row.app_feat_2 }}</a></li>
 		    {% endfor %}
 		{% endfor %}
-		</ul>
-		
+
 
 	</footer>
 		<h3>Administration</h3>
@@ -28,3 +23,5 @@
 			<li class="icn_security"><a href="/">Log-off</a></li>
 		</ul>
 	</footer>
+
+	

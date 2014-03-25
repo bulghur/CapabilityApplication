@@ -111,8 +111,8 @@
 					<tr><td><label>Process Name</label><input type="text" name="proc_nm" style="width:50%;"><tr>
 					<tr><td><label>Process Description</label><input type="text" name="proc_desc" style="width:50%;"><tr>
 					<tr><td><label>Process Owner</label><select name="emp_id" id="emp_id">
-					{% for row in ddb_person %}
-							<option value={{ row[4]|e }}>{{ row[1]|e }}{{ row[2]|e }}</option>
+					{% for row in allUsers %}
+							<option value={{ row.google_user_id|e }}>{{ row.first_nm|e }}{{ row.last_nm|e }}</option>
 					{% endfor %}
 				</select><tr>
 					<tr><td><label>Process Start Date Picker</label><input type="text" id="datepicker" name="proc_start_dt" style="width:50%;">
@@ -136,12 +136,12 @@
 					<tr><td><label>Process Step Description</label><input type="text" name="proc_step_desc" style="width:90%;">
 					<td><label>Parent Process</label><select name="proc_id">
 					{% for row in ddb_process %}
-							<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
+							<option value={{ row.proc_id|e }}>{{ row.proc_nm|e }}</option>
 					{% endfor %}
 				</select><tr>
 					<td><label>Process Owner</label><select name="owner" id="owner">
-					{% for row in ddb_person %}
-							<option value={{ row[4]|e }}>{{ row[1]|e }}{{ row[2]|e }}</option>
+					{% for row in allUsers %}
+							<option value={{ row.google_user_id|e }}>{{ row.first_nm|e }}{{ row.last_nm|e }}</option>
 					{% endfor %}
 				</select><tr>
 					<td><label>Process Step SOP</label><input type="text" name="proc_step_sop" style="width:90%;">
@@ -162,12 +162,11 @@
 		<fieldset style="width:100%; float:left;"> 		
 			<form action="/postrequirement" method="POST">
 				<table>
-					<tr><td><label>Requirement Name</label><input type="text" name="proc_req_nm" style="width:25%;"><tr>
 					<tr><td><label>Requirement Description</label><input type="text" name="proc_req_desc" style="width:25%;"><tr>
 					<tr><td><label>Sequence</label><input type="text" name="proc_req_seq" style="width:25%;"><tr>
 					<tr><td><label>Process Step</label><select name="proc_step_id">
 					{% for row in ddb_processsteps %}
-							<option value={{ row[0]|e }}>{{ row[1]|e }}</option>
+							<option value={{ row.proc_step_id|e }}>{{ row.proc_step_nm|e }}</option>
 					{% endfor %}
 				</select>
 				<td><input type="submit" value="Create Requirement">
@@ -195,9 +194,9 @@
 	<article class="module width_full">
 		<label><h2>PCA ZD Capable Processes</h2></label>
 			<table class=datatable align="center"> 
-				{% for group in processlist|groupby(1) %}
+				{% for group in zdProcesses|groupby('proc_nm') %}
 				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="7" align="left">{{ group.grouper }}</th><tr>
-				    {% for group in group.list|groupby(6)  %}
+				    {% for group in group.list|groupby('proc_step_seq')  %}
 				    <th colspan="7" align="left">{{ group.grouper }}</th><tr>
 				    <th class=datatable>Seq</th>
 				    <th class=datatable>Process Step</th>
@@ -207,13 +206,13 @@
 					<th class=datatable>Requirement Description</th>
 					<th class=datatable>Process Owner</th><tr>
 					    {% for row in group.list %}
-					    	<td width=1% align="center">{{ row[6]|e }}
-					        <td width=10%>{{ row[7]|e }}
-					        <td width=20%>{{ row[8]|e }}
-					        <td width=1% align="center">{{ row[17]|e }}
-					        <td width=10%>{{ row[15]|e }}
-					        <td width=40%>{{ row[16]|e }}
-					        <td width=2%>{{ row[9]|e }}<tr>
+					    	<td width=1% align="center">{{ row.proc_step_seq|e }}
+					        <td width=10%>{{ row.proc_step_nm|e }}
+					        <td width=20%>{{ row.proc_step_desc|e }}
+					        <td width=1% align="center">{{ row.proc_step_seq|e }}
+					        <td width=10%>{{ row.proc_req_nm|e }}
+					        <td width=40%>{{ row.proc_req_desc|e }}
+					        <td width=2%>{{ row.proc_step_owner|e }}<tr>
 					    {% endfor %}
 					{% endfor %}  
 				{% endfor %}
@@ -224,9 +223,9 @@
 	<article class="module width_full">
 		<label><h2>Your Local Processes</h2></label>
 			<table class=datatable align="center"> 
-				{% for group in localprocesslist|groupby(1) %}
+				{% for group in localprocesslist|groupby('proc_nm') %}
 				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="7" align="left">{{ group.grouper }}</th><tr>
-				    {% for group in group.list|groupby(6)  %}
+				    {% for group in group.list|groupby('proc_step_seq')  %}
 				    <th colspan="7" align="left" !important color="2A2A2A" font-color="white" font-size="1.5em">{{ group.grouper }}</th><tr>
 				    <th class=datatable>Seq</th>
 				    <th class=datatable>Process Step</th>
@@ -236,13 +235,13 @@
 					<th class=datatable>Requirement Description</th>
 					<th class=datatable>Local Owner</th><tr>
 					    {% for row in group.list %}
-					    	<td width=1% align="center">{{ row[6]|e }}
-					        <td width=10%>{{ row[7]|e }}
-					        <td width=20%>{{ row[8]|e }}
-					        <td width=1% align="center">{{ row[17]|e }}
-					        <td width=10%>{{ row[15]|e }}
-					        <td width=40%>{{ row[16]|e }}
-					        <td width=2%>{{ row[9]|e }}<tr>
+					    	<td width=1% align="center">{{ row.proc_step_seq|e }}
+					        <td width=10%>{{ row.proc_step_nm|e }}
+					        <td width=20%>{{ row.proc_step_desc|e }}
+					        <td width=1% align="center">{{ row.proc_req_seq|e }}
+					        <td width=10%>{{ row.proc_req_nm|e }}
+					        <td width=40%>{{ row.proc_req_desc|e }}
+					        <td width=2%>{{ row.proc_step_owner|e }}<tr>
 					    {% endfor %}
 					{% endfor %}  
 				{% endfor %}

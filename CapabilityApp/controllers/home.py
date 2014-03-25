@@ -25,12 +25,12 @@ class MainPageHandler(webapp.RequestHandler): #This is messy coding -- clean it 
             authenticateUser = str(users.get_current_user()) 
             featureList = database.gaeSessionNavBuilder()
             user = database.gaeSessionUser()
-            emp_id = user[0][0]
+            emp_id = str(user[0]['emp_id']), user[0]['first_nm']
                         
             conn = config.get_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT proc_id, proc_nm, SUM(proc_step_conf), COUNT(proc_id), SUM(proc_step_conf)/COUNT(proc_id) AS conformance_rate, "
-                           "SUM(proc_ponc), SUM(proc_poc), SUM(proc_efc) "
+            cursor.execute("SELECT proc_id, proc_nm, SUM(proc_step_conf) AS sum_conf, COUNT(proc_id) AS count, SUM(proc_step_conf)/COUNT(proc_id) AS conformance_rate, "
+                           "SUM(proc_ponc) AS ponc, SUM(proc_poc) AS poc, SUM(proc_efc) "
                            "FROM `capability`.`vw_proc_run_sum` "
                            "WHERE proc_run_start_tm > (NOW() - INTERVAL 7 DAY)"
                            "GROUP BY proc_id") 

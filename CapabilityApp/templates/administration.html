@@ -1,0 +1,125 @@
+    <!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8"/>
+	<title>Philip Crosby Associates</title>
+	
+	<link rel="stylesheet" href="/stylesheets/layout.css" type="text/css" media="screen" />
+	<!--[if lt IE 9]>
+	<link rel="stylesheet" href="css/ie.css" type="text/css" media="screen" />
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<script src="js/jquery-1.5.2.min.js" type="text/javascript"></script>
+	<script src="js/hideshow.js" type="text/javascript"></script>
+	<script src="js/jquery.tablesorter.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="js/jquery.equalHeight.js"></script>
+	<script type="text/javascript"> 
+	$(document).ready(function() 
+    	{ 
+		      	  $(".tablesorter").tablesorter(); 
+		   	 } 
+			);
+			$(document).ready(function() {
+		
+			//When page loads...
+			$(".tab_content").hide(); //Hide all content
+			$("ul.tabs li:first").addClass("active").show(); //Activate first tab
+			$(".tab_content:first").show(); //Show first tab content
+		
+			//On Click Event
+			$("ul.tabs li").click(function() {
+		
+				$("ul.tabs li").removeClass("active"); //Remove any "active" class
+				$(this).addClass("active"); //Add "active" class to selected tab
+				$(".tab_content").hide(); //Hide all tab content
+		
+				var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
+				$(activeTab).fadeIn(); //Fade in the active ID content
+				return false;
+			});
+		
+		});
+    </script>
+	<script>
+	function CurrencyFormatted(amount) {
+		var i = parseFloat(amount);
+		if(isNaN(i)) { i = 0.00; }
+		var minus = '';
+		if(i < 0) { minus = '-'; }
+		i = Math.abs(i);
+		i = parseInt((i + .005) * 100);
+		i = i / 100;
+		s = new String(i);
+		if(s.indexOf('.') < 0) { s += '.00'; }
+		if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+		s = minus + s;
+		return s;
+	}
+	</script>
+<script>
+    <script type="text/javascript">
+    $(function(){
+        $('.column').equalHeight();
+    });
+</script>
+	 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<script>
+		$(function() {
+		$( "#tabs" ).tabs({active: 0});
+		});
+	</script>
+</head>
+<body>  
+
+<div class="clear"></div>
+<div id="tabs">
+<ul>
+	<li><a href="#tabs-1">Process Subscription Summary</a></li>
+	<li><a href="#tabs-2">Feature Enablement by Person</a></li>
+
+</ul>
+<div id="tabs-1"> 
+ <article class="module width_quarter">   
+    
+    <h2>Process Subscription Summary</h2>
+			<table class=datatable align="center"> 
+			{% for proc_nm, proc_nm_group in operatorSubscriptions|groupby('proc_nm') %}
+			<th class=datatable id="group1_header" style="color: #FFFFFF" colspan="2" align="left">{{ proc_nm }}</th><tr>
+			{% for proc_step_nm, list in proc_nm_group|groupby('proc_step_nm') %}
+			<th class=datatable id="group2_header" style="color: #FFFFFF"  align="left">{{ proc_step_nm|e }}</th><tr>	
+				<th class=datatable>Operators</th><tr>
+					{% for row in list %}
+					<td align="left" width=10%>{{ row.first_nm|e }} {{ row.last_nm|e }}<tr>	
+					{% endfor %}
+			{% endfor %}
+			{% endfor %}
+			</table>
+</article>
+</div>
+<div id="tabs-2"> 
+
+
+    <h2>Application Features Enablement by Person (Active Features Only)</h2>
+			<table class=datatable align="center" width: "30%"> 
+			{% for last_nm, last_nm_group in operatorFeatures|groupby('last_nm') %}
+			<th class=datatable id="group1_header" style="color: #FFFFFF" colspan="2" align="left">{{ last_nm }}</th><tr>
+			{% for app_feat_cat_0, list in last_nm_group|groupby('app_feat_cat_0') %}
+			<th class=datatable id="group2_header" style="color: #FFFFFF"  align="left">{{ app_feat_cat_0|e }}</th><tr>
+				<th class=datatable>app_feat_2<tr>
+					{% for row in list %}
+					<td width=30%>{{ row.app_feat_2|e }}<tr>
+					{% endfor %}
+			{% endfor %}
+			{% endfor %}
+				</table>
+			</table>
+
+</div>
+
+</div>
+</body>
+</html>

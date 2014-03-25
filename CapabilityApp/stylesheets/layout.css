@@ -436,14 +436,14 @@ float: left;
 }
 
 .width_quarter {
-width: 26%;
+width: 23%;
 margin-right: 0;
 float: left;
 }
 
 .width_3_quarter {
 width: 66%;
-margin-right: 0;
+margin-right: 1;
 float: left;
 }
 
@@ -549,19 +549,31 @@ padding: 15px 10px;
 .datatable th { padding: .5em 0 .5em;
 	padding: 10;
 	background-color: #D1D1D1;
-	border-top: 1px solid #C8C8C8 thin;
+	border-top: 1px solid  	#888888 thin;
 	border-bottom: solid #C8C8C8 thin;
 	margin-left:50px;
 	margin-right:50px;
 }
 
 #group1_header 
-  { font-size: 1.45em;
+  { font-size: 1.25em;
   	padding: .5em 0 .5em;
 	padding: 10;
-	background-color: #282828;
-	border-top: 1px solid #C8C8C8 thin;
-	border-bottom: solid #C8C8C8 thin;
+	background-color: #666666;
+	border-top: 1px solid #666666 thin;
+	border-bottom: solid #666666 thin;
+	margin-left:50px;
+	margin-right:50px;
+}
+
+#group2_header 
+  { font-size: 1em;
+  	padding: .5em 0 .5em;
+  	text-indent:10px;
+	padding: 20;
+	background-color: #888888;
+	border-top: 1px solid #888888 thin;
+	border-bottom: solid #888888 thin;
 	margin-left:50px;
 	margin-right:50px;
 }
@@ -569,6 +581,7 @@ padding: 15px 10px;
 .datatable groupheader { padding: .5em 0 .5em;
 	padding: 10;
 	font-size:16px;
+	text-indent:20px;
 	background-color: gray;
 	border-top: 1px solid #C8C8C8 thin;
 	border-bottom: solid #C8C8C8 thin;
@@ -775,7 +788,7 @@ fieldset {
 border-radius: 5px;
 background: #F6F6F6;
 border: 1px solid #ccc;
-padding: 1% 0%;
+padding: 5% 5%;
 margin: 10px 0;
 }
 

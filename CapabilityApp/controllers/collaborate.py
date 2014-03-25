@@ -32,13 +32,17 @@ class CollaborationHandler(webapp.RequestHandler):
         
         authenticateUser = str(users.get_current_user()) 
         user = database.gaeSessionUser()
-        userName = user[0][1:5]
-        emp_id = user[0][0]
-        googleID = user[0][4]
+        userName = user[0]['first_nm'] + user[0]['last_nm']
+        emp_id = user[0]['emp_id']
+        googleID = user[0]['google_user_id']
         featureList = database.gaeSessionNavBuilder()
         processmenu = database.gaeSessionProcessMenu()
+        hold = database.gaeSessionActiveCase()
         
-        cursor.execute("SELECT * FROM vw_processes WHERE proc_owner = %s ", (authenticateUser))        
+        cursor.execute("SELECT DISTINCTROW * "
+                       "FROM vw_processes "
+                       "WHERE proc_owner = %s "
+                       "GROUP BY proc_step_id ", (authenticateUser))        
         ownerProcesses = cursor.fetchall()     
 
         cursor.execute("SELECT DISTINCT vw_processes.proc_nm, vw_processes.proc_step_nm, vw_processes.proc_step_seq, vw_processes.proc_owner, "
@@ -68,8 +72,8 @@ class CollaborationHandler(webapp.RequestHandler):
  
         cursor.execute("SELECT DISTINCT proc_id, proc_nm, proc_step_id, proc_step_seq, proc_step_nm, proc_step_status "
                        "FROM vw_processes "
-                       "WHERE (proc_step_id NOT IN (SELECT proc_step_id FROM map_person_proc_step where emp_id= %s )) "
-                       "AND (vw_processes.proc_step_status = 'ZD Capable' OR vw_processes.proc_step_status = 'published') ", (emp_id))     
+                       "WHERE (vw_processes.proc_step_status = 'ZD Capable' OR vw_processes.proc_step_status = 'published') "
+                       "AND proc_step_id NOT IN (SELECT proc_step_id FROM map_person_proc_step where emp_id= %s ) " , (emp_id)) 
         availableProcesses = cursor.fetchall() 
                        
         cursor.execute("SELECT * FROM person")                 
@@ -80,10 +84,51 @@ class CollaborationHandler(webapp.RequestHandler):
         template_values = {'authenticateUser': authenticateUser, 'featureList': featureList, 'processmenu': processmenu, 
                            'user': user, 'userName': userName, 'emp_id': emp_id, 'googleID': googleID, 
                            'ownerProcesses': ownerProcesses, 'subscribedProcesses': subscribedProcesses, 'yourteam': yourteam,
-                           'requestedProcesses': requestedProcesses, 'grantRequest': grantRequest, 'availableProcesses': availableProcesses}
+                           'requestedProcesses': requestedProcesses, 'grantRequest': grantRequest, 'availableProcesses': availableProcesses }
         template = jinja2_env.get_template('collaborate.html')
         self.response.out.write(template.render(template_values))
 
+
+        
+class RequestSubscription(webapp.RequestHandler):
+   def post(self):
+        emp_id = self.request.get('emp_id')
+        proc_step_id = self.request.get('proc_step_id')
+        
+        conn = config.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO map_person_proc_step (proc_step_id, emp_id, status) "
+                       "VALUES(%s, %s, %s) ",
+                       (
+                        (proc_step_id),
+                        (emp_id),
+                        (0) #set initial value of submitted for submission to be granted. 
+                        ))
+        conn.commit()
+        
+        self.redirect("/CollaborationHandler")
+        
+class GrantSubscription(webapp.RequestHandler):
+    '''
+    This handler displays requested subscriptions for the Owner to grant.
+    '''
+    def post(self):
+        map_person_proc_step_id = self.request.get('map_person_proc_step_id')
+        status = self.request.get('status')
+        
+        conn = config.get_connection()
+        cursor = conn.cursor()
+        
+        if status is 1: # Grant
+            cursor.execute("UPDATE map_person_proc_step SET status = %s WHERE map_person_proc_step_id = %s ", (status, map_person_proc_step_id))
+            conn.commit()
+        else: #Deny and remove request from the queue
+            cursor.execute("DELETE FROM map_person_proc_step "
+            "WHERE map_person_proc_step_id = %s ", (map_person_proc_step_id ))
+            conn.commit()
+            
+        self.redirect("/CollaborationHandler")
+        
 class PostPerson(webapp.RequestHandler):
     def post(self): # post to DB
         
@@ -128,39 +173,4 @@ class YourProfile(webapp2.RequestHandler):
                
         template_values = {'yourprofile': yourprofile, 'yourteam': yourteam}
         template = jinja2_env.get_template('collaborate.html')
-        self.response.out.write(template.render(template_values))
-        
-class RequestSubscription(webapp.RequestHandler):
-   def post(self):
-        emp_id = self.request.get('emp_id')
-        proc_step_id = self.request.get('proc_step_id')
-        
-        conn = config.get_connection()
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO map_person_proc_step (proc_step_id, emp_id, status) "
-                       "VALUES(%s, %s, %s) ",
-                       (
-                        (proc_step_id),
-                        (emp_id),
-                        (0)
-                        ))
-        conn.commit()
-        
-        self.redirect("/CollaborationHandler")
-        
-class GrantSubscription(webapp.RequestHandler):
-    '''
-    This handler displays requested subscriptions for the Owner to grant.
-    '''
-    def post(self):
-        map_person_proc_step_id = self.request.get('map_person_proc_step_id')
-        status = self.request.get('status')
-        
-        conn = config.get_connection()
-        cursor = conn.cursor()
-        cursor.execute("UPDATE map_person_proc_step SET status = %s WHERE map_person_proc_step_id = %s ", (status, map_person_proc_step_id))
-        conn.commit()
-        
-        self.redirect("/CollaborationHandler")
-        
-            
+        self.response.out.write(template.render(template_values))            

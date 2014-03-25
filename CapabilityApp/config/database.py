@@ -25,17 +25,44 @@ def queryUser():
     conn.close()
     return user
 
-def gaeSessionUser(): #if the Memcache is empty, load it with the query data
+def gaeSessionUser(): 
     session = get_current_session()
     user = session.get('user')
   
     if user is '':
         user = queryUser()
         session.set_quick('user', user)
+    elif user is None:
+        user = queryUser()
+        session.set_quick('user', user)
     else:
         user
 
     return user
+
+def queryAllUsers(): 
+    #This generates a dict of all users
+    conn = config.get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM person") 
+    allUsers = list(cursor.fetchall())
+    conn.close()
+    return allUsers
+
+def gaeAllUsers(): 
+    session = get_current_session()
+    allUsers = session.get('allUsers')
+  
+    if allUsers is '':
+        allUsers = queryAllUsers()
+        session.set_quick('allUsers', allUsers)
+    elif allUsers is None:
+        allUsers = queryAllUsers()
+        session.set_quick('allUsers', allUsers)
+    else:
+        allUsers
+
+    return allUsers
 
 def queryNavBuilder(): 
     #This generates the leftnav features dependent on user rights on the application.
@@ -52,11 +79,14 @@ def queryNavBuilder():
     conn.close()
     return navList
 
-def gaeSessionNavBuilder(): #if the Memcache is empty, load it with the query data
+def gaeSessionNavBuilder():
     session = get_current_session()
     navList = session.get('navList')
   
     if navList is '':
+        navList = queryNavBuilder()
+        session.set_quick('navList', navList)
+    elif navList is None:
         navList = queryNavBuilder()
         session.set_quick('navList', navList)
     else:
@@ -65,7 +95,8 @@ def gaeSessionNavBuilder(): #if the Memcache is empty, load it with the query da
     return navList 
     
 def queryProcessMenu():     
-    emp_id = gaeSessionUser()[0][0]
+    emp_id = gaeSessionUser()[0]['emp_id']
+    
     conn = config.get_connection()
     cursor = conn.cursor() 
 
@@ -80,11 +111,14 @@ def queryProcessMenu():
     conn.close()
     return processmenu  
 
-def gaeSessionProcessMenu(): #if the Memcache is empty, load it with the query data
+def gaeSessionProcessMenu():
     session = get_current_session()
     processmenu = session.get('processmenu')        
 
     if processmenu is '':
+        processmenu = queryProcessMenu()
+        session.set_quick('processmenu', processmenu)
+    elif processmenu is None:
         processmenu = queryProcessMenu()
         session.set_quick('processmenu', processmenu)
     else:
@@ -112,6 +146,9 @@ def gaeSessionActiveCase():
     if ddb_active_case is '':
         ddb_active_case = queryActiveCase()
         session.set_quick('ddb_active_case', ddb_active_case)
+    elif ddb_active_case is None:
+        ddb_active_case = queryActiveCase()
+        session.set_quick('ddb_active_case', ddb_active_case)
     else:
         ddb_active_case
                
@@ -130,7 +167,6 @@ def queryOpenOperations():
     return openoperations
     
 def gaeSessionOpenOperations():
-    authenticateUser = str(users.get_current_user())
     session = get_current_session()
     openoperations = session.get('openoperations')
     
@@ -146,6 +182,26 @@ def gaeSessionOpenOperations():
                
     return openoperations
 
+def cacheFilter(dataSource, constraint, searchColumn ):
+    outerRow = {}
+    innerRow = {}
+    resultSet = {}
+    columns = {}
+    row = 0
+    while row < len(dataSource):
+        #if constraint in dataSource[row][searchColumn]:
+        if dataSource[row][searchColumn] == constraint:
+            columns = dataSource[0].keys()
+            c = 0
+            while c < len(columns):
+                innerRow[columns[c]] = dataSource[row][columns[c]] 
+                outerRow[row] = dict(innerRow)
+                c += 1
+            resultSet = outerRow.values()
+        row += 1
+    return resultSet
+    
+
 def query(query, condition1):  #this is the sample pattern
     #this is a test form of centralising a query
        
@@ -159,45 +215,27 @@ def query(query, condition1):  #this is the sample pattern
     
     return dbResults
 
-class MemcacheTest(webapp2.RequestHandler):
+######***********************    MEMCACH    ***********************######
 
-    def queryBuilder(self): # this is the query
-        authenticateUser = str(users.get_current_user())
+def memcacheProcesses(self): #if the Memcache is empty, load it with the query data
+    client = memcache.Client()
+    allProcesses = client.get('allProcesses')
+    
+    if allProcesses is not None:
+        pass
+    else:
+        #allProcesses = queryProcesses1(self)
         conn = config.get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT proc_nm, proc_desc, proc_owner, proc_status, proc_step_id, proc_step_seq, proc_step_nm, proc_step_desc, "
-                       "proc_step_owner, proc_step_status, proc_req_id, proc_req_nm, proc_req_desc, "
-                       "proc_req_seq, proc_req_status "
-                       " FROM vw_processes "
-                       "WHERE proc_id = 15") 
-        memQuery = cursor.fetchall()
+        cursor.execute("SELECT * FROM vw_processes") 
+        allProcesses = cursor.fetchall()
         conn.close()
-        return memQuery
-
-    def memcacheBuilder(self): #if the Memcache is empty, load it with the query data
-        client = memcache.Client()
-        memQuery = client.get('memQuery')
-        
-        if memQuery is not None:
-            pass
-        else:
-            memQuery = self.queryBuilder()
-            client.add('memQuery', memQuery, 120)
-        
-        return memQuery
-
+        return allProcesses
+        client.add('allProcesses', allProcesses, 120)
     
-    def get(self):
-        memQuery = self.queryBuilder()
-        generatedData = self.queryBuilder()
-        memcacheData = self.memcacheBuilder()
-        
-        generatedList = list(generatedData)
-        generatedList1 = memQuery[2][1]
-        
-        template_values = {'generatedData': generatedData, 'memcacheData': memcacheData, 'generatedList1': generatedList1}
-        template = jinja2_env.get_template('memcache.html')
-        self.response.out.write(template.render(template_values))
+    return allProcesses
+
+
 '''
 def sumProblemString(x, y):
     sum = x + y

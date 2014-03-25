@@ -1,38 +1,61 @@
 #    Centralised configuration
-
+import cgi
+import webapp2
+from google.appengine.ext.webapp.util import run_wsgi_app
+import os
 import datetime
 import time
 from google.appengine.api import rdbms
+import MySQLdb, MySQLdb.cursors
 '''
 Configure
 1. Change from Local to the appropriate CLOUD SQL instance
 2. Change the password
 3. Update the Yaml File: 
 Version 1 for production, or 2 for dev
+'''
+'''
 
-
-'''
-#Database Connections: LOCAL
-CLOUDSQL_INSTANCE = 'MySQL56'
-HOST = 'localhost'
-DATABASE_NAME = 'capability'
-USER_NAME = 'root'
-PASSWORD = ''
-'''
-#Database Connections: CLOUD
-CLOUDSQL_INSTANCE = 'pca-dev-capability:capability' # 'noble-freehold-326:learndb' OR 'pca-dev-capability:capability'
-DATABASE_NAME = 'capability'
-HOST = 'localhost'
-USER_NAME = 'root'
-PASSWORD = '' 
-'''
-def get_connection():
-    return rdbms.connect(instance=CLOUDSQL_INSTANCE, 
-                         database=DATABASE_NAME, 
-                         user=USER_NAME, 
-                         password=PASSWORD, 
+def get_connection(): #Database Connections: Local
+    return rdbms.connect(instance='MySQL56', 
+                         host='127.0.0.1', #'localhost' 
+                         port=3306, 
+                         database='capability', 
+                         user='root', 
+                         password='cDnfom100!', #coldDaring
                          charset='utf8', 
-                         use_unicode = True)
+                         use_unicode = True, 
+                         cursorclass=MySQLdb.cursors.DictCursor)
+'''
+def get_connection(): #Database Connections: CLOUD
+        return MySQLdb.connect(unix_socket='/cloudsql/' + 'pca-dev-capability:capability', 
+                               db='capability', 
+                               user='root', 
+                               passwd= '5Ab$olutes', #5A$
+                               charset='utf8', 
+                               use_unicode = True, 
+                               cursorclass=MySQLdb.cursors.DictCursor)
+
+'''
+def get_connection(): #USE FOR DEVELOPMENT BUT DEPLOY USING: Database Connections: CLOUD 
+    #db = MySQLdb.connect(unix_socket='/cloudsql/' + _INSTANCE_NAME, db='guestbook', user='root')
+    if (os.getenv('SERVER_SOFTWARE') and os.getenv('SERVER_SOFTWARE').startswith('Google App Engine/')):
+        return MySQLdb.connect(unix_socket='/cloudsql/' + 'pca-dev-capability:capability', 
+                               db='capability', 
+                               user='root', 
+                               passwd= '5Ab$olutes', #5A$
+                               charset='utf8', 
+                               use_unicode = True, 
+                               cursorclass=MySQLdb.cursors.DictCursor)
+    else:
+        return MySQLdb.connect(host='127.0.0.1', 
+                               port=3306, user='root', 
+                               passwd='cDnfom100!', 
+                               db='capability', 
+                               charset='utf8', 
+                               use_unicode = True, 
+                               cursorclass=MySQLdb.cursors.DictCursor)
+'''
 # Tools
 def UTCTime():
     rawNow = datetime.datetime.now()
