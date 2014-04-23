@@ -14,7 +14,6 @@ Configure
 3. Update the Yaml File: 
 Version 1 for production, or 2 for dev
 '''
-'''
 
 def get_connection(): #Database Connections: Local
     return rdbms.connect(instance='MySQL56', 
@@ -36,7 +35,7 @@ def get_connection(): #Database Connections: CLOUD
                                use_unicode = True, 
                                cursorclass=MySQLdb.cursors.DictCursor)
 
-'''
+
 def get_connection(): #USE FOR DEVELOPMENT BUT DEPLOY USING: Database Connections: CLOUD 
     #db = MySQLdb.connect(unix_socket='/cloudsql/' + _INSTANCE_NAME, db='guestbook', user='root')
     if (os.getenv('SERVER_SOFTWARE') and os.getenv('SERVER_SOFTWARE').startswith('Google App Engine/')):
