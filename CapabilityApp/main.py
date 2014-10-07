@@ -11,7 +11,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.api import users
 from google.appengine.api import memcache
-from controllers import collaborate, design, home, measure, operate, utilities, playground, reviewprocess
+from controllers import collaborate, design, home, measure, operate, utilities, playground, reviewprocess, ndbtest
 from config import *
 
 # Paths and Jinja2
@@ -120,7 +120,9 @@ application = webapp.WSGIApplication(
         ("/TestJinja2", playground.TestJinja2),
         ("/ajax", playground.AjaxHandler),
         ("/ajaxjson", playground.AjaxJSON),
-        ("/jQueryJSON", playground.jQueryJSON)
+        ("/jQueryJSON", playground.jQueryJSON),
+        ('/NDBMainPage', ndbtest.NDBMainPage),
+        ('/Greeting', ndbtest.Guestbook)
         
     ],
     debug=True

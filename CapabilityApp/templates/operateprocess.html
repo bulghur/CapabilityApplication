@@ -163,9 +163,9 @@
 			<ul>
 				<li><b>Process Case: </b>{{ row.case_id|e }} - {{ row.case_nm|e }}</li>
 				<li><b>Process Instance: </b>{{ row.instance_key|e }}</li>
-				<li><b>Link to SOP: </b><a href={{ row.proc_step_sop|e }} target="_blank">Click here for SOP</a></li>
-				<li><b>Link to Local SOP (under construction): </b><a href={{ row.proc_step_sop|e }} target="_blank">Click here for Personal SOP</a></li>
-				<li><b>Link to Process Model Worksheet: </b><a href={{ row.proc_model_link|e }} target="_blank">Click here for PMW</a></li>
+				<li><b>Link to SOP: </b><a href={{ row.proc_step_sop|e }} target="_blank">{{ row.proc_step_sop|e }}</a></li>
+				<li><b>Link to Local SOP (under construction): </b><a href={{ row.proc_step_sop|e }} target="_blank">{{ row.proc_step_sop|e }}</a></li>
+				<li><b>Link to Process Model Worksheet: </b><a href={{ row.proc_model_link|e }} target="_blank">{{ row.proc_model_link|e }}</a></li>
 	
 			{% endfor %}
 			</ul>

@@ -108,25 +108,57 @@
 </ul>
 <div id="tabs-1">
 
-columns: {{ columns }}<br>
-columnLen: {{ columnLen }}<br>
 
-     
+columnkeys: {{ columnNames }}<br>
+columnRow: {{ columnRow }}<br> 
+
+    <form action="/Greeting?%s" method="post">
+      <div><textarea name="proc_nm" rows="3" cols="60"></textarea></div>
+      <div><input type="submit" value="Enter Process"></div>
+    </form>
+
+    <hr>
+
+    <form>Process Name:
+      <input value="%s" name="proc_nm">
+      <input type="submit" value="switch">
+    </form>
+
+    <a href="%s">%s</a>
+<table class=datatable align="center">     
+<th class=datatable id="group_header" style="color: #FFFFFF" colspan="5" align="left"></th><tr>
+	<th class=datatable>Process</th>
+	<th class=datatable>Proc Desc</th>
+	<th class=datatable>Proc Name</th>
+	<th class=datatable>Owner</th><tr>
+	
+	{% for row in processes %}
+	<td align="center" width=5%>{{row.Process|e}}</th>
+	<td align="center" width=5%>{{row.proc_desc|e}}</th>
+	<td align="center" width=5%>{{row.proc_nm|e}}</th>
+	<td align="center" width=5%>{{row.proc_step_owner|e}}</th><tr>
+	{% endfor %}
+	</table>
+	
+
+
+	
+
+    
+
+  </body>
+</html>
 
     
     <br>
 			<table class=datatable align="center"> 
-				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="13" align="left"></th><tr>
-					<th class=datatable>Proc ID</th>
-					<th class=datatable>Scope</th>
-					<th class=datatable>Process</th>
-					<th class=datatable>Requirement</th><tr>
-				    {% for row in resultSet %}
-				   	 	<td width=5%>{{ row.proc_id|e }}
-				   	 	<td width=10%>{{ row.proc_nm|e }} {{ row.proc_step_nm|e }}
-				   	 	<td width=10%>{{ row.proc_step_owner|e }}
-				   	 	<td width=10%>{{ row.proc_req_desc|e }}<tr>
-				    {% endfor %}
+				    <th class=datatable id="group1_header" style="color: #FFFFFF" colspan="{{ columnRow}}" align="left"></th><tr>
+				    {% for item in columnNames %}
+					<th class=datatable>{{item}}</th>
+					{% endfor %}<tr>
+					
+					
+
 			</table>
 
 
